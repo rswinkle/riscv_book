@@ -54,7 +54,7 @@ main:
 	li   a7, 1  # print int
 	mv   a0, t0  # a1 = age + height
 	ecall
-	
+
 	# print newline
 	li   a7, 11   # print char
 	li   a0, 10   # ascii value of '\n'

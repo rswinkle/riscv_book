@@ -1,0 +1,32 @@
+# Object files
+*.o
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# misc
+*.c
+*~
+*.kate-swp
+CMakeFiles/*
+CMakeCache.txt
+cmake_install.cmake
+stats/*
+!build/Makefile
+!build/*.make
+*.swp
+
+# at least until the book is in a more stable state
+build/*.html

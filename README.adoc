@@ -1,0 +1,38 @@
+= RISC-V Assembly Programming
+
+This repo is the workspace of a book on RISC-V assembly programming written
+in asciidoc.
+
+== Download
+Get the source from https://github.com/rswinkle/riscv_book[Github].
+
+
+The pre-built book is available in the root directory as both an all-in-one
+html page and a pdf and they're also available on my website:
+
+http://www.robertwinkler.com/projects/riscv_book/riscv_book.html[HTML Page]
+
+http://www.robertwinkler.com/projects/riscv_book/riscv_book.pdf[PDF]
+
+== Code
+You can get all code seen or mentioned in the book in the
+https://github.com/rswinkle/riscv_book/tree/main/code[code] directory.
+
+== Exercise Solutions
+You can support the book by purchasing the chapter exercise solutions
+https://store.robertwinkler.com/[here].
+
+== Contact Me/Tutoring
+If you're interested in contacting me regarding assembly tutoring or any other
+business request related to the book, you can reach me at mips at robertwinkler dot com.
+
+== License
+
+The book (all adoc files and final generated pdf/html) is under a
+https://creativecommons.org/licenses/by-nc-sa/4.0/[Creative Commons License].
+
+The separate code files in the code subdirectory are under the MIT license.
+
+
+
+

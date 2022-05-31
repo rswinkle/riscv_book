@@ -1,0 +1,30 @@
+
+=== Exercises
+
+include::../support.adoc[]
+
+. Create a MIPS data section that declares variables equivalent to the following.  This will not be a runnable program without a main.
++
+[source,c,linenums]
+----
+	float a;
+	float b = 2.71;
+	int myarray[10] = { 9, 8, 7, 6, 5, 4, 3, 2, 1 };
+	short array2[10];
+
+	char mips_str[] = "MIPS assembly is awesome!";
+----
+
+. How would you declare an array of 500 points?  The point structure is tightly
+packed and defined like this:
++
+[source,c,linenums]
+----
+struct point {
+	float x;
+	float y;
+	float z;
+};
+----
+
+

@@ -1,0 +1,150 @@
+
+== Chapter 1: Data
+
+In MIPS, you can declare global variables in the `.data` section.
+
+At a minimum, this is where you would declare/define any literal strings
+your program will be printing, since virtually every program has
+at least 1 or 2 of those.
+
+When declaring something in the `.data` section, the format is
+
+`variable_name: .directive value(s)`
+
+where whitespace between the 3 is arbitrary.  The possible directives are listed
+in the following table:
+
+.MIPS data types
+[cols="1,1,2"]
+|===
+| Directive | Size | C equivalent
+
+| .byte | 1 | char
+
+| .half | 2 | short
+
+| .word | 4 | int, all pointer types
+
+| .float | 4 | float
+
+| .double | 8 | double
+
+| .ascii | NA | char str[5] = "hello"; (no '\0')
+
+| .asciiz | NA | char str[] = "hello"; (includes the '\0')
+
+| .space  | NA | typeless, unitinialized space, can be used for any type/array
+|===
+
+
+As you can see it's pretty straightforward, but there are a few more details
+about actually using them so let's move onto some examples.
+
+Say you wanted to convert the following simple program to MIPS:
+
+[source,c,linenums]
+----
+#include <stdio.h>
+
+int main()
+{
+	char name[30];
+	int age;
+	printf("What's your name and age?\n");
+	scanf("%s %d", name, &age);
+	printf("Hello %s, nice to meet you!\n", name);
+	return 0;
+}
+----
+
+The first thing you have to remember is that when converting from a higher level
+language to assembly (any assembly) is that what matters is whether it's functionally
+the same, not that everything is done in exactly the same way.  In this instance,
+that means realizing that your literal strings and your local variables `name`
+and `age` become globals in MIPS.
+
+[source,mips,linenums]
+----
+.data
+age:         .word 0  # can be initialized to anything
+
+ask_name:    .asciiz "What's your name and age?\n"
+hello_space: .asciiz "Hello "
+nice_meet:   .asciiz ", nice to meet you!\n"
+
+name:        .space 30
+
+.text
+
+# main goes here
+
+----
+
+As you can see in the example, we extract all the string literals and
+the character array `name` and int `age` and declare them as MIPS globals.
+One thing to note is the second `printf`.  Because it prints a variable, `name`,
+using the conversion specifier, we break the literal into pieces around that.
+Since there is no built-in `printf` function in MIPS, you have to handle printing
+variables yourself with the appropriate system calls.
+
+
+=== Arrays
+
+Obviously strings are special cases that can be handled with `.ascii` or `.asciiz`
+for literals, but for other types or user inputed strings how do we do it?
+
+The first way, which was demonstrated in the snippet above is to use `.space`
+to declare an array of the necessary byte size.  Keep in mind that the size is
+specified in bytes not elements, so it only matches for character arrays.  For
+arrays of ints/words, floats, doubles etc. you'd have to multiply by the sizeof(type).
+
+"But, `.space` only lets you declare uninitialized arrays, how do I do initialized ones?"
+
+Actually, it appears `.space` initializes everything to 0 similar to global/static
+data in C and C{plus}{plus}, though I can't find that documented anywhere.
+
+Aside from that, there are two ways depending on whether you want to initialize
+every element to the same value or not.
+
+For different values, the syntax is an extension of declaring a single variable
+of that type.  You specify all the values, comma separated.  This actually gives
+you another way to declare a string or a character array, though I can't really
+think of a reason you'd want to.  You could declare a `.byte` array and list all
+the characters individually.
+
+However, if you want an array with all elements initialized to the same value there
+is a more convenient option that I learned very recently.  After the type you
+put the value you want, a colon, and then the number of elements.  So `a: .word 123 : 10`
+would declare a 10 integer array with all elements set to 123.  This works for all
+types in MARS, but SPIM does not support this syntax for floats and doubles.  Since
+you'll probably not have to deal with floating point types at all, let alone arrays
+of them initialized to a particular value, this isn't a huge loss.
+
+Given what we just covered, this:
+
+[source,c,linenums]
+----
+int a[20];
+double b[20];
+int c[10] = { 9,8,7,6,5,4,3,2,1,0 };
+int d[5] = { 42, 42, 42, 42, 42 };
+char e[3] = { 'a', 'b', 'c' };
+----
+
+becomes
+
+[source,mips,linenums]
+----
+.data
+a:        .space 80
+b:        .space 160
+c:        .word 9,8,7,6,5,4,3,2,1,0
+d:        .word 42 : 5
+e:        .byte 'a', 'b', 'c'
+----
+
+For more examples of array declarations, see 
+https://raw.githubusercontent.com/rswinkle/mips_book/master/code/array_decls.s[array_decls.s].
+You don't have to understand the rest of the code, just that it prints out each of the arrays.
+
+

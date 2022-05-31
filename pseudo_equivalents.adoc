@@ -1,0 +1,106 @@
+
+
+.Pseudoinstruction Equivalents
+[cols="3,3a,4a"]
+|===
+| Pseudoinstruction | Example Use | Equivalence
+
+| Load Immediate |
+
+ li    $t0, 42 |
+
+ ori   $t0, $0, 42
+ # or
+ addi  $t0, $0, 42
+
+'''
+
+| Move           |
+
+ move  $t0, $t1 |
+
+ or    $t0, $0, $t1
+ # or
+ add   $t0, $0, $t1
+
+'''
+
+| No Operation   |
+
+ nop |
+
+ # anything with $0 as dest
+ # reg will work, I prefer
+ or    $0, $0, $0
+
+'''
+
+| Load Address   |
+
+ la    $t0, label |
+
+ # use 0x1001 for MARS
+ lui   $t0, 0x1000
+ ori   $t0, $t0, byte_offset
+
+'''
+
+| Branch Less Than |
+
+ blt  $t0, $t1, label |
+
+ # t2 = t0 < t1
+ slt   $t2, $t0, $t1
+ bne   $t2, $0, label
+
+ # or if you're counting up and
+ # you know they'll be equal,
+ # you can simplify to
+ bne   $t0, $t1, label
+
+'''
+
+| Branch Greater Than |
+
+ bgt  $t0, $t1, label |
+
+ # flip order to get >
+ slt   $t2, $t1, $t0
+ bne   $t2, $0, label
+
+'''
+
+| Branch Less Than or Equal |
+
+ ble  $t0, $t1, label |
+
+ # test for < and = separately
+ slt    $t2, $t0, $t1
+ bne    $t2, $0, label
+ beq    $t0, $t1, label
+
+ # or add 1 to change <= to <
+ # use a spare reg if you need
+ # to preserve the original value
+ addi   $t3, $t1, 1
+ slt    $t2, $t0, $t3
+ bne    $t2, $0, label
+
+'''
+
+| Branch Greater Than or Equal |
+
+ bge  $t0, $t1, label |
+
+ # test for opposite
+ # and branch on failure
+ slt  $t2, $t0, $t1
+ beq  $t2, $0, label
+
+'''
+
+|===
+
+
+// NOTE: need the line breaks (''') after each code block to force grey box to
+// not overflow table cell

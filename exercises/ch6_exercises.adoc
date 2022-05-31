@@ -1,0 +1,14 @@
+
+=== Exercises
+
+include::../support.adoc[]
+
+. Write a program to convert an input in minutes to hours.
+
+. Write the following functions and use them in a program.
++
+[source,c,linenums]
+----
+float miles2kilometers(float miles);
+float pounds2kilograms(float pounds);
+----

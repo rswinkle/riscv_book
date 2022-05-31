@@ -1,0 +1,21 @@
+[dedication]
+== Dedication
+
+This book is dedicated to all its xref:supporters.adoc#_supporters[supporters] and all the students
+I've helped with RISC-V over the years who inspired me to create it.
+
+Thank you.
+
+An extra thank you goes to the corporate level sponsors below:
+
+[%autowidth,cols="1a,1a,1a",frame=none,grid=none]
+|===
+|[link=http://www.robertwinkler.com/projects/mips_book/]
+image::images/mips_book.png[Cover Logo,250,250]
+
+|[link=http://www.robertwinkler.com/]
+image::images/gravatar_250.png[My Gravatar,250,250]
+
+| {nbsp}
+|===
+

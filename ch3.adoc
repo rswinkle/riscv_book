@@ -1,0 +1,571 @@
+:greensheet: footnote:[https://inst.eecs.berkeley.edu/~cs61c/resources/MIPS_Green_Sheet.pdf]
+:de_morgans: footnote:[https://en.wikipedia.org/wiki/De_Morgan%27s_laws]
+
+== Chapter 3: Branches and Logic
+
+We can't go much farther in our MIPS programming journey without covering branching.
+Almost every non-trivial program requires some logic, even if it's only a few `if` or
+`if-else` statements.  In other words, almost every program requires branching, a way
+to do a instead of b, or to do a only if certain conditions are met.
+
+You already know how to do this in higher level languages, the aforementioned `if`
+statement.  In assembly it's more complicated.  Your only tool is the ability
+to jump to a label on another line based on the result of various comparisons.  The
+relevant instructions are listed in the following table:
+
+
+.MIPS branching related instructions (and pseudoinstructions)
+[cols="3,1,2,2"]
+|===
+| Name | Opcode | Format | Operation
+
+| Branch On Equal | beq | beq rs, rt, label | if (rs == rt) goto label
+
+| Branch On Not Equal | bne | bne rs, rt, label | if (rs != rt) goto label
+
+| Branch Less Than | blt | blt rs, rt, label | if (rs < rt) goto label
+
+| Branch Greater Than | bgt | bgt rs, rt, label | if (rs > rt) goto label
+
+| Branch Less Than Or Equal | ble | ble rs, rt, label | if (rs <= rt) goto label
+
+| Branch Greater Than Or Equal | bge | bge rs, rt, label | if (rs >= rt) goto label
+
+| Set Less Than | slt | slt rd, rs, rt | rd = (rs < rt) ? 1 : 0
+
+| Set Less Than Immediate | slti | slt rd, rs, imm | rd = (rs < imm) ? 1 : 0
+
+| Set Less Than Immediate Unsigned | sltiu | slt rd, rs, imm | rd = (rs < imm) ? 1 : 0
+
+| Set Less Than Unsigned | sltu | sltu rd, rs, imm | rd = (rs < imm) ? 1 : 0
+
+|===
+
+You can see the same information and more (like which ones are pseudoinstructions)
+on the MIPS greensheet.{greensheet}
+
+There are additional pseudoinstructions in the form of beq/bne/blt/bgt/ble/bge + 'z' which
+are syntactic sugar to compare a register against 0, ie the 0 register.
+
+So the following:
+----
+	beq     $t0, $0, label
+	bne     $t1, $0, label
+	blt     $t2, $0, label
+----
+would be equivalent to:
+----
+	beqz    $t0, label
+	bnez    $t1, label
+	bltz    $t2, label
+----
+
+Note `$0` is the same as `zero` and is the hard coded 0 register.  I'll cover
+registers in xref:ch5.adoc#_the_convention[more detail] in the chapter on functions and the calling conventions.
+
+One final thing is that labels have the same naming requirements as C variables and
+functions.  They must start with a letter or underscore and the rest can be letters,
+underscores, or digits.
+
+=== Practice
+
+The rest of this chapter will be going over many examples, looking at snippets
+of code in C and translating them to MIPS.
+
+==== Basics
+
+Let's start with the most basic if statement.  The code in and after
+the if statement is arbitrary.
+
+[source,c,linenums]
+----
+	if (a > 0) {
+		a++;
+	}
+	a *= 2;
+----
+
+Now in MIPS, let's assume that a is in `$t0`.  The tranlation would look
+like this:
+
+[source,mips,linenums]
+----
+	ble   $t0, $0, less_eq_0    # if (a <= 0) goto less_eq_0
+	addi  $t0, $t0, 1           # a++
+less_eq_0:
+	sll   $t0, $t0, 1           # a *= 2  (shifting left by n is multiplying by 2^n)
+----
+
+There are a few things to note in this example.  The first is that in assembly
+we test for the opposite of what was in the if statement.  This will always be
+the case when jumping forward because (if we want to keep the same order of code)
+we can only jump _over_ a block of code, whereas in C we fall into the block if
+the condition is true.  In the process of mentally compiling a bit of C to
+assembly, it can be helpful to some to change to jump based
+logic first.  For example the previous C would become:
+
+[source,c,linenums]
+----
+	if (a <= 0)
+		goto less_eq_0;
+	a++;
+less_eq_0:
+	a *= 2;
+----
+
+This is obviously still valid C but matches the branching behavior of assembly
+exactly.  You can see I put comments for the equivalent C code in my assembly;
+it helps with readability to comment every line or group of lines that way.
+
+The second thing to notice is how we handled the multiplication.  This has
+nothing to do with branching but is something we'll touch on multiple times
+throughout the book.  Your job when acting as a human compiler is to match the
+_behavior_. You are under no obligation to match the structure or operations
+of the higher level code exactly (unless your professor stupidly forces you to).
+
+Given that, it is in your best interest to change and rearrange things in
+order to simplify the assembly as much as possible to make your life easier.
+Generally speaking, this also tends to result in more performant code, since
+using fewer instructions and fewer branches (the most common outcomes) saves
+execution time.
+
+In this case, the standard `mult` instruction (from the green sheet) would have
+required 3 instructions, and even the `mul` instruction (that does seem to
+be supported everywhere but is not on the green sheet) would take 2:
+
+[source,mips,linenums]
+----
+	li    $t1, 2
+	mult  $t0, $t1
+	mflo  $t0           # a *= 2
+
+	# or
+
+	li    $t1, 2
+	mul   $t0, $t0, $t1   # a *= 2
+----
+
+Given that, when multiplying or dividing by a power of 2 it's common practice
+to use `sll` or `sra`.  This is true in all assembly languages because
+multiplication and division are relatively costly operations so using shifts
+when you can saves performance even if you didn't actually save instructions.
+
+Ok, let's look at an `if-else` example.  Again, the actual code is arbitrary and
+we're assuming a and b are in `$t0` and `$t1` respectively
+
+[source,c,linenums]
+----
+	if (a > 0) {
+		b = 100;
+	} else {
+		b -= 50;
+	}
+----
+
+You could do it something like these two ways
+
+[source,mips,linenums]
+----
+	bgt    $t0, $0, greater_0   # if (a > 0) goto greater_0
+	addi   $t1, $t1, -50        # b -= 50
+	j      less_eq_0
+greater_0:
+	li     $t1, 100             # b = 100
+less_eq_0:
+
+	# or
+
+	ble    $t0, $0, less_eq0    # if (a <= 0) goto less_eq_0
+	li     $t1, 100             # b = 100
+	j      greater_0
+less_eq_0:
+	addi   $t1, $t1, -50        # b -= 50
+greater_0:
+----
+
+You can see how the first swaps the order of the actual code which keeps the
+actual conditions the same as in C, while the second does what we discussed
+before and inverts the condition in order keep the the blocks in the same
+order.  In both cases, an extra unconditional branch and label is necessary
+so we don't fall through the else case.  This is inefficient and wasteful,
+not to mention complicates the code unecessarily.  Remember how our job
+is to match the behavior, not the exact structure?  Imagine how we could
+rewrite it in C to simplify the logic:
+
+[source,c,linenums]
+----
+	b -= 50;
+	if (a > 0) {
+		b = 100;
+	}
+----
+
+which becomes
+
+[source,mips,linenums]
+----
+	addi   $t1, $t1, -50        # b -= 50;
+	ble    $t0, $0, less_eq_0   # if (a <= 0) goto less_eq_0
+	li     $t1, 100             # b = 100
+less_eq_0:
+----
+
+That is a simple example of rearranging code to make your life easier.
+In this case, we are taking advantage of what the code is doing to make a
+default path or default case.  Obviously, because of the nature of the code
+subtracting 50 has to be the default since setting b to 100 overwrites
+the original value which we'd need if we were supposed to subtract 50 instead.
+In cases where you can't avoid destructive changes (like where the condition and the
+code are using/modifying the same variable), you can use a temporary variable;
+i.e. copy the value into a spare register.  You still save yourself an unecessary
+jump and label.
+
+==== Compound Conditions
+
+These first 2 examples have been based on simple conditions, but what if you
+have compound conditions?  How does that work with branch operations that only
+test a single condition?  As you might expect, you have to break things down
+to match the logic using the operations you have.
+
+Let's look at *and* first.  Variables a, b, and c are in t0, t1, and t2.
+
+[source,c,linenums]
+----
+	if (a > 10 && a < b) {
+		c += 20;
+	}
+	b &= 0xFF;
+----
+
+So what's our first step?  Like previous examples, we need to test
+for the opposite when we switch to assembly, so we need the equivalent of
+
+[source,c,linenums]
+----
+	if (!(a > 10 && a < b))
+		goto no_add20;
+	c += 20;
+no_add20:
+	b &= 0xFF;
+----
+
+That didn't help us much because we still don't know how to handle that compound
+condition.  In fact we've made it more complicated.  If only there were
+a way to convert it to *or* instead of *and*.  Why would we want that?  Because,
+while both *and* and *or* in C allow for short circuit evaluation (where
+the result of the whole expression is known early and the rest of expression
+is not evaluated), with *or*, it short circuits on success while *and* short
+circuits on failure.  What does that mean?  It means that with *or*, the whole
+expression is true the second a single true term is found, while with *and*
+the whole expression is false the second a single false term is found.
+
+Let's look at the following code to demonstrate:
+
+[source,c,linenums]
+----
+	if (a || b || c) {
+		something;
+	}
+
+	// What does this actually look like if we rewrote it to show what it's
+	// actually doing with short circuit evaluation?
+
+	if (a) goto do_something;
+	if (b) goto do_something;
+	if (c) goto do_something;
+	goto dont_do_something;
+
+do_something:
+	something;
+
+dont_do_something:
+
+	// You can see how the first success is all you need:
+	// Compare that with and below
+
+	if (a && b && c) {
+		something;
+	}
+
+	if (a) {
+		if (b) {
+			if (c) {
+				something;
+			}
+		}
+	}
+	// which in jump form is
+
+	if (a)
+		goto a_true;
+	goto failure;
+a_true:
+	if (b)
+		goto b_true;
+	goto failure;
+
+b_true:
+	if (c)
+		goto c_true:
+	goto failure;
+
+c_true:
+	something;
+failure:
+	
+	// Man that's ugly, overcomplicated, and hard to read
+	// But what if we did this instead:
+
+	if (!a) goto dont_do_something;
+	if (!b) goto dont_do_something;
+	if (!c) goto dont_do_something;
+
+	something;
+
+dont_do_something:
+
+	// Clearly you need all successes for and.  In other words
+	// to do and directly, you need state, knowledge of past
+	// successes.  But what about that second translation of and?
+	// It looks a lot like or?
+
+----
+
+You're exactly right.  That final translation of *and* is exactly like *or*.
+
+It takes advantage of De Morgan's laws.{de_morgans}  For those
+of you who haven't taken a Digital Logic course (or have forgotten), De
+Morgan's laws are 2 equivalencies, a way to change an *or* to an *and*, and vice versa.
+
+They are (in C notation):
+
+`!(A || B) == !A && !B`
+
+`!(A && B) == !A || !B`
+
+Essentially you can think of it as splitting the not across the terms and changing
+the logical operation.  The law works for arbitrary numbers of terms, not just 2:
+
+----
+(A && B && C)
+is really
+((A && B) && C)
+so when you apply De Morgan's Law recursively you get:
+!((A && B) && C) == !(A && B) || !C == !A || !B || !C
+----
+
+
+Let's apply the law to our current compound *and* example.  Of course
+the negation of greater or less than comparisons means covering the rest
+of the number line so it becomes:
+
+[source,c,linenums]
+----
+	if (a <= 10 || a >= b))
+		goto no_add20;
+	c += 20;
+no_add20:
+	b &= 0xFF;
+----
+
+which turns into:
+
+[source,mips,linenums]
+----
+	li     $t9, 10
+	ble    $t0, $t9, no_add20      # if (a <= 10) goto no_add20
+	bge    $t0, $t1, no_add20      # if (a >= b)  goto no_add20
+
+	addi   $t2, $t2, 20            # c += 20
+no_add20:
+	andi   $t1, $t1, 0xFF          # b &= 0xFF
+----
+
+See how that works?  **Or**'s do not need to remember state.  Just the fact that
+you reached a line in a multi-term *or* expression means the previous checks
+were false, otherwise you'd have jumped.  If you tried to emulate the same
+thing with an *and*, as you saw in the larger snippet above, you'd need a
+bunch of extra labels and jumps for each term.
+
+// TODO add example of mixed compond expression if (A || B && C)
+What about mixed compound statements?
+
+[source,c,linenums]
+----
+	if (a > 10 || c > 100 && b >= c)
+		printf("true\n");
+	
+	b |= 0xAA;
+----
+
+Well, the first thing to remember is that `&&` has a higher priority than `||`,
+which is why most compilers these days will give a warning for the above code
+about putting parenthesis around the `&&` expression to show you meant it (even
+though it's completely legal as is).
+
+So with that in mind, let's change it to jump format to better see what we
+need to do.  While we're at it, let's apply De Morgan's law to the `&&`.
+
+[source,c,linenums]
+----
+	if (a > 10)
+		goto do_true;
+	if (c <= 100)
+		goto done_if;
+	if (b < c)
+		goto done_if;
+do_true:
+	printf("true\n");
+
+done_if:
+	b |= 0xAA;
+----
+
+This one is trickier because we don't flip the initial expression like normal.
+Instead of jumping _over_ the body which would require testing for the opposite,
+we jump to the true case.  We do this because we don't want to have multiple
+print statements and it lets us fall through the following conditions.  We would
+need multiple print statements because failure for the first expression _is not_
+failure for the entire expression.  Here's how it would look otherwise:
+
+[source,c,linenums]
+----
+	if (a <= 10)
+		goto check_and;
+	printf("true\n");
+	goto done_if;
+check_and:
+	if (c <= 100)
+		goto done_if;
+	if (b < c)
+		goto done_if;
+
+	printf("true\n");
+
+done_if:
+	b |= 0xAA;
+----
+
+That is harder to read and has both an extra print and an extra jump.
+
+So let's convert the better version to MIPS (a,b,c = `$t0`, `$t1`, `$t2`):
+
+[source,mips,linenums]
+----
+.data
+true_str: .asciiz "true\n"
+
+.text
+	li    $t8, 10   # get the necessary literals in some unused regs
+	li    $t9, 100
+
+	bgt   $t0, $t8, do_true   # if (a > 10) goto do_true
+	ble   $t2, $t9, done_if   # if (c <= 100) goto done_if
+	blt   $t1, $t2, done_if   # if (b < c) goto done_if
+
+do_true:
+	li    $v0, 4           # print string
+	la    $a0, true_str    # address of str in a0
+	syscall
+
+done_if:
+	ori   $t1, $t1, 0xAA   # b |= 0xAA
+----
+
+		
+
+==== If-Else Chain
+
+Ok, let's look at a larger example.  Say you're trying to determine
+a student's letter grade based on their score.  We're going to need a chain
+of ``if-else-if``'s to handle all cases.  Assume `score` is declared and
+set somewhere before.
+
+[source,c,linenums]
+----
+	char letter_grade;
+	if (score >= 90) {
+		letter_grade = 'A';
+	} else if (score >= 80) {
+		letter_grade = 'B';
+	} else if (score >= 70) {
+		letter_grade = 'C';
+	} else if (score >= 60) {
+		letter_grade = 'D';
+	} else {
+		letter_grade = 'F';
+	}
+
+	printf("You got a %c\n", letter_grade);
+}
+----
+
+With chains like these, you following everything we've learned before, it
+comes out looking like this (assuming score is `$t0` and letter_grade is `$t1`):
+
+[source,mips,linenums]
+----
+.data
+grade_str: .asciiz "You got a "
+
+.text
+	li     $t1, 70   # letter_grade default to 'F' ascii value
+	
+	li     $t2, 90
+	blt    $t0, $t2, not_a   # if (score < 90) goto not_a
+	li     $t1, 65           # leter_grade = 'A'
+	j      grade_done
+
+not_a:
+	li     $t2, 80
+	blt    $t0, $t2, not_b   # if (score < 80) goto not_b
+	li     $t1, 66           # leter_grade = 'B'
+	j      grade_done
+
+not_b:
+	li     $t2, 70
+	blt    $t0, $t2, not_c   # if (score < 70) goto not_c
+	li     $t1, 67           # leter_grade = 'C'
+	j      grade_done
+
+not_c:
+	li     $t2, 60
+	blt    $t0, $t2, grade_done   # if (score < 60) goto grade_done
+	li     $t1, 68           # leter_grade = 'D'
+
+grade_done:
+	li     $v0, 4      # print str
+	la     $a0, grade_str
+	syscall
+
+	li     $v0, 11     # print character
+	move   $a0, $t1    # char to print
+	syscall
+
+	move   $a0, 10    # print '\n'
+	syscall
+----
+	
+You can see how we set a default value and then test for the opposite
+of each condition to jump to the next test, until we get one that fails
+(aka was true in the original C condition) and set the appropriate grade.
+
+You can arrange chains like this in either direction, it doesn't have to match
+the order of the C code.  As long as it works the same, do whatever makes the 
+code simpler and more sensible to you.
+
+=== Conclusion
+
+Branching and logic and learning to translate from higher level code to assembly
+is something that takes a lot of practice, but eventually it'll become
+second nature.  We'll get more practice in the chapter on looping which naturally
+also involves branching.
+
+One final note, there's really no reason to use the `slt` family of opcodes _unless_
+your professor requires it, ie he says you can't use pseudoinstructions so you're
+left with `beq`, `bne`, `j` and the `slt` ops.  I'll show how you can code without
+using pseudoinstructions in a later chapter.
+
+// TODO reference to extra's chapter covering stupid professor requirements
+
+

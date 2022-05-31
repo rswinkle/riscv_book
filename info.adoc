@@ -1,0 +1,19 @@
+== Info
+
+Copyright (C) 2021-2022 http://robertwinkler.com[Robert Winkler]
+
+Licensed under https://creativecommons.org/licenses/by-nc-sa/4.0/[Creative Commons].
+
+This book is available online in both
+http://www.robertwinkler.com/projects/riscv_book/riscv_book.html[HTML] and
+http://www.robertwinkler.com/projects/riscv_book/riscv_book.pdf[PDF] form.
+
+include::support.adoc[]
+
+The repo for the book, where you can get the code referenced and report
+any errors (submit an issue or even a pull request) is
+https://github.com/rswinkle/riscv_book[here].
+
+If you're interested in contacting me regarding MIPS tutoring or any other
+business request related to the book, you can reach me at mips@robertwinkler.com.
+

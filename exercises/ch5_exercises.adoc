@@ -1,0 +1,37 @@
+
+=== Exercises
+
+include::../support.adoc[]
+
+. Implement the following functions in MIPS and write a program to demonstrate their use.
+You can reuse much of your code from the previous chapter's exercises.
++
+[source,c,linenums]
+----
+// return the min or max
+int get_min(int* array, int size);
+int get_max(int* array, int size);
+
+// return the index of the min/max
+int locate_min(int* array, int size);
+int locate_max(int* array, int size);
+
+// return the average of the array
+int calc_average(int* array, int size);
+----
+
+. The Collatz conjecture is defined as follows: start with any positive integer n,
+if n is even, divide by 2, otherwise, multiply by 3 and add 1.  The conjecture is
+that all sequences will eventually reach 1.  Write 2 versions of the collatz function,
+one iterative and one recursive.  Print out the sequence as they go.
++
+[source,c,linenums]
+----
+void collatz_iterative(int n);
+void collatz_recursive(int n);
+
+// for an added challenge return the number of steps taken to reach 1
+// you can remove the printing of the steps
+int collatz_iterative2(int n);
+int collatz_recursive2(int n);
+----

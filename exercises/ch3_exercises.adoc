@@ -1,0 +1,32 @@
+
+=== Exercises
+
+include::../support.adoc[]
+
+. Convert the following C code to MIPS.
++
+[source,c,linenums]
+----
+#include <stdio.h>
+
+int main()
+{
+	int num;
+	printf("Enter an integer: ");
+	scanf("%d", &num);
+
+	if (num > 50) {
+		puts("The number is greater than 50");
+	} else if (num < 50) {
+		puts("The number is less than 50");
+	} else {
+		puts("You entered 50!");
+	}
+
+	return 0;
+}
+----
+
+. Prompt for the user's name, then tell them whether their name starts with
+a letter from the first or second half of the alphabet. Be sure to handle both
+upper and lower case correctly, but assume they entered a valid letter.

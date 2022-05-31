@@ -1,0 +1,210 @@
+:mars_syscalls: footnote:[https://courses.missouristate.edu/KenVollmar/mars/Help/SyscallHelp.html]
+
+== Chapter 2: System Calls
+
+We mentioned system calls (aka syscalls from now on) in chapter 0 when we were
+going over our "Hello World" program, but what exactly are they?
+
+Essentially, they are the built in functions of a operating system; in this case,
+the simple operating system of the MIPS simulators.  They provide access to all the
+fundamental features, like input and output to/from both the console and files,
+allocating memory, and exiting.  That covers all the 17 syscalls supported by spim,
+but MARS supports many more, for things ranging from playing MIDI sounds, to getting
+a random number, to creating GUI dialogs.{mars_syscalls}
+
+NOTE: Except for the MARS or SPIM specific chapters/sections, I'll be sticking to code
+compatible with both throughout this book, meaning we only use the first 17 syscalls,
+and don't get to use some of the syntactic sugar available in MARS, or any SPIM
+specific features either.
+
+.SPIM supported syscalls
+[cols="3,1,6,6"]
+|===
+| Name | $v0 | Arguments | Result
+
+| print integer | 1 | $a0 = integer to print |
+
+| print float | 2 | $f12 = float to print |
+
+| print double | 3 | $f12 = double to print |
+
+| print string | 4 | $a0 = address of string |
+
+| read integer | 5 | | $v0 = integer read
+
+| read float | 6 | |$f0 = float read
+
+| read double | 7 | | $f0 = double read
+
+| read string | 8 | $a0 = address of input buffer +
+$a1 = buffer size | works like C's fgets
+
+| sbrk | 9 | $a0 = size in bytes to allocate | $v0 = address of allocated memory (sbrk is basically malloc but there is no free)
+
+| exit | 10 | | program terminates
+
+| print character | 11 | $a0 = character to print (ascii value) |
+
+| read character | 12 | | $v0 = character read
+
+| open file | 13 | $a0 = address of filename +
+$a1 = flags +
+$a2 = mode | $v0 = file descriptor (negative if error)
+
+| read from file | 14 | $a0 = file descriptor +
+$a1 = address of input buffer +
+$a2 = max characters to read | $v0 = number of characters read, 0 for end-of-file, negative for error
+
+| write to file | 15 | $a0 = file descriptor +
+$a1 = address of output buffer +
+$a2 = number of characters to write | $v0 = number of characters written, negative for error
+
+| close file | 16 | $a0 = file descriptor |
+
+| exit2 | 17 | $a0 = termination result | program terminates, returning number in $a0 (only meaningful when run in the terminal, ignored in GUI)
+
+|===
+
+As you can see, they really only cover the basics.  You can read or write the
+different types, do file I/O using calls identical to POSIX functions
+(open, read, write, close; see man pages), allocate memory, and exit.
+Even so, they're sufficient to build anything you want.
+
+So, what does that table mean?  How do these actually work?
+
+The process is:
+
+. Put the number for the syscall you want in `$v0`
+. Fill in the appropriate arguments, if any
+. Execute the syscall with `syscall`
+
+[source,mips,linenums]
+----
+	li    $v0, 1   # 1 is print integer
+	li    $a0, 42  # takes 1 arg in a0, the number to print
+	syscall        # actually execute syscall
+----
+
+You can think of the above as `print_integer(42);`.  Let's look at an actual
+program that uses a few more syscalls next.
+
+=== Examples
+
+[source,c,linenums]
+----
+#include <stdio.h>
+
+int main()
+{
+	int age;
+	int height;
+	char name[50];
+	printf("What's your name? ");
+	fgets(name, 50, stdin);
+
+	printf("Hello %s", name);
+
+	printf("How old are you? ");
+	scanf("%d", &age);
+
+	printf("Enter your height in inches: ");
+	scanf("%d", &height);
+
+	printf("Your age + height = %d\n", age + height);
+
+	return 0;
+}
+----
+
+I'm using `fgets()` instead of `scanf("%s", name)` because fgets works the same as the
+read string syscall (8).
+
+[source,mips,linenums]
+----
+.data
+
+name:     .space 50
+
+nameprompt:  .asciiz "What's your name? "
+hello_space: .asciiz "Hello "
+how_old:     .asciiz "How old are you? "
+ask_height:  .asciiz "Enter your height in inches: "
+ageplusheight: .asciiz "Your age + height = "
+
+
+.text
+main:
+	li   $v0, 4      # print string system call
+	la   $a0, nameprompt  # load address of string to print into a0
+	syscall
+
+	li   $v0, 8      # read string
+	la   $a0, name
+	li   $a1, 50
+	syscall
+
+	li   $v0, 4
+	la   $a0, hello_space
+	syscall
+
+	la   $a0, name  # note 4 is still in $v0
+	syscall
+
+	# don't print a newline here because
+	# one will be part of name
+
+	li   $v0, 4
+	la   $a0, how_old
+	syscall
+
+	li   $v0, 5   # read integer
+	syscall
+	move $t0, $v0  # save age in t0
+
+	li   $v0, 4
+	la   $a0, ask_height
+	syscall
+
+	li   $v0, 5   # read integer
+	syscall
+	add  $t0, $t0, $v0 # t0 += height
+
+
+	li   $v0, 4
+	la   $a0, ageplusheight
+	syscall
+
+	li   $v0, 1  # print int
+	move $a0, $t0  # a0 = age + height
+	syscall
+	
+	# print newline
+	li   $v0, 11   # print char
+	li   $a0, 10   # ascii value of '\n'
+	syscall
+
+
+	li   $v0, 10     # exit syscall
+	syscall
+----
+
+There a few things to note from the example.
+
+We don't declare global variables for age or height.  We could, but there's no reason
+to since we have to have them in registers to do the addition anyway.  Instead, we
+copy/save height to `$t0` so we can use `$v0`  for 2 more syscalls,
+then add age to `$t0`.
+
+This is generally how it works.  Use registers for local variables unless
+required to do otherwise.  We'll cover xref:ch5.adoc#_the_convention[more about]
+register use when we cover the MIPS calling convention.
+
+Another thing is when we print their name, we don't put 4 in `$v0` again because it
+is still/already 4 from the lines above.  Unless the syscall says it writes to $v0
+you can assume it is unmodified.
+
+Lastly, many people will declare a string `"\n"` and use print string to print a newline,
+but it's easier to use the print char syscall as we do right before exiting.
+
+
+

@@ -1,0 +1,263 @@
+:old_website: footnote:[Besides, https://www.cs.uaf.edu/2000/fall/cs301/notes/notes/node66.html[it's], the same one we referenced last chapter about fp == s8]
+
+== Chapter 6: Floating Point Types
+
+Up to this point we haven't really mentioned floating point values or instructions
+at all, except how to declare them in the `.data` section and the syscalls for
+reading and printing them.  There are two reasons we've left them alone till now.
+First, they use a whole separate set of registers and instructions.  Second, and
+partly because of the first reason, most MIPS college courses do not ever require
+you to know or use floating point values.  Since this book is targeted at college
+students, if you know you won't need to know this feel free to skip this chapter.
+
+=== Floating Point Registers and Instructions
+
+While the greensheet contains a nice table for the normal registers it is completely
+lacking for the floating point registers.  There are 32 32-bit floating point registers.
+You can use them all for floats but they are paired even-odd for doubles.  In other
+words, you can only use even numbers for doubles, because storing a double at $f0 actually
+uses $f0 and $f1 because it takes 64 bits/8 bytes.
+
+As far as the calling conventions for floating point registers, it is actually
+https://techpubs.jurassic.nl/manuals/0630/developer/Mpro_n32_ABI/sgi_html/ch02.html[hard]
+to
+https://microcontrollerslab.com/mips-floating-point-architecture-using-pcspim/[find]
+anything definitive and clear even for the basics.  You could make up your own
+but the float/double syscalls, and the tiny code snippet in
+https://amzn.to/3zN71KP[Patterson and Hennessy] were
+at least consistent with this old website{old_website} so we'll go with that.
+I have seen at least one course page where the prof wanted _all_ float registers
+preserved which seems excessive and ridiculous but prof's are gonna prof.
+
+.MIPS Floating Point Registers and Uses
+[cols="1,2,2"]
+|===
+| Name | Use | Preserved Across a Call
+
+| $f0-$f2 | Function Results | No
+
+| $f4-$f10 | Temporaries | No
+
+| $f12-f14 | Arguments | No
+
+| $f16-f18 | Temporaries | No
+
+| $f20-f30 | Saved Temporaries | Yes
+
+|===
+
+This table is based on doubles so it may look like it's skipping odd registers but
+they're included where the even they're paired with is.  So, for example you actually
+have 4 registers for float arguments `$f12` through `$f15` but only 2 for doubles
+`$f12` and `$f14`.  Similarly you have 12 saved registers for floats but 6 for doubles.
+
+You might find things like
+https://www.dsi.unive.it/~architet/LAB/spim.htm#Floating%20Point[this], which seems
+to say that SPIM doesn't support using the odd registers at all but both example
+programs for this chapter use `$f1` and work with both SPIM and MARS.  Given that,
+and the fact that it references instructions [l.d] and [l.s] which don't work
+(`li.s` and `li.d` do, see below), it's probably really out of date.
+
+Most of the next table is actually on the Greensheet but not all of it and I thought
+it worth reproducing here.
+
+.MIPS floating point instructions (and pseudoinstructions)
+[cols="3,1,2m,2"]
+|===
+| Name | Opcode | Format | Operation
+
+| Load Word to Coprocessor 1 | lwc1 (or l.s) | lwc1 ft, n(rs)  | F[ft] = M[R[rs]+n]
+
+| Store Word from Coprocessor 1 | swc1 (or s.s) | swc1 ft, n(rs)  | M[R[rs]+n] = F[ft]
+
+| Load Double to Coprocessor 1 | ldc1 (or l.d) | ldc1 ft, n(rs)  |
+
+F[ft] = M[R[rs]+n]
+
+F[ft+1] = M[R[rs]+n+4]
+
+| Store Double from Coprocessor 1 | sdc1 (or s.d) | sdc1 ft, n(rs)  |
+
+M[R[rs]+n] = F[ft]
+
+M[R[rs]+n+4] = F[ft+1]
+
+| Move From Coprocessor 1 | mfc1 | mfc1 rd, fs | R[rd] = F[fs]
+
+| Move To Coprocessor 1 | mtc1 | mtc1 rd, fs | F[fs] = R[rd] 
+
+| Convert Word To Single Precision | cvt.s.w | cvt.s.w fd, fs | F[fd] = (float)F[fs]
+
+| Convert Single Precision To Word | cvt.w.s | cvt.w.s fd, fs | F[fd] = (int)F[fs]
+
+| Convert Word To Double Precision | cvt.d.w | cvt.d.w fd, fs | F[fd] = (double)F[fs]
+
+| Convert Double Precision To Word | cvt.w.d | cvt.w.d fd, fs | F[fd] = (int)F[fs]
+
+| Branch on FP True | bc1t | bc1t label | if (FPcond) goto label;
+
+| Branch on FP False | bc1f | bc1f label | if (!FPcond) goto label;
+
+| FP Compare | c._y_._x_ | c._y_._x_ fs, ft | FPcond = (F[fs] op F[ft]) ? 1 : 0
+
+| Absolute Value | abs._x_ | abs.x fs, ft | F[fs] = (F[ft] > 0) ? F[ft] : -F[ft]
+
+| Add | add._x_ | add.x fd, fs, ft | F[fd] = F[fs] + F[ft]
+
+| Subtract | sub._x_ | sub.x fd, fs, ft | F[fd] = F[fs] - F[ft]
+
+| Multiply | mul._x_ | mul.x fd, fs, ft | F[fd] = F[fs] * F[ft]
+
+| Divide | div._x_ | div.x fd, fs, ft | F[fd] = F[fs] / F[ft]
+
+| Negation | neg._x_ | neg.x fs, ft | F[fs] = -F[ft]
+
+| Move | mov._x_ | mov.x fd, fs | F[fd] = F[fs]
+
+|===
+
+With all of the opcodes that end in ._x_, the x is either s for single
+precision or d for double precision.
+
+The _y_ in the Compare instructions are one of eq, lt, le.
+Naturally _op_ would be the matching ==, <, <=.  Unfortunately, you don't
+get _not equal_, _greater than_, or _greater equal_, even as pseudoinstructions,
+but it's easy enough to flip the order of operands or branch on the
+opposite result.
+
+
+=== Practice
+
+We're going to briefly go over some of the more different aspects of dealing
+with floating point numbers, but since most of it is the same but with a new
+set of registers and calling convention, we won't be rehashing most concepts.
+
+=== Getting Floating Point Literals
+
+The first thing to know when dealing with floats is how to get float
+(or double) literals into registers where you can actually operate on them.
+
+There are two ways.  The first, and simpler way, is to declare them as globals
+and then use the `lwc1` or `ldw1` instructions:
+
+
+[source,mips,linenums]
+----
+.data
+a:     .float 3.14159
+b:     .double 1.61
+
+.text
+main:
+
+	la      $t0, a
+	lwc1    $f0, 0($t0)   # get a into $f0
+
+	la      $t0, b
+	ldc1    $f2, 0($t0)   # get b into $f2-3
+
+	# other code here
+----
+
+The second way is to use the regular registers and convert the values.  Of course
+this means unless you want an integer value, you'd have to actually do it twice
+and divide, and even that would limit you to rational numbers.  It looks like this.
+
+[source,mips,linenums]
+----
+	mtc1    $0, $f0     # move 0 to $f0 (0 integer == 0.0 float)
+
+	# get 4 to 4.0 in $f2
+	li       $t0, 4
+	mtc1     $t0, $f2
+	cvt.s.w  $f2, $f2   # convert 4 to 4.0
+----
+
+As you can see, other than 0 which is a special case, it requires at least 3
+instructions, more than the 2 (or 1 if you load directly from the address) of
+the first method.
+
+NOTE: There is a 3rd way that is even easier, but it's only supported in SPIM.  The
+pseudoinstructions `li.s` and `li.d` work exactly like `li` except to load float
+and double literals into float/double registers.
+
+=== Branching
+
+Branching based on floating point values is slightly different than normal.  Instead
+of being able to test and jump in a single convenient instruction, you have to test
+first and then jump in a second instruction if the test was true or not.  This is the
+same way x86 does it.  The test sets a special control/flag register (or a certain
+bit or bits in the register) and then all jumps are based on its state.
+
+Using it looks like this:
+
+[source,mips,linenums]
+----
+	c.lt.s  $f0, $f2   # fpcond = f0 < f2
+	bc1t    was_less   # if (f0 < f2) goto was_less
+
+	# do something for f0 >= f2
+
+	j       blah
+was_less:
+	
+	# do something for f0 < f2
+
+blah:
+----
+
+=== Functions
+
+Finally, lets do a simple example of writing a function that takes a float and
+returns a float.  I'm not going to bother doing one for doubles because it'd
+be effectively the same, or doing one that requires the stack, because the only
+differences from normal are a new set of registers and knowing which ones to save
+or not from the table above.
+
+So, how about a function to convert a fahrenheit temperature to celsius:
+
+[source,mips,linenums]
+----
+.data
+
+# 5/9 = 0.5 with 5 repeating
+fahrenheit2celsius: .float 0.5555555
+
+.text
+# float convert_F2C(float degrees_f)
+convert_F2C:
+	la      $t0, fahrenheit2celsius
+	lwc1    $f0, 0($t0)    # get conversion factor
+
+	# C = (F - 32) * 5/9
+	li      $t0, 32        
+	mtc1    $t0, $f1       # move int 32 to f1
+	cvt.s.w $f1, $f1      # convert to 32.0
+
+
+	sub.s   $f12, $f12, $f1  # f12 = degrees - 32
+
+	mul.s   $f0, $f0, $f12  # f0 = 0.555555 * f12
+
+	jr     $ra
+----
+
+You can see we follow the convention with the argument coming in `$f12` and the
+result being returned in `$f0`.  In this function we use both methods for getting
+a value into float registers; one we load from memory and the other, being
+an integer, we move and convert.
+
+
+=== Conclusion
+
+As I said before, it is rare for courses to even bother covering floating point
+instructions or assign any homework or projects that use them, but hopefully this
+brief overview, combined with the knowledge of previous chapters is sufficient.
+
+There are also 2 example programs
+https://raw.githubusercontent.com/rswinkle/mips_book/master/code/conversions.s[conversions.s]
+and
+https://raw.githubusercontent.com/rswinkle/mips_book/master/code/calc_pi.s[calc_pi.s]
+for you to study.
+
+

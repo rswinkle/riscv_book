@@ -1,0 +1,47 @@
+
+=== Exercises
+
+include::../support.adoc[]
+
+. Convert the following C code to MIPS.  If using SPIM, you can just hard code
+a "random" number between 0 and 100.
++
+[source,c,linenums]
+----
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+	int num = rand() % 101
+	int guess;
+	puts("I'm thinking of a number 0-100.  Try to guess it!");
+	while (1) {
+		printf("Guess a number: ");
+		scanf("%d", &guess);
+
+		if (guess > num) {
+			puts("Too high!");
+		} else if (guess < num) {
+			puts("Too low!");
+		} else {
+			break;
+		}
+	}
+
+	printf("Correct, it was %d!\n", num);
+
+	return 0;
+}
+----
+
+. Write a MIPS program to find and print the average of the following array.
+Just use integer division.
++
+[source,mips,linenums]
+----
+.data
+array:        .word 93,8,78,-6,51,49,3,2,128,0
+----
+
+. Write a program to find the min and max of the array in the previous exercise

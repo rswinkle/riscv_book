@@ -1,0 +1,415 @@
+
+== Chapter 4: Loops
+
+[quote, Unknown, Often misattributed to Albert Einstein]
+"Insanity is doing the same thing over and over again and expecting different results."
+
+Before we get into the MIPS, I want to cover something that may be obvious to some but
+may have never occurred to others.  Any loop structure can be converted to any other
+(possibly with the addition of an `if` statement).  So a `for` can be written as a `while`
+and vice versa.  Even a `do-while` can be written as a `for` or `while` loop.  Let's look
+at some equivalencies.
+
+[source,c,linenums]
+----
+	for (int i=0; i<a; i++) {
+		do_something;
+	}
+
+	int i = 0;
+	while (i < a) {
+		do_something;
+		i++;
+	}
+
+	int i = 0;
+	if (i < a) {
+		do {
+			do_something;
+			i++;
+		} while (i < a);
+	}
+	// you could also have an if (i >= a) goto loop_done; to jump over do-while
+----
+
+In general, when writing assembly, it can help to think more in terms of `while` or
+`do-while` rather than `for` because the former more closely resemble what the
+assembly looks like in terms of what goes where.  Like in the last chapter,
+where we would think of the `if-else` statements in "jump-form" or "branch-form",
+we can do the same here, converting for to while in our head as an intermediary
+step before going to assembly.
+
+Speaking of "jump-form", lets apply it to the loop above:
+
+[source,c,linenums]
+----
+	int i=0;
+	if (i >= a)
+		goto done_loop;
+loop:
+	do_something;
+	i++
+	if (i < a)
+		goto loop;
+
+done_loop:
+----
+
+You can see how that starts to look more like assembly.  Another thing to note is that
+unlike with `if` statements where we test for the opposite to jump over the block of code,
+when you're doing the loop test at the bottom like with a `do-while`, it is unchanged
+from C because you are jumping to _continue_ the loop.  If you put the test at the top it
+becomes inverted, and you put an unconditional jump at the bottom:
+
+[source,c,linenums]
+----
+	int i=0;
+loop:
+	if (i >= a)
+		goto done_loop;
+	do_something;
+	i++
+	goto loop:
+
+done_loop:
+----
+
+In general it's better to test at the bottom, both because the condition matches
+the higher level form, and because when you know the loop is going to execute at least once it requires
+only one jump + label, rather than 2 since you can forgo the the initial `if` check:
+
+[source,c,linenums]
+----
+	for (int i=0; i<10; i++)
+		do_something;
+
+	// becomes
+
+	int i=0;
+loop:
+	do_something;
+	i++
+	if (i < a)
+		goto loop;
+----
+
+Ok, now that we've got the theory and structure out of the way, let's try doing a simple
+one in MIPS.
+
+[source,c,linenums]
+----
+	int sum = 0;
+	for (int i=0; i<100; i++) {
+		sum += i;
+	}
+----
+
+That's about as basic as it gets, adding up the numbers 0 to 99.
+
+[source,mips,linenums]
+----
+	li    $t0, 0   # sum = 0
+	li    $t1, 1   # i = 1  we can start at 1 because obviously adding 0 is pointless
+	li    $t2, 100
+loop:
+	addi  $t0, $t0, $t1    # sum += i
+	addi  $t1, $t1, 1      # i++
+	blt   $t1, $t2, loop   # while (i < 100)
+----
+
+Ok I don't think there's much point in doing any more without getting to what loops
+are most often used for, looping through data structures, most commonly arrays.
+
+
+=== Looping Through Arrays
+
+Looping and arrays go together like peanut butter and jam.  An array is a sequence of
+variables of the same type, almost always related in some way.  Naturally, you
+want to operate on them all together in various ways; sorting, searching,
+accumulating, etc.  Given that the only way to do that is with loops, in this
+section we'll cover different ways of looping through arrays, and dealing with
+multi-dimentional arrays.
+
+==== 1D Arrays
+
+Let's pretend there's an array `int numbers[10];` filled with 10 random numbers.
+
+[source,c,linenums]
+----
+	int total = 0;
+	for (int i=0; i<10; i++) {
+		total += numbers[i];
+	}
+----
+
+There are several ways to do this.  The first is the most literal translation.
+
+[source,mips,linenums]
+----
+	li    $t0, 0     # total = 0
+	li    $t1, 0     # i = 0
+	la    $t2, numbers   # t2 = numbers
+	li    $t3, 10
+sum_loop:
+	sll   $t4, $t1, 2    # t4 = i*sizeof(int) == i*4
+	add   $t4, $t4, $t2  # t4 = &numbers[i]
+	lw    $t4, 0($t4)    # t4 = numbers[i]
+	add   $t0, $t0, $t4  # total += numbers[i]
+
+	addi  $t1, $t1, 1    # i++
+	blt   $t1, $t3, sum_loop   # while (i < 10)
+----
+
+We initialize the relevant variables beforehand (`numbers` and `$t3` could be set
+every iteration but that's less efficient).  Now what's with the `i*4`?  We already
+discussed using shifts to multiply and divide by powers of 2 in a previous chapter,
+but here we're doing something that higher level languages do automatically for you
+every time you do an array access.  When you access the _i_'th element, under the hood
+it is multiplying `i` by the size of the type of the array and adding that number of
+bytes to the base address and then loading the element located there.
+
+If you're unfamiliar with the C syntax in the comments, `&` means "address of", so
+`$t4` is being set to the address of the _i_'th element.  Actually that C syntax is
+redundant because the the `&` counteracts the brackets.  In C adding a number to a
+pointer does pointer math (ie it multiplies by the size of the items as discussed
+above).  This means that the following comparison is true:
+
+`&numbers[i] == numbers + i`
+
+which means that this is true too
+
+`&numbers[0] == numbers`
+
+The reason I use the form on the left in C/C++ even when I can use the right is it
+makes it more explicit and obvious that I'm getting the address of an element of an
+array.  If you were scanning the code quickly and saw the expression on the right,
+you might not realize that's an address at all, it could be some mathematical
+expression (though the array name would hopefully clue you in if it was picked well).
+
+Anyway, back to the MIPS code.  After we get the address of the element we want, we
+have to actually read it from memory (ie load it).  Since it's an array of words
+(aka 4 byte ints) we can use load word, `lw`.
+
+Finally, we add that value to `total`, increment `i`, and perform the loop check.
+
+Now, I said at the beginning that this was the most literal, direct translation
+(not counting the restructuring to a `do-while` form).  However, it is not my preferred
+form because it's not the simplest, nor the shortest.
+
+Rather than calculate the element address every iteration, why not keep a pointer
+to the current element and iterate through the array with it?  In C what I'm suggesting
+is this:
+
+[source,c,linenums]
+----
+	int* p = &numbers[0];
+	int i = 0, total = 0;
+	do {
+		total += *p;
+		i++;
+		p++;
+	} while (i < 10);
+----
+
+In other words, we set `p` to point at the first element and then increment it every
+step to keep it pointing at `numbers[i]`.  Again, all mathematical operations on pointers
+in C deal in increments of the byte syze of the type, so `p++` is really adding `1*sizeof(int)`.
+
+
+[source,mips,linenums]
+----
+	li    $t0, 0     # total = 0
+	li    $t1, 0     # i = 0
+	la    $t2, numbers   # p = numbers
+	li    $t3, 10
+sum_loop:
+	lw    $t4, 0($t2)    # t4 = *p
+	add   $t0, $t0, $t4  # total += *p
+
+	addi  $t1, $t1, 1    # i++
+	addi  $t2, $t2, 4    # p++  ie p += sizeof(int)
+	blt   $t1, $t3, sum_loop   # while (i < 10)
+----
+	
+Now, that may not look much better, we only saved 1 instuction, and if we were
+looping through a string (aka an array of characters, `sizeof(char) == 1`) we wouldn't
+have saved any.  However, imagine if we weren't using `sll` to do the multiply but
+`mult`.  That would take 3 instructions, not 1.  Even `mul` would take 2.  Remember
+we _would_ have to use one of those if we were iterating through an array of
+structures with a size that wasn't a power of 2.
+
+However, there is one more variant that you can use that can save a few more instructions.
+Instead of using `i` and `i<10` to control the loop, use `p` and the address just past the
+end of the array.  In C it would be this:
+
+[source,c,linenums]
+----
+	int* p = &numbers[0];
+	int* end = &numbers[10];
+	int total = 0;
+	do {
+		total += *p;
+		p++;
+	} while (p < end);
+----
+
+You could also use `!=` instead of `<`.  This is similar to using the `.end()` method
+on many C{plus}{plus} data structures when using iterators.  Now the MIPS version:
+
+[source,mips,linenums]
+----
+	li    $t0, 0     # total = 0
+	la    $t2, numbers   # p = numbers
+	addi  $t3, $t2, 40   # end = &numbers[10] = numbers + 10*sizeof(int)
+sum_loop:
+	lw    $t4, 0($t2)    # t4 = *p
+	add   $t0, $t0, $t4  # total += *p
+
+	addi  $t2, $t2, 4    # p++  ie p += sizeof(int)
+	blt   $t2, $t3, sum_loop   # while (p < end)
+----
+
+So we dropped from 10 to 7 instructions and even more if we had had to do `mul`
+or `mult` originally.  And this was for a 1D array.  Imagine if you had 2
+or 3 indices you had to use to calculate the correct offset.  That's what 
+we go over in the next section.
+
+
+==== 2D Arrays
+
+The first thing to understand is what's really happening when you declare a 2D
+array in C.  The contents of a 2D array are tightly packed, in row-major order,
+meaning that all the elements from the first row are followed by all the elements
+of the second row and so on.  What this means is that a 2D array is equivalent
+to a 1D array with rows*cols elements in the same order:
+
+[source,c,linenums]
+----
+	// The memory of these two arrays are identical
+	int array2d[2][4] = { { 1, 2, 3, 4 }, { 5, 6, 7, 8 } };
+	int array1d[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+----
+
+See the code example
+https://raw.githubusercontent.com/rswinkle/mips_book/master/code/2d_arrays.c[2d_arrays.c] for more details.
+
+What this means is that when we declare a 2D array, it's basically a 1D array with
+the size equal to the rows * columns.  Also, when we loop through a 2D array, we can
+often treat it like a 1D array with a single loop.  So everything that we learned
+before applies.
+
+Let's do an example.
+
+[source,c,linenums]
+----
+	for (int i=0; i<rows; i++) {
+		for (int j=0; j<cols; ++j) {
+			array[i][j] = i + j;
+		}
+	}
+
+	// becomes
+
+	int r, c;
+	for (int i=0; i<rows*cols; i++) {
+		r = i / cols;
+		c = i % cols;
+		array[i] = r + c;
+	}
+----
+
+So assuming `rows` and `cols` are in `$a0` and `$a1` (and nonzero), it would
+look like this:
+
+[source,mips,linenums]
+----
+	la    $t0, array    # p = &array[0]
+	li    $t1, 0        # i = 0
+	mult  $a0, $a1      # a0 = rows, a1 = cols
+	mflo  $t2           # t2 = rows * cols
+loop:
+	div   $t1, $a1
+	mflo  $t3           # r = i / cols
+	mfhi  $t4           # c = i % cols
+	add   $t3, $t3, $t4    # t3 = r + c
+
+	sw    $t3, 0($t0)      # array[i] = *p = r + c
+
+	addi  $t1, $t1, 1      # i++
+	addi  $t0, $t0, 4      # p++ (keep pointer in sync with i, aka p = &array[i])
+	blt   $t1, $t2, loop   # while (i < rows*cols)
+----
+
+You might ask if it's it worth it to convert it to a single loop when you still
+need the original `i` and `j` as if you were doing nested loops.  Generally, it is
+much nicer to avoid nested loops in assembly if you can.  There are many cases
+when you get the best of both worlds though.  If you're doing a clear for example,
+setting the entire array to a single value, there's no need to calculate the row
+and column like we did here.  I only picked this example to show how you could
+get them back if you needed them.
+
+For comparison here's the nested translation (while still taking advantage of
+the 1D arrangement of memory and pointer iterators):
+
+[source,mips,linenums]
+----
+	la    $t0, array    # p = &array[0]
+	li    $t1, 0        # i = 0
+looprows:
+	li    $t2, 0        # j = 0
+loopcols:
+	add   $t3, $t1, $t2    # t3 = i + j
+	sw    $t3, 0($t0)      # array[i][j] = *p = i + j
+
+	addi  $t2, $t2, 1         # j++
+	addi  $t0, $t0, 4         # p++ (keep pointer in sync with i and j, aka p = &array[i][j])
+	blt   $t2, $a1, loopcols  # while (j < cols)
+
+	addi  $t1, $t1, 1          # i++
+	blt   $t1, $a0, looprows   # while (i < rows)
+----
+
+It's a bit shorter but again, how much are those extra labels and branching worth?
+For me, this one's a toss up.  On the other hand, either of the last 2 versions are
+better than the literal translation below:
+
+[source,mips,linenums]
+----
+	la    $t0, array    # p = &array[0]
+	li    $t1, 0        # i = 0
+looprows:
+	li    $t2, 0        # j = 0
+loopcols:
+	add   $t3, $t1, $t2    # t3 = i + j
+
+	# need to calculate the byte offset of element array[i][j]
+	mult  $t1, $a1
+	mflo  $t4              # i * cols
+
+	add   $t4, $t4, $t2    # t4 = i * cols + j
+
+	sll   $t4  $t4, 2      # t4 = (i * cols + j) * sizeof(int)
+	add   $t4, $t4, $t0    $ t4 = &array[i][j] (calculated as array + (i*cols + j)*4)
+
+	sw    $t3, 0($t4)      # array[i][j] = i + j
+
+	addi  $t2, $t2, 1         # j++
+	blt   $t2, $a1, loopcols  # while (j < cols)
+
+	addi  $t1, $t1, 1          # i++
+	blt   $t1, $a0, looprows   # while (i < rows)
+----
+
+That chunk in the middle calculating the offset of every element?  Not only is
+it far slower than iterating the pointer through the array, but you can
+imagine how much worse it would be for a 3D array with 3 nested loops.
+
+
+=== Conclusion
+
+Hopefully after those examples you have a more solid understanding of looping in
+MIPS and how to transform various loops and array accesses into the form
+that makes your life the easiest.  There is more we could cover here, like
+looping through a linked list, but I think that's beyond the scope of what we've
+covered so far.  Perhaps in a later chapter.
+

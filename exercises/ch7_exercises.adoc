@@ -1,0 +1,56 @@
+
+=== Exercises
+
+include::../support.adoc[]
+
+. Convert the exercises from chapter 5 to run in `spim -bare` mode and/or
+in MARS with delayed branches and no pseudoinstructions (`java -jar ~/Mars_4.5.jar db np file.s` on the command line).
+
+. Convert the following C code to MIPS using a jump table (Note in C/C++
+enum values start at 0 and go up by one unless the user manually assigns a value, in
+which case it continues counting up from there).
++
+[source,c,linenums]
+----
+enum { STATE0, STATE1, STATE2, STATE3, STATE14 = 14, STATE42 = 42, STATE43, STATE44 };
+
+
+int main()
+{
+	int num;
+	do {
+		printf("Enter a number between 0 and 50: ");
+		scanf("%d", &num);
+	} while (num < 0 || num > 50);
+
+	switch (num) {
+	case STATE0:
+		puts("Zilch");
+		break;
+	case STATE1:
+		puts("Uno");
+		break;
+	case STATE2:
+		puts("Dos");
+		break;
+	case STATE3:
+		puts("Tres");
+		break;
+	case STATE14:
+		puts("Catorce");
+	case STATE42:
+		puts("The answer to life, the universe, and everything.");
+	case STATE43:
+		puts("Off by one");
+	case STATE44:
+		puts("4 * 11?");
+		break;
+	}
+
+	puts("Thanks for playing!");
+
+
+	return 0;
+}
+----
+

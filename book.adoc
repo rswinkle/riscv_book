@@ -1,0 +1,47 @@
+:source-highlighter: pygments
+
+= RISC-V Assembly Programmming
+Robert Winkler <mips@robertwinkler.com>
+v0.1.0, 2022-06-10: Beta
+:toc:
+
+include::info.adoc[]
+
+include::dedication.adoc[]
+
+include::ch0.adoc[]
+
+include::exercises/ch0_exercises.adoc[]
+
+include::ch1.adoc[]
+
+include::exercises/ch1_exercises.adoc[]
+
+include::ch2.adoc[]
+
+include::exercises/ch2_exercises.adoc[]
+
+include::ch3.adoc[]
+
+include::exercises/ch3_exercises.adoc[]
+
+include::ch4.adoc[]
+
+include::exercises/ch4_exercises.adoc[]
+
+include::ch5.adoc[]
+
+include::exercises/ch5_exercises.adoc[]
+
+include::ch6.adoc[]
+
+include::exercises/ch6_exercises.adoc[]
+
+include::ch7.adoc[]
+
+include::exercises/ch7_exercises.adoc[]
+
+include::refs.adoc[]
+
+include::supporters.adoc[]
+

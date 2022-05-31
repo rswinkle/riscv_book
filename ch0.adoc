@@ -1,0 +1,206 @@
+:mars_slow: footnote:[Starting up the MARS GUI (an old Java app) is often annoyingly slow]
+:mars_versions: footnote:[Some schools/professors have their own versions with extra features and other improvements over the old version available on the MARS website]
+:mars_commandline: footnote:[https://courses.missouristate.edu/KenVollmar/mars/Help/MarsHelpCommand.html]
+
+== Chapter 0: Hello World
+
+In which we lay the groundwork for the rest of the book...
+
+=== Prereqs
+
+While someone with no programming experience could probably learn RISC-V from this
+book, it is definitely preferable to have at least some experience in a higher
+level imperative programming language. I say imperative, because programming
+in assembly is the antithesis of functional programming; everything is about
+state, with each line changing the state of the CPU and sometimes memory. Given
+that, experience in functional languages like Lisp, Scheme etc. are less helpful
+than experience in C/C{plus}{plus}, Java, Python, Javascript etc.
+
+Of all of the latter, C is the best, with C{plus}{plus} being a close second because at least
+all of C exists in C{plus}{plus}. There are many reasons C is the best prior experience when
+learning assembly (any assembly, not just RISC-V), including the following:
+
+* pointers, concepts and symmetry of "address of" and "dereference" operators
+* pointer/array syntax equivalence
+* stack allocation as the default
+* manual memory management, no garbage collector
+* global data
+* rough equivalence in structure of a C program and an assembly program (vs. say Java)
+* pass by value
+
+There is some overlap between those and there are probably more, but you can see that
+most other languages that are commonly taught as first languages are missing most, if
+not all of those things.
+
+Even C{plus}{plus}, which technically has all of them being a superset of C,
+is usually taught in a way that mostly ignores all of those things.  They teach
+C{plus}{plus} as if it's Java, never teaching the fundamentals. In any case this
+is getting into my problems with CS pedagogy of the last 20 years based on my
+experience as a CS major myself ('12) and as a programming tutor helping college
+students across the country since 2016, and I should save it for a proper
+essay/rant sometime.
+
+Long story short, I use C code and C syntax to help explain and teach RISC-V.  I'll
+try to provide enough explanation regardless of past experience as best I can.
+
+=== System Setup
+
+As I tell all of my tutoring students, if you're majoring in CS or anything related
+I highly recommend you use Linux. It's easier in every way to do dev work
+on Linux vs Windows or Mac.  Many assignments require it, which often necessitates
+using a virtual machine (which is painful, especially on laptops) and/or ssh-ing
+into a school Linux server, which is also less than ideal.  In general, you'll have
+to learn how to use the unix terminal eventually and will probably use it to some
+extent in your career so it also makes sense to get used to it asap.
+
+That being said, Windows does now have WSL so you can get the full Ubuntu or Debian
+or Fedora etc. terminal based system on Windows without having to setup a real
+virtual machine (or dealing with the slowdown that would cause). I've even heard
+that they'll get support for Linux GUI programs soon.
+
+MacOS on the other hand, is technically a Unix based system and you can use their
+terminal and install virtually any program from there using Macports or Homebrew
+or similar.
+
+There are a few RISC-V simulators that I know of and h
+
+* RARS is a RISC-V port of MARS, a Java GUI based simulator with dozens of extra
+environment calls, syntactic sugar and features like graphics, memory mapped I/O, etc.
+* Venus, a web based simulator used by Berkeley (also has a downloadable jar)
+* Ripes, a graphical processor simulator and assembly editor for bare bones assembly
+programming
+
+Of those three, RARS is by far the most full featured and user friendly for learning
+since it forked from the venerable MARS MIPS simulator.  It is also the most
+commonly used by students outside of Berkeley.  Given that, this book will focus
+primarily on RARS, though it almost all of it should apply equally well to Venus.
+
+You can download/access both at the following links:
+
+* https://github.com/TheThirdOne/rars[RARS]
+* https://venus.cs61c.org/[Venus]
+
+=== Handy Resources
+
+There are a few references that you should bookmark (or download) before you get started.
+The first is the
+https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/riscvcard.pdf[RISC-V Greensheet].
+It's possible you already have a physical copy of this as it's actually the tearout from the Patterson
+and Hennessey textbook https://amzn.to/3zN71KP[_Computer Architecture and Design_]
+that is commonly used in college courses.
+
+There is also a large format of the
+https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/riscvcard_large.pdf[greensheet].
+
+The second thing is the list of
+https://github.com/TheThirdOne/rars/wiki/Environment-Calls[system calls] (aka syscalls,
+environment calls, ecalls) from the RARS wiki.
+
+I recommend you download/bookmark both and keep them open while working because
+you'll be referencing them often to remind yourself which instructions and syscalls
+you have available and how they work.
+
+=== Hello World
+
+Let's start with the classic hello world program, first in C, then in RISC-V, and go
+over all the pieces in overview.  You can copy paste these into your editor of choice
+(mine being neovim), or use the files in the associated repo to follow along.
+
+[source,c,linenums]
+----
+#include <stdio.h>
+
+int main()
+{
+	printf("Hello World!\n");
+	return 0;
+}
+----
+
+It is pretty self explanatory.  You have to include stdio.h so you can use the
+function printf (though in the real world I'd use puts here), the function main
+is the start of any C/C{plus}{plus} program, which is a function that returns
+an int.  We call printf to display the string "Hello World!\n" to the user and
+then return 0 to exit.  Returning 0 indicates success and there were no errors.
+
+You can compile and run it in a linux/unix terminal as shown below.  You
+can substitute clang or another compiler for gcc if you want.
+
+[source,bash]
+----
+$ gcc -o hello hello.c
+$ ./hello
+Hello World!
+----
+
+Now, the same program in RISC-V:
+
+[source,riscv,linenums]
+----
+.data
+hello:   .asciz "Hello World!\n"
+
+.text
+main:
+	li   a7, 4      # load immediate, a7 = 4 (4 is print string system call)
+	la   a0, hello  # load address of string to print into a0
+	ecall
+
+	li   a7, 10     # exit syscall
+	ecall
+----
+
+The `.data` section is where you declare global variables, which includes string
+literals as in this case.  We'll cover them in more detail later.
+
+The `.text` section is where any code goes.  Here we declare a single label `main:`,
+indicating the start of our main function.
+
+We then put the number 4 in the `a7` register to select the print string system
+call.  The print string system call takes one argument, the address of the string
+to print, in the `a0` register.  We do that on the next line. On line 8, we call
+the system call using the syscall instruction.
+
+Finally we call the exit system call which takes no arguments and exits the program.
+
+Again, we'll cover system calls in a later chapter.  This is just an intro/overview
+so don't worry if some things aren't completely clear.  This chapter is about getting
+you up and running, not really about teaching anything specific yet.
+
+=== Building and Running
+
+Now that we have our hello world MIPS program, how do we run it?  Well the easiest
+and quickest{mars_slow} way is of course to do it on the command line, which can be done like
+this:
+
+[source,bash]
+----
+$ java -jar ~/rars_latest.jar hello.s
+RARS 4.5  Copyright 2003-2019 Pete Sanderson and Kenneth Vollmar
+
+Hello World!
+
+Program terminated by calling exit
+----
+
+The name of your rARS jar file may be different{rars_versions}, so be sure to
+use the correct name and path.  For myself, I keep the jar file in my home
+directory so I can use tilde to access it no matter where I am.  You can also
+copy it into your working directory (ie wherever you have your source code) so you
+don't have to specify a path at all.  There are lots of useful command line options
+that you can use{rars_commandline}, some of which we'll touch on later.
+
+Running the jar directly on the command line works even in the Windows/DOS command
+line though I've never done it and it's probably not worth it.
+
+Alternatively, you can start up RARS like a normal GUI application and
+then load your source file.  RARS requires you to hit "assemble" and then "run".
+
+
+=== Conclusion
+
+Well, there you have it, you have written and run your first RISC-V program.  Another
+few chapters and you will have no trouble with almost anything you would want
+to do in RISC-V, whether for a class, or on your own for fun.
+
+

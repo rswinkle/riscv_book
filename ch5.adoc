@@ -1,0 +1,450 @@
+:one_return: footnote:[I do not agree with an ironclad "one return" policy in higher level languages.  Sometimes returning early results in cleaner code, sometimes not.  Similarly, `goto` is not evil and there are rare cases where using it creates the best code.]
+:zero_reg: footnote:[Obviously the zero register is not really a variable.  I never understood how people could say "const variable" with a straight face, it's literally an oxymoron.]
+:fp_is_s8: footnote:[It's an https://www.cs.uaf.edu/2000/fall/cs301/notes/notes/node66.html[old link], but not as old as SPIM so maybe using it for a frame pointer was added later]
+
+== Chapter 5: Functions and the MIPS Calling Convention
+
+While I'm sure everyone here probably knows what functions are, and we'll cover
+them in assembly shortly, you might be wondering what a "Calling Convention" is.
+In short, it is an agreement between the caller and callee about how to treat/use
+certain registers.  We'll get to the why and how later.
+
+
+=== Functions
+
+In assembly, a function is simply a label with a return instruction associated with it;
+because this is far more ambiguous than a function in a higher level language, it
+is good practice to only have a single return instruction associated with a
+function.{one_return}  A comment above the label is also helpful.  Together those help you
+quickly see the start and end of the function.
+
+[source,c,linenums]
+----
+void func1() {}
+----
+
+would be
+
+[source,mips,linenums]
+----
+# void func1()
+func1:
+	# body goes here
+	jr     $ra
+----
+
+As you can see my policy is to put a single line comment of the C prototype above
+label.
+
+But how do you call a function in assembly?  You use the instruction Jump and Link:
+`jal func_label`.
+Let's change the hello world program from chapter 0 to call a function:
+
+
+[source,mips,linenums]
+----
+.data
+hello:   .asciiz "Hello World!\n"
+
+.text
+main:
+	jal  hello_world
+
+	li   $v0, 10     # exit syscall
+	syscall
+
+
+# void hello_world()
+hello_world:
+	li   $v0, 4      # print string system call
+	la   $a0, hello  # load address of string to print into a0
+	syscall
+
+	jr  $ra
+
+----
+
+What `jal` actually does, is save the address of the next instruction to `$ra`
+and then do an unconditional jump to the function label.  So you could achieve
+the same results with the following:
+
+----
+	jal    func
+
+	# is equivalent to
+
+	la     $ra, next_instr
+	j      func
+next_instr:
+----
+
+That would get tiring and ugly fast though, having to come up with unique labels
+for the next instruction every time.  You also might be confused about why the
+greensheet says `jal` saves PC+8 in `$ra` instead of PC+4.  The reason
+is that MIPS technically has delayed branching, i.e. a single instruction after
+every branch instruction is executed before the jump actually happens.  So `jal`
+adds 8 instead of 4 to account for that extra instruction delay.  However,
+every simulator we've mentioned does non-delayed branching by default so you
+can ignore it.
+
+// TODO I'll cover using delayed branching in the chapter covering stupid prof
+// requirements like not using pseudoinstructions etc.
+
+=== The Convention
+
+We've gone as far as we can without starting to talk about registers and their
+purposes in functions.  You can think of registers as variables{zero_reg} that
+are part of the CPU.  In this case, since we're dealing with a 32-bit MIPS
+architecture, they are 32-bit (aka 4 bytes, 1 word) variables.  Since they're
+part of the CPU, they exist for the life of the program and the whole program
+shares the same registers.
+
+But how does that work?  If all parts of the program use the same
+32 registers, how does one function not stomp all over what another was doing
+when it uses them?  In fact, how do functions communicate at all?  How do they
+pass arguments or return results?  All these questions are solved by deciding
+on a "Calling Convention".  It's different for different architectures and even
+different operating systems on the same architecture.  This is because different
+architectures have different numbers of registers, and some registers like `$ra`
+have hardcoded uses.  The op `jal` modifies `$ra`, and `$0` is a constant 0 and
+there's no way to change either of those facts.  That still leaves a lot of
+flexibility about designing a calling convention.  While they mostly match,
+you'll find several variations of MIPS calling conventions online.  They
+usually differ in how they setup a stack frame.  The convention covered
+in this chapter is consistent with, and sufficient for, almost every college
+course I've ever heard of.
+
+Regardless, what matters is that the calling convention works by setting rules
+(and guidelines) for register use, and when/how to use the stack.
+
+If you're unfamiliar with the
+runtime stack, it's exactly what it sounds like.  It's a Last-In-First-Out (LIFO)
+data structure that you can use to store smaller values in a program.  It grows
+in a negative direction, so to allocate 12 bytes, you would subtract 12 from the
+stack pointer (in MIPS that's `$sp`).
+
+MIPS specifically designates certain registers to be used for passing arguments
+(at least the first 4), others for return values, and others for misc. temporary
+or saved values.  The rest are special use registers like `$ra`.
+
+The quickest way to summarize is to look at the table
+on the greensheet which is reproduced (with some modifications) below:
+
+
+.MIPS Registers and Uses
+[cols="1,1,3,1"]
+|===
+| Name | Number | Use | Preserved Across a Call
+
+| $zero | 0 | Constant 0 | N.A.
+
+| $at | 1 | Assembler Temporary (used to expand pseudo-ops) | No
+
+| $v0-$v1 | 2-3 | Function Results and Expression Evaluation | No
+
+| $a0-$a3 | 4-7 | Arguments | No
+
+| $t0-$t7 | 8-15 | Temporaries | No
+
+| $s0-$s7 | 16-23 | Saved Temporaries | Yes
+
+| $t8-$t9 | 24-25 | Temporaries | No
+
+| $k0-$k1 | 26-27 | Reserved for OS Kernel | No
+
+| $gp | 28 | Global Pointer | Yes
+
+| $sp | 29 | Stack Pointer | Yes
+
+| $fp (or $s8) | 30 | Frame Pointer if necessary or can be another saved reg | Yes
+
+| $ra | 31 | Return Address | No
+
+|===
+
+To summarize, you have 16 registers that can be used anytime for temporary
+values, though some have special uses too (the v, a, and t registers).
+You have 8 s registers that have to be saved on the stack if you use
+them, plus `$ra` as well.  The `$zero` register is obviously a special case.
+
+The `$sp` register is technically preserved but not in the same way.  Basically
+what you allocate (subtract) you have to deallocate (add) before returning
+from a function, thus preserving the original value.
+
+You can ignore `$at, $k0-$k1, $gp` and most of the time `$fp` too.  In over 5 years
+of tutoring I've helped students with MIPS from at least 2 dozen different colleges
+and I think I've only seen a professor force his students to use `$fp`
+or pass more than 4 arguments twice.  You can see{fp_is_s8} register 30 sometimes
+referred to as `$s8` rather than, or in addition to, `$fp` which shows you how rarely
+it's actually used/needed as a frame pointer.
+
+==== Basic example
+
+Let's start with something simple that doesn't use the stack.
+
+----
+int hello_name_number(char* name, int number)
+{
+	printf("Hello %s!\n", name);
+	return number*10;
+}
+----
+
+According to the convention that becomes:
+
+----
+.data
+hello_space:  .asciiz "Hello "
+exclaim_nl:   .asciiz "!\n"
+
+.text
+# int hello_name_number(char* name, int number)
+hello_name_number:
+	move    $t0, $a0   # save name in t0 since we need a0 for the syscall
+
+	li      $v0, 4        # print string
+	la      $a0, hello_space
+	syscall
+
+	move      $a0, $t0    # print name (v0 is still 4)
+	syscall
+
+	la        $a0, exclaim_nl  # print "!\n"
+	syscall
+
+
+	addi    $v0, $a1, 10  # return number+10
+	jr      $ra
+----
+
+Some things to note, syscalls are not function calls so we can "save" `$a0` in
+a t register and know that it'll still be there when the syscall is done.  In the
+same way, we know that `$v0` is still the same so we don't have to keep setting
+it to 4 for print string.  Lastly, to return a value, we make sure that value
+is in `$v0` before returning.
+
+==== Using the Stack
+
+Ok, first let's establish the rules on when you _have_ to use the stack (You can
+always use it for arbitrary local variables, like a local array for example, but
+generally don't if you don't have a good reason).
+
+. *You call another function, ie you're a non-leaf function.*
++
+This means you have to save `$ra` on the stack at the very least, otherwise when you
+do your `jr $ra` you'd jump back into yourself (right after the last `jal` instruction).
+This does not apply to main because you don't/shouldn't return from main, you should
+call the exit (or exit2) syscall (10 or 17).
+
+. *You need to save values across a function call (automatically includes reason 1).*
++
+This is fairly common for non-trivial functions. Obvious examples are calling a
+function in a loop or loops (you'd have to preserve the iterator(s)), and
+many recursive functions.
+
+. *You run out of temporary registers and overflow into the s registers.*
++
+This is very rare.  The most common reason this "happens" is people forget they have
+10 t registers instead of 8 like s registers and even if they remember that they
+forget they can also use the a and v registers for temporaries.  16 is more than
+enough to handle pretty much any function because you rarely need 17 discrete values
+at the same time.
+
+Ok let's look at an example for the first two.  Any example for the last rule
+would be prohibitively large and complicated.
+
+
+[source,c,linenums]
+----
+int non_leaf()
+{
+	func1();
+	return 42
+}
+----
+
+This calls the empty function discussed at the top of this chapter.
+
+[source,mips,linenums]
+----
+#int non_leaf()
+non_leaf:
+	addi    $sp, $sp, -4  # space to save 1 register, $ra
+	sw      $ra, 0($sp)   # store $ra in the newly allocated stack space
+
+	jal     func1
+
+	li      $v0, 42       # return 42
+
+	lw      $ra, 0($sp)   # restore original $ra
+	addi    $sp, $sp, 4   # pop the stack
+	jr      $ra
+----
+
+The bit of code at the top and bottom of the function are called the prologue
+and epilogue respectively for obvious reasons.  We allocate 4 bytes on the stack
+by subtracting 4 (I add a negative rather than subtract
+because I can copy-paste the line with a single character change for the
+epilogue).  Then we store the current `$ra` in that space at the new top of the
+stack.  Then before we exit we have to load it back and pop the stack.
+
+If we didn't save and restore `$ra` we would jump to line 7 when we do our
+`jr $ra` and then we'd be in an infinite loop.
+
+Next we have the second case, where we need to preserve regular local values
+across a function call.
+
+[source,c,linenums]
+----
+void print_letters(char letter, int count)
+{
+	for (int i=0; i<count; i++) {
+		putchar(letter);
+	}
+	putchar('\n');
+}
+
+int save_vals()
+{
+	for (int i=0; i<10; i++) {
+		print_letters('A'+i, i+1);
+	}
+	return 8;
+}
+----
+
+That becomes this in mips:
+
+[source,mips,linenums]
+----
+#void print_letters(char letter, int count)
+print_letters:
+	ble     $a1, $0, exit_pl   # if (count <= 0) goto exit_pl
+	li      $v0, 11            # print character
+pl_loop:
+	syscall
+	addi    $a1, $a1, -1       # count--
+	bgt     $a1, $0, pl_loop   # while (count > 0)
+
+	li      $a0, 10            # '\n'
+	syscall
+	
+exit_pl:
+	jr      $ra
+
+
+#int save_vals()
+save_vals:
+	addi    $sp, $sp, -12
+	sw      $ra, 0($sp)
+	sw      $s0, 4($sp)
+	sw      $s1, 8($sp)
+
+	li      $s0, 0  # i = 0
+	li      $s1, 10
+sv_loop:
+	addi    $a0, $s0, 65   # i + 'A'
+	addi    $a1, $s0, 1    # i + 1
+	jal     print_letters
+
+	addi    $s0, $s0, 1        # i++
+	blt     $s0, $s1, sv_loop  # while (i < 10)
+
+	lw      $ra, 0($sp)
+	lw      $s0, 4($sp)
+	lw      $s1, 8($sp)
+	addi    $sp, $sp, 12
+	jr      $ra
+----
+
+Notice that for print_letters, we not only convert the loop to a `do-while`, but
+we also use the parameter `count` as the iterator to count _down_ to 0.  It saves
+us an instruction initializing an `i`.
+
+Second, for `save_vals`, we save not only `$ra` because we call another function,
+but also two s registers to save `i` and our stopping point.  The second is not
+actually necessary.  Because it's a constant, we could load 10 into a register
+right before the check every iteration of the loop.  Which version is better depends on
+several factors, like how long or complex the loop is, how many times it executes, and
+of course personal preference.
+
+==== Recursive Functions
+
+Let's do a classic recursive function, the fibonacci sequence.
+
+[source,c,linenums]
+----
+int fib(int n)
+{
+	if (n <= 1)
+		return n;
+
+	return fib(n-2) + fib(n-1);
+}
+
+----
+
+You can see how, at the very least, we'll have to save `$ra` and `n`, because we
+need the original even after the first recursive call.  It's not as
+obvious, but we'll also have to save the return value of the first call so
+we'll still have it to do the addition after the second.  You might think
+this would require using two s regs, but does it?  Let's see...
+
+[source,mips,linenums]
+----
+#int fib(int n)
+fib:
+	addi    $sp, $sp, -8
+	sw      $ra, 0($sp)
+	sw      $s0, 4($sp)
+
+	move    $v0, $a0        # prepare to return n
+	li      $t0, 1
+	ble     $a0, $t0, exit_fib  # if (n <= 1) goto exit_fib (ie return n)
+
+	move    $s0, $a0        # save n
+
+	addi    $a0, $a0, -2    # a0 = n - 2
+	jal     fib             # fib(n-2)
+
+	addi    $a0, $s0, -1    # a0 = n - 1, prep arg first so we can use s0 to save v0
+	move    $s0, $v0        # save return of fib(n-2) in s0
+	jal     fib             # fib(n-1)
+
+	add     $v0, $v0, $s0   #  v0 = fib(n-1) + fib(n-2)
+
+exit_fib:
+	lw      $ra, 0($sp)
+	lw      $s0, 4($sp)
+	addi    $sp, $sp, 8
+	jr      $ra
+----
+
+Notice how we don't have to save `n` any sooner than necessary, ie right before
+we have to use `$a0` to setup the first recursive call.  Also, the ordering of
+lines 16 and 17 is important.  We needed the original `n` to calculate `n-1` but
+once that's in `$a0` ready for the call, because we won't need `n` again afterward,
+we can now use `$s0` to preserve the return value of the first call.
+
+Some of you, if you were paying attention, might point out that you could save
+a few instructions of performance if you moved the base case testing before the
+prologue as long as you put the exit label after the epilogue.  This is true,
+but I'd recommend against it unless you were really trying to eke out every last
+microsecond.  It's nicer/cleaner to keep the prologue and epilogue as the
+first and last things; they're one more thing to catch your eye and help delineate
+where functions start and end.  Regardless, if you're curious, you can see that
+version, along with every other function in this chapter in the included program
+https://raw.githubusercontent.com/rswinkle/mips_book/master/code/calling.s[calling.s].
+
+// TODO A recursive function that doesn't require saving anything but $ra
+
+=== Conclusion
+
+While grasping the basics of a calling convention is not too difficult, it takes
+practice to get used to it.  There are many things that we haven't covered
+in this chapter, like how to pass more than 4 arguments, or use `$fp`, or handle
+floating point arguments or return values.  The latter at least, will be covered in
+the next chapter.
+
+
+

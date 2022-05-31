@@ -1,0 +1,33 @@
+
+=== Exercises
+
+include::../support.adoc[]
+
+. Convert the following C code to MIPS
++
+[source,c,linenums]
+----
+#include <stdio.h>
+
+int main()
+{
+	float price;
+	double golden = 1.618;
+	int ret;
+
+	printf("Enter what the price of gas was last time you filled up: ");
+	scanf("%f", &price);
+
+	printf("%f is too expensive!\n", price);
+
+	printf("The golden ratio is roughly %f\n", golden);
+
+
+	printf("Enter an integer for the program to return: "
+	scanf("%d", &ret);
+	return ret;
+}
+----
+
+. Write a program that asks the user for their name, reads it in, and then
+prints "Hello [user's name]!"

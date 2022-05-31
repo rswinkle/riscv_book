@@ -1,0 +1,8 @@
+
+== References and Useful Links
+
+* https://inst.eecs.berkeley.edu/~cs61c/resources/MIPS_Green_Sheet.pdf[Greensheet]
+* https://courses.missouristate.edu/KenVollmar/mars/Help/SyscallHelp.html[MARS syscall list]
+* https://learnxinyminutes.com/docs/mips/[learnxinyminutes page]
+* https://courses.necaise.org/MIPSReference/MIPSReference[Randolph-Macon College MIPS Reference]
+* https://chortle.ccsu.edu/AssemblyTutorial/index.html[CCSU MIPS Reference]

@@ -1,0 +1,608 @@
+:source-highlighter: pygments
+
+:green_tabs: footnote:[When I find the post I read years ago about how using tabs saves CO2 I'll put it here, but I'm joking.  I use tabs because it makes sense and there are accessibility reasons too: https://www.reddit.com/r/javascript/comments/c8drjo/nobody_talks_about_the_real_reason_to_use_tabs/]
+
+:label_addresses: footnote:[https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html]
+
+
+== Chapter 7: Tips and Tricks
+
+This chapter is a grab bag of things you can do to improve your MIPS
+programs and make your life easier.
+
+=== Formatting
+
+You may have noticed I have a general format I like to follow when writing
+MIPS (or any) assembly.  The guidelines I use are the following
+
+. *1 indent for all code excluding labels/macros/constants.*
++
+I use hard tabs set to a width of 4 but it really doesn't matter as long as
+it's just 1 indent according to your preferences.
+
+. *Use _spaces_ to align the first operand of all instructions out far enough.*
++
+Given my 4 space tabs, this means column 13+ (due to syscall, though I often stop at 11).
+The reason to use spaces is to prevent the circumstances that gave
+hard tabs a bad name.  When you use hard tabs for alignment, rather than indentation,
+and then someone else opens your code with their tab set to a different width,
+suddenly everything looks terrible.  Thus, tabs for indentation, spaces for alignment.
+Or as is increasingly common (thanks Python), spaces for everything but I refuse
+to do that to the poor planet.{green_tabs}
+
+. *A comma and a single space between operands.*
++
+The simulators don't actually require the comma but since other assembly
+languages/assemblers do, you might as well get used to it.  Besides I think
+it's easier to read with the comma, though that might be me comparing it
+to passing arguments to a function.
+
+. *Comment every line or group of closely related lines with the purpose.*
++
+This is often simply the equivalent C code.  You can relax this a little as you get
+more experience.
+
+. *Use a blank line to separate logically grouped lines of code.*
++
+While you can smash everything together vertically, I definitely wouldn't recommend
+it, even less than I would in a higher level language.
+
+. *Put the `.data` section at the top, similar to declaring globals in C.*
++
+There are exceptions for this.  When dealing with a larger program with lots
+of strings, it can be convenient to have multiple `.data` sections with the
+strings you're using declared close to where you use them.  The downside is
+you have to keep swapping back and forth between `.text` and `.data`.
+
+=== Misc. General Tips
+
+. *Try to use registers starting from 0 and working your way up.*
++
+It helps you keep track of where things are (esp. combined with the comments).
+This can fall apart when you discover you forgot something or need to
+modify the code later and it's often not worth changing all the registers
+you're already using so you can maintain that nice sequence.  When that happens
+I'll sometimes just pick the other end of sequence (ie `$t9` or `$s7`) since
+if it's out of order I might as well make it obvious.
+
+. *Minimize your jumps, labels, and especially your level of nested loops.*
++
+This was already covered in the chapters on branching and loops but it bears
+repeating.
+
+. *In your prologue save `$ra` first, if necessary, then all s regs used starting at `$s0`.*
++
+Then copy paste the whole thing to the bottom, move the first line to the bottom and
+change the number to positive and change all the `sw` to `lw`.
+
+....
+func:
+	addi    $sp, $sp, -20
+	sw      $ra, 0($sp)
+	sw      $s0, 4($sp)
+	sw      $s1, 8($sp)
+	sw      $s2, 12($sp)
+	sw      $s3, 16($sp)
+
+	# body of func here that calls another function or functions
+	# and needs to preserve 4 values across at least one of those calls
+
+	lw      $ra, 0($sp)
+	lw      $s0, 4($sp)
+	lw      $s1, 8($sp)
+	lw      $s2, 12($sp)
+	lw      $s3, 16($sp)
+	addi    $sp, $sp, 20
+....
+
+
+=== Constants
+
+One of the easiest things you can do to make your programs more readable
+is to use defined constants in your programs.  Both MARS and SPIM have ways
+of defining constants similar to how C defines macro constants; ie they
+aren't "constant variables" that take up space in memory, it's as if a
+search+replace was done on them right before assembling the program.
+
+Let's look at our Hello World program using constants for SPIM and MARS
+
+SPIM:
+
+[source,mips,linenums]
+----
+sys_print_str = 4
+sys_exit = 10
+
+.data
+hello:   .asciiz "Hello World!\n"
+
+.text
+main:
+	li      $v0, sys_print_str
+	la      $a0, hello  # load address of string to print into a0
+	syscall
+
+	li      $v0, sys_exit
+	syscall
+----
+
+MARS:
+
+[source,mips,linenums]
+----
+.eqv sys_print_str 4
+.eqv sys_exit 10
+
+.data
+hello:   .asciiz "Hello World!\n"
+
+.text
+main:
+	li      $v0, sys_print_str
+	la      $a0, hello  # load address of string to print into a0
+	syscall
+
+	li      $v0, sys_exit
+	syscall
+----
+
+=== Macros
+
+MARS supports function style macros that can shorten your code and improve
+readability in some cases (though I feel it can also make it worse or be a wash).
+
+The syntax looks like this:
+
+[source,mips,linenums]
+----
+.macro macroname
+	instr1  a, b, c
+	instr2, b, d
+# etc.
+.end_macro
+
+# or with parameters
+.macro macroname(%arg1)
+	instr1    a, %arg1
+	instr2    c, d, e
+# etc.
+.end_macro
+----
+
+Some common examples are using them to print strings:
+
+[source,mips,linenums]
+----
+.macro print_str_label(%x)
+	li     $v0, 4
+	la     $a0, %x
+	syscall
+.end_macro
+
+.macro print_str(%str)
+.data
+str: .asciiz %str
+.text
+	li     $v0, 4
+	la     $a0, str
+	syscall
+.end_macro
+
+.data
+
+str1:   .asciiz "Hello 1\n"
+
+.text
+# in use:
+	print_str_label(str1)
+
+	print_str("Hello World\n")
+
+	...
+----
+
+You can see an example program in
+https://raw.githubusercontent.com/rswinkle/mips_book/master/code/macros.s[macros.s].
+
+Unfortunately, as far as I can tell, SPIM does not support function style macros
+despite what MARS's documentation implies about using a $ instead of a % for arguments.
+
+=== Switch-Case Statements
+
+It is relatively common in programming to compare an integral type variable
+(ie basically any built-in type but float and double) against a bunch of different
+constants and do something different based on what it matches or if it matches none.
+
+This could be done with a long `if-else-if` chain, but the longer the chain the more
+likely the programmer is to choose a `switch-case` statement instead.
+
+Here's a pretty short/simple example in C:
+
+[source,c,linenums]
+----
+	printf("Enter your grade (capital): ");
+	int grade = getchar();
+	switch (grade) {
+	case 'A': puts("Excellent job!"); break;
+	case 'B': puts("Good job!"); break;
+	case 'C': puts("At least you passed?"); break;
+	case 'D': puts("Probably should have dropped it..."); break;
+	case 'F': puts("Did you even know you were signed up for the class?"); break;
+	default: puts("You entered and invalid grade!");
+	}
+----
+
+You could translate this to its eqivalent `if-else` chain and handle it like we
+cover in the chapter on branching.  However, imagine if this switch statment had
+a dozen cases, two dozen etc.  The MIPS code for that quickly becomes long and ugly.
+
+So what if we implemented it in MIPS the same way it is semantically in C?
+The same way compilers often (but not necessarily) use?  Well, before we do that,
+what is a switch actually doing?  It is _jumping_ to a specific case label based
+on the value in the specified variable.  It then starts executing, falling through
+any other labels, till it hits a `break` which will jump to the end of the switch
+block.  If the value does not have its own case label, it will jump to the default
+label.
+
+Compilers handle it by creating what's called a jump table, basically an array
+of label addresses, and using the variable to calculate an index in the table
+to use to jump to.
+
+The C eqivalent of that would look like this:
+
+
+[source,c,linenums]
+----
+include::code/switch.c[]
+----
+
+The `&&` and `goto *var` syntax are actually not standard C/C++ but are GNU
+extensions that are supported in gcc (naturally) and clang, possibly others.{label_addresses}
+
+First, notice how the size of the jump table is the value of the highest valued label
+minus the lowest + 1.  That's why we subtract the lowest value to shift the range
+to start at 0 for the indexing.  Second, any values without labels within that range
+are filled with the `default_label` address.  Third, there has to be an initial
+check for values outside the range to jump to default otherwise you could get an
+error from an invalid access outside of the array's bounds.
+
+The same program/code in MIPS would look like this:
+
+[source,mips,linenums]
+----
+include::code/switch.s[]
+----
+
+It's easy to forget that `jr` does not actually stand for "jump return" or
+"jump ra," though it's almost always used for that purpose.  Instead, it stands
+for "jump register" and we can use it to do the eqivalent of the computed goto
+statement in C.
+
+This example probably wasn't worth making switch style, because the overhead
+and extra code of making the table and preparing to jump balanced out or even
+outweighed the savings of a branch instruction for every case.  However, as the
+number of options increases, the favor tilts toward using a jump table like this as
+long as the range of values isn't too sparse.  If the range of values is in the 100's
+or 1000's but you only have cases for a dozen or so, then obviously it isn't worth
+creating a table that large only to fill it almost entirely with the default label
+address.
+
+To reiterate, remember it is not about the magnitude of the actual values
+you're looking for, only the difference between the highest and lowest because
+high - low + 1 is the size of your table.
+
+=== Command Line Arguments
+
+Command line arguments, also known as program arguments, or command line parameters,
+are strings that are passed to the program on startup.  In high level languages like
+C, they are accessed through the parameters to the main function (naturally):
+
+
+[source,c,linenums]
+----
+#include <stdio.h>
+
+int main(int argc, char** argv)
+{
+	printf("There are %d command line arguments:\n", argc);
+
+	for (int i=0; i<argc; i++) {
+		printf("%s\n", argv[i]);
+	}
+
+	return 0;
+}
+----
+
+As you can see, `argc` contains the number of parameters and `argv` is an array of
+those arguments as C strings.  If you run this program you'll get something
+like this:
+
+[source,bash]
+----
+$ ./args 3 random arguments
+There are 4 command line arguments:
+./args
+3
+random
+arguments
+----
+
+Notice that the first argument is the what you actually typed to invoke the program,
+so you always have at least one argument.
+
+MIPS works the same way.  The number of arguments is in `$a0` and an array of strings
+is in `$a1` when main starts.  So the same program in MIPS looks like this:
+
+
+[source,mips,linenums]
+----
+.data
+
+there_are:  .asciiz "There are "
+arguments:  .asciiz " command line arguments:\n"
+
+.text
+
+main:
+	move    $t0, $a0  # save argc
+
+	li      $v0, 4
+	la      $a0, there_are
+	syscall
+
+	move    $a0, $t0
+	li      $v0, 1   # print int
+	syscall
+
+	li      $v0, 4            # print string
+	la      $a0, arguments
+	syscall
+
+	li      $t1, 0   # i = 0
+	j       arg_loop_test
+
+arg_loop:
+	li      $v0, 4
+	lw      $a0, 0($a1)
+	syscall
+
+	li      $v0, 11    # print character
+	li      $a0, 10    # '\n'
+	syscall
+
+	addi    $t1, $t1, 1   # i++
+	addi    $a1, $a1, 4    # argv++ ie a1 = &argv[i]
+arg_loop_test:
+	blt     $t1, $t0, arg_loop  # while (i < argc)
+
+	li      $v0, 10
+	syscall
+----
+
+This program works exactly like the C program when using SPIM:
+
+[source]
+----
+$ spim -file args.s 3 random arguments
+SPIM Version 8.0 of January 8, 2010
+Copyright 1990-2010, James R. Larus.
+All Rights Reserved.
+See the file README for a full copyright notice.
+Loaded: /usr/lib/spim/exceptions.s
+There are 4 command line arguments:
+args.s
+3
+random
+arguments
+----
+
+Obviously the commands for SPIM itself are not included but the file name (args.s)
+takes the place as the "executable".
+
+Unfortunately, MARS works differently, probably because it's more GUI focused.  It
+does not pass the program/file name as the first argument, so you can actually get
+0 arguments:
+
+[source]
+----
+$ java -jar ~/Mars4_5.jar args.s pa 3 random arguments
+MARS 4.5  Copyright 2003-2014 Pete Sanderson and Kenneth Vollmar
+
+There are 3 command line arguments:
+3
+random
+arguments
+----
+
+You can see that you have to pass "pa" (for "program arguments") to indicate that
+the following strings are arguments.  In the GUI, there is an option in
+"Settings" called "Program arguments provided to MIPS progam" which if selected will
+add a text box above the Text Segment for you to enter in the arguments to be
+passed.
+
+.Enable program arguments in MARS GUI
+image::images/enable_mars_args.png[]
+
+.Example using program arguments in MARS GUI
+image::images/mars_args.png[]
+
+=== Delayed Branches and Delayed Loads
+
+MIPS originally had a 1-instruction delay between when a branch or load was executed,
+and when it actually jumped or completed the load.  By default, SPIM has both of
+these turned off but you can turn them on with the arguments `-delayed_branches`
+and `-delayed_loads` respectively, or use the `-bare` which turns on both, as
+well as disabling pseudoinstructions (ie it simulates the "bare" machine without
+any of the niceties).  MARS is the same as SPIM in that it defaults to the more
+user friendly mode, but you can turn on delayed branches in the settings (but
+not delayed loads, that isn't supported as far as I can tell).  From the command
+line you can turn it on with the `db` argument and you can turn off pseudoinstructions
+with `np` (for the next section).
+
+The only reason you'd probably ever want to do this to yourself is if your professor
+requires it for some unknown reason.  There is some learning value to seeing how
+pseudoinstructions are turned into actual instructions, but there's absolutely nothing
+useful to be gained in turning on the delays.
+
+To handle delayed branches, all you have to do is add a
+`nop` (No Operation) instruction after every branch or jump instruction
+(including `jal` and `jr`).  The solution is identical for delayed loads, put a
+`nop` after every load instruction.
+
+You could put other instructions there, intsructions that you have above the jumps
+or loads that don't have to occur before.  If you were doing a real project on
+real hardware and were trying to minimize program size and maximize speed, you
+would definitely do this (if that hardware had delayed branches/loads).  However,
+it's a bad idea for two reasons.  First, it takes longer to figure out which
+instructions you can move and why, and it makes your program harder to read since
+you naturally don't expect an instruction to occur before the previous one.
+Second, and more importantly, it means your program will no longer work if you
+turn delayed branches/loads off again.  Using a `nop` means the change is quick,
+easy, and you can still run it in the simulator's default mode if needed.
+
+One final note, and it relates to the following section.  Even though `nop`
+is supposedly represented by all 0's, and MARS supports it even with pseudoinstrutions
+disabled, SPIM does not support it in bare mode.  This means you have to use
+some other instruction that has no side effects, like `or  $0, $0, $0`, which
+will work as a `nop` under all conditions and simulators.
+
+=== No Pseudoinstructions Allowed
+
+Far more common than requiring delayed loads is forbidding pseudoinstructions,
+either all of them, or some subset of them.  This forces us to explicitly write
+what actually happens when you use those pseudoinstructions.
+
+ifndef::is_pdf[]
+include::pseudo_equivalents.adoc[]
+endif::[]
+
+ifdef::is_pdf[]
+include::pseudo_equivalents_pdf.adoc[]
+endif::[]
+
+You can see how you use the non-pseudoinstructions to match the same behavior, and
+there's often (usually) more than one way.  Of all of them, `ble` is
+the worst, because what was 1 instruction becomes 3, and you'll sometimes need an
+extra register to hold the "plus 1" value if you still need the original.
+
+Another thing I should comment on is the `la` equivalence.  The reason it is
+a pseudoinstruction in the first place is that an address is 32 bits.  That's also
+the size of a whole instruction.  Clearly there's no way to represent a whole
+address and anything else at the same time.  The lower left corner of the
+greensheet has the actual formats of the 3 different types of instructions and
+even the jump format still needs 6 bits for the opcode.  This is why `lui` exists,
+in order to facilitate getting a full address into a register by doing it in two
+halves, 16 + 16.  The lower 16 can be placed with `addi` or `ori` after the `lui`.
+
+That begs the question, what actually goes in the upper half?  Well, since
+we're dealing with addresses in the `.data` section, the upper portion should
+match the upper part of address of the `.data` section.  In SPIM the `data` section
+starts at `0x10000000` in bare mode.  In normal mode it is `0x10010000`, but you'd be
+able to use `la` in normal mode.  However, in MARS it is always `0x10010000`,
+so you won't be able to have it work correctly in bare SPIM and MARS without
+changing that back and forth.
+
+But what about the lower part of the address?  This involves counting the bytes
+from the top of `.data` to the label you want.  If all you have is words, halfs,
+floats, doubles, or space (with a round number), that's fairly easy, but the
+second you have strings between the start and the label you want, it's a bit
+more painful.  This is why I recommend putting any string declarations at the
+bottom so at least any other globals will have nice even offsets.  Also, if
+you have a bunch of globals, it doesn't hurt to count once and put the offsets
+in comments above each label so you don't forget.  Of course, none of this matters
+if you're allowed to just use `la` which is true the vast majority of the time.
+
+Let's look at a small example.  We'll convert the following code from
+args.s to bare mode:
+
+[source,mips,linenums]
+----
+.data
+
+there_are:  .asciiz "There are "
+arguments:  .asciiz " command line arguments:\n"
+
+.text
+main:
+	move    $t0, $a0  # save argc
+
+	li      $v0, 4
+	la      $a0, there_are
+	syscall
+
+	# some code removed for brevity
+
+	li      $t1, 0   # i = 0
+	j       arg_loop_test
+
+arg_loop:
+	li      $v0, 4
+	lw      $a0, 0($a1)
+	syscall
+
+	li      $v0, 11
+	li      $a0, 10    # '\n'
+	syscall
+
+	addi    $t1, $t1, 1   # i++
+	addi    $a1, $a1, 4    # argv++ ie a1 = &argv[i]
+arg_loop_test:
+	blt     $t1, $t0, arg_loop  # while (i < argc)
+----
+
+So we need to change the `move`, the ``li``'s, the `la` and the `blt` and add a `nop`
+after any branches or loads.
+
+[source,mips,linenums]
+----
+.data
+
+there_are:  .asciiz "There are "
+arguments:  .asciiz " command line arguments:\n"
+
+.text
+
+main:
+	or      $t0, $0, $a0  # save argc
+
+	ori     $v0, $0, 4
+	lui     $a0, 0x1000    # there_are is at beginning of data so just lui, lower is 0
+	syscall
+
+	ori     $t1, $0, 0   # i = 0
+	j       arg_loop_test
+	or      $0, $0, $0
+
+arg_loop:
+	ori     $v0, $0, 4     # print string for argv[i]
+	lw      $a0, 0($a1)
+	or      $0, $0, $0     # nop
+	syscall
+
+	ori     $v0, $0, 11
+	ori     $a0, $0, 10    # '\n'
+	syscall
+
+	addi    $t1, $t1, 1    # i++
+	addi    $a1, $a1, 4    # argv++ ie a1 = &argv[i]
+arg_loop_test:
+	bne     $t1, $t0, arg_loop  # while (i != argc)
+	or      $0, $0, $0
+----
+
+Following the table, you can see the `move` became `or`, the ``li``'s became
+`ori`, we added `nop` instructions in the form of `or` with `$0` as the destination,
+and lastly, the `blt` became `bne`.  That last is worth noting, because there's no
+reason to do a complicated transformation if you don't have to and `bne` accomplishes
+the same thing here.
+
+
+See the example program
+https://raw.githubusercontent.com/rswinkle/mips_book/master/code/args_bare.s[args_bare.s]
+which is just
+https://raw.githubusercontent.com/rswinkle/mips_book/master/code/args.s[args.s]
+in bare mode for a complete example.
+
+
+

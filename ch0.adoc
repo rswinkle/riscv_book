@@ -1,6 +1,6 @@
-:mars_slow: footnote:[Starting up the MARS GUI (an old Java app) is often annoyingly slow]
-:mars_versions: footnote:[Some schools/professors have their own versions with extra features and other improvements over the old version available on the MARS website]
-:mars_commandline: footnote:[https://courses.missouristate.edu/KenVollmar/mars/Help/MarsHelpCommand.html]
+:rars_slow: footnote:[Starting up the RARS GUI (an old style Java app) is often annoyingly slow]
+:rars_versions: footnote:[Some schools/professors have their own versions with extra features and other improvements over the official releases]
+:rars_commandline: footnote:[https://github.com/TheThirdOne/rars/wiki/Using-the-command-line]
 
 == Chapter 0: Hello World
 
@@ -170,7 +170,7 @@ you up and running, not really about teaching anything specific yet.
 === Building and Running
 
 Now that we have our hello world MIPS program, how do we run it?  Well the easiest
-and quickest{mars_slow} way is of course to do it on the command line, which can be done like
+and quickest{rars_slow} way is of course to do it on the command line, which can be done like
 this:
 
 [source,bash]
@@ -183,7 +183,7 @@ Hello World!
 Program terminated by calling exit
 ----
 
-The name of your rARS jar file may be different{rars_versions}, so be sure to
+The name of your RARS jar file may be different{rars_versions}, so be sure to
 use the correct name and path.  For myself, I keep the jar file in my home
 directory so I can use tilde to access it no matter where I am.  You can also
 copy it into your working directory (ie wherever you have your source code) so you

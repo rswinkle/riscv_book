@@ -1,7 +1,7 @@
 
 == Chapter 1: Data
 
-In MIPS, you can declare global variables in the `.data` section.
+In RISC-V, you can declare global variables in the `.data` section.
 
 At a minimum, this is where you would declare/define any literal strings
 your program will be printing, since virtually every program has
@@ -14,7 +14,7 @@ When declaring something in the `.data` section, the format is
 where whitespace between the 3 is arbitrary.  The possible directives are listed
 in the following table:
 
-.MIPS data types
+.RISC-V data types
 [cols="1,1,2"]
 |===
 | Directive | Size | C equivalent
@@ -31,7 +31,9 @@ in the following table:
 
 | .ascii | NA | char str[5] = "hello"; (no '\0')
 
-| .asciiz | NA | char str[] = "hello"; (includes the '\0')
+| .asciz | NA | char str[] = "hello"; (includes the '\0')
+
+| .string | NA | alias for .asciz
 
 | .space  | NA | typeless, unitinialized space, can be used for any type/array
 |===
@@ -40,7 +42,7 @@ in the following table:
 As you can see it's pretty straightforward, but there are a few more details
 about actually using them so let's move onto some examples.
 
-Say you wanted to convert the following simple program to MIPS:
+Say you wanted to convert the following simple program to RISC-V:
 
 [source,c,linenums]
 ----
@@ -61,16 +63,16 @@ The first thing you have to remember is that when converting from a higher level
 language to assembly (any assembly) is that what matters is whether it's functionally
 the same, not that everything is done in exactly the same way.  In this instance,
 that means realizing that your literal strings and your local variables `name`
-and `age` become globals in MIPS.
+and `age` become globals in RISC-V.
 
 [source,mips,linenums]
 ----
 .data
 age:         .word 0  # can be initialized to anything
 
-ask_name:    .asciiz "What's your name and age?\n"
-hello_space: .asciiz "Hello "
-nice_meet:   .asciiz ", nice to meet you!\n"
+ask_name:    .asciz "What's your name and age?\n"
+hello_space: .asciz "Hello "
+nice_meet:   .asciz ", nice to meet you!\n"
 
 name:        .space 30
 
@@ -84,14 +86,15 @@ As you can see in the example, we extract all the string literals and
 the character array `name` and int `age` and declare them as MIPS globals.
 One thing to note is the second `printf`.  Because it prints a variable, `name`,
 using the conversion specifier, we break the literal into pieces around that.
-Since there is no built-in `printf` function in MIPS, you have to handle printing
+Since there is no built-in `printf` function in RISC-V, you have to handle printing
 variables yourself with the appropriate system calls.
 
 
 === Arrays
 
-Obviously strings are special cases that can be handled with `.ascii` or `.asciiz`
-for literals, but for other types or user inputed strings how do we do it?
+Obviously strings are special cases that can be handled with `.ascii` or `.asciz`
+(or the alias `.string`) for literals, but for other types or user inputed strings
+how do we do it?
 
 The first way, which was demonstrated in the snippet above is to use `.space`
 to declare an array of the necessary byte size.  Keep in mind that the size is
@@ -115,10 +118,8 @@ the characters individually.
 However, if you want an array with all elements initialized to the same value there
 is a more convenient option that I learned very recently.  After the type you
 put the value you want, a colon, and then the number of elements.  So `a: .word 123 : 10`
-would declare a 10 integer array with all elements set to 123.  This works for all
-types in MARS, but SPIM does not support this syntax for floats and doubles.  Since
-you'll probably not have to deal with floating point types at all, let alone arrays
-of them initialized to a particular value, this isn't a huge loss.
+would declare a 10 integer array with all elements set to 123. TODO check if venus
+supports this syntax.
 
 Given what we just covered, this:
 
@@ -133,7 +134,7 @@ char e[3] = { 'a', 'b', 'c' };
 
 becomes
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
 .data
 a:        .space 80
@@ -143,8 +144,8 @@ d:        .word 42 : 5
 e:        .byte 'a', 'b', 'c'
 ----
 
-For more examples of array declarations, see 
-https://raw.githubusercontent.com/rswinkle/mips_book/master/code/array_decls.s[array_decls.s].
+For more examples of array declarations, see
+https://raw.githubusercontent.com/rswinkle/riscv_book/master/code/array_decls.s[array_decls.s].
 You don't have to understand the rest of the code, just that it prints out each of the arrays.
 
 

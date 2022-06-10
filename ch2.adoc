@@ -1,4 +1,4 @@
-:mars_syscalls: footnote:[https://courses.missouristate.edu/KenVollmar/mars/Help/SyscallHelp.html]
+:rars_syscalls: footnote:[https://github.com/TheThirdOne/rars/wiki/Environment-Calls]
 
 == Chapter 2: System Calls
 
@@ -6,62 +6,60 @@ We mentioned system calls (aka syscalls from now on) in chapter 0 when we were
 going over our "Hello World" program, but what exactly are they?
 
 Essentially, they are the built in functions of a operating system; in this case,
-the simple operating system of the MIPS simulators.  They provide access to all the
+the simple operating system of the RISCV simulators.  They provide access to all the
 fundamental features, like input and output to/from both the console and files,
-allocating memory, and exiting.  That covers all the 17 syscalls supported by spim,
-but MARS supports many more, for things ranging from playing MIDI sounds, to getting
-a random number, to creating GUI dialogs.{mars_syscalls}
+allocating memory, and exiting.  That covers the basics but RARS supports many more,
+for things ranging from playing MIDI sounds, to getting a random number, to creating
+GUI dialogs.{rars_syscalls}
 
-NOTE: Except for the MARS or SPIM specific chapters/sections, I'll be sticking to code
-compatible with both throughout this book, meaning we only use the first 17 syscalls,
-and don't get to use some of the syntactic sugar available in MARS, or any SPIM
-specific features either.
-
-.SPIM supported syscalls
+.Basic RARS supported syscalls
 [cols="3,1,6,6"]
 |===
-| Name | $v0 | Arguments | Result
+| Name | a7 | Arguments | Result
 
-| print integer | 1 | $a0 = integer to print |
+| print integer | 1 | a0 = integer to print |
 
-| print float | 2 | $f12 = float to print |
+| print float | 2 | fa0 = float to print |
 
-| print double | 3 | $f12 = double to print |
+| print double | 3 | fa0 = double to print |
 
-| print string | 4 | $a0 = address of string |
+| print string | 4 | a0 = address of string |
 
-| read integer | 5 | | $v0 = integer read
+| read integer | 5 | | a0 = integer read
 
-| read float | 6 | |$f0 = float read
+| read float | 6 | | fa0 = float read
 
-| read double | 7 | | $f0 = double read
+| read double | 7 | | fa0 = double read
 
-| read string | 8 | $a0 = address of input buffer +
-$a1 = buffer size | works like C's fgets
+| read string | 8 | a0 = address of input buffer +
+a1 = buffer size | works like C's fgets
 
-| sbrk | 9 | $a0 = size in bytes to allocate | $v0 = address of allocated memory (sbrk is basically malloc but there is no free)
+| sbrk | 9 | a0 = size in bytes to allocate | a0 = address of allocated memory (sbrk is basically malloc but there is no free)
 
 | exit | 10 | | program terminates
 
-| print character | 11 | $a0 = character to print (ascii value) |
+| print character | 11 | a0 = character to print (ascii value) |
 
-| read character | 12 | | $v0 = character read
+| read character | 12 | | a0 = character read
 
-| open file | 13 | $a0 = address of filename +
-$a1 = flags +
-$a2 = mode | $v0 = file descriptor (negative if error)
+| open file | 1024 | a0 = address of filename +
+$a1 = flags | a0 = file descriptor (negative if error)
 
-| read from file | 14 | $a0 = file descriptor +
-$a1 = address of input buffer +
-$a2 = max characters to read | $v0 = number of characters read, 0 for end-of-file, negative for error
+| lseek | 62 | a0 = file descriptor, a1 = offset from base, +
+a2 = beginning(0), current(1), or end of the file(2) |
+a0 = selected position from beginning of the file or -1 if error
 
-| write to file | 15 | $a0 = file descriptor +
-$a1 = address of output buffer +
-$a2 = number of characters to write | $v0 = number of characters written, negative for error
+| read from file | 63 | a0 = file descriptor +
+a1 = address of input buffer +
+a2 = max characters to read | a0 = number of characters read, -1 if error
 
-| close file | 16 | $a0 = file descriptor |
+| write to file | 64 | a0 = file descriptor +
+a1 = address of output buffer +
+a2 = number of characters to write | a0 = number of characters written
 
-| exit2 | 17 | $a0 = termination result | program terminates, returning number in $a0 (only meaningful when run in the terminal, ignored in GUI)
+| close file | 57 | a0 = file descriptor |
+
+| exit2 | 93 | a0 = termination result | program terminates, returning number in a0 (only meaningful when run in the terminal, ignored in GUI)
 
 |===
 

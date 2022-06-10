@@ -1,0 +1,6 @@
+
+
+
+Write sample programs in MIPS and RISC-V (RARS and Venus) showing
+how to open/read/write files.  Verify RARS file syscall behavior differs from
+MARS and how

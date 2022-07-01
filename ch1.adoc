@@ -65,7 +65,7 @@ the same, not that everything is done in exactly the same way.  In this instance
 that means realizing that your literal strings and your local variables `name`
 and `age` become globals in RISC-V.
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
 .data
 age:         .word 0  # can be initialized to anything

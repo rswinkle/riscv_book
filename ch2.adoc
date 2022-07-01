@@ -1,8 +1,8 @@
-:rars_syscalls: footnote:[https://github.com/TheThirdOne/rars/wiki/Environment-Calls]
+:rars_ecalls: footnote:[https://github.com/TheThirdOne/rars/wiki/Environment-Calls]
 
-== Chapter 2: System Calls
+== Chapter 2: Environment Calls
 
-We mentioned system calls (aka syscalls from now on) in chapter 0 when we were
+We mentioned environment calls (aka ecalls from now on) in chapter 0 when we were
 going over our "Hello World" program, but what exactly are they?
 
 Essentially, they are the built in functions of a operating system; in this case,
@@ -10,9 +10,9 @@ the simple operating system of the RISCV simulators.  They provide access to all
 fundamental features, like input and output to/from both the console and files,
 allocating memory, and exiting.  That covers the basics but RARS supports many more,
 for things ranging from playing MIDI sounds, to getting a random number, to creating
-GUI dialogs.{rars_syscalls}
+GUI dialogs.{rars_ecalls}
 
-.Basic RARS supported syscalls
+.Basic RARS supported ecalls
 [cols="3,1,6,6"]
 |===
 | Name | a7 | Arguments | Result
@@ -72,19 +72,19 @@ So, what does that table mean?  How do these actually work?
 
 The process is:
 
-. Put the number for the syscall you want in `$v0`
+. Put the number for the ecall you want in `a7`
 . Fill in the appropriate arguments, if any
-. Execute the syscall with `syscall`
+. Execute the ecall with `ecall`
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
-	li    $v0, 1   # 1 is print integer
-	li    $a0, 42  # takes 1 arg in a0, the number to print
-	syscall        # actually execute syscall
+	li    a7, 1   # 1 is print integer
+	li    a0, 42  # takes 1 arg in a0, the number to print
+	ecall         # actually execute ecall
 ----
 
 You can think of the above as `print_integer(42);`.  Let's look at an actual
-program that uses a few more syscalls next.
+program that uses a few more ecalls next.
 
 === Examples
 
@@ -115,94 +115,93 @@ int main()
 ----
 
 I'm using `fgets()` instead of `scanf("%s", name)` because fgets works the same as the
-read string syscall (8).
+read string ecall (8).
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
 .data
 
 name:     .space 50
 
-nameprompt:  .asciiz "What's your name? "
-hello_space: .asciiz "Hello "
-how_old:     .asciiz "How old are you? "
-ask_height:  .asciiz "Enter your height in inches: "
-ageplusheight: .asciiz "Your age + height = "
+nameprompt:  .asciz "What's your name? "
+hello_space: .asciz "Hello "
+how_old:     .asciz "How old are you? "
+ask_height:  .asciz "Enter your height in inches: "
+ageplusheight: .asciz "Your age + height = "
 
 
 .text
 main:
-	li   $v0, 4      # print string system call
-	la   $a0, nameprompt  # load address of string to print into a0
-	syscall
+	li    a7, 4      # print string
+	la    a0, nameprompt  # load address of string to print into a7
+	ecall
 
-	li   $v0, 8      # read string
-	la   $a0, name
-	li   $a1, 50
-	syscall
+	li    a7, 8      # read string
+	la    a0, name
+	li    a1, 50
+	ecall
 
-	li   $v0, 4
-	la   $a0, hello_space
-	syscall
+	li    a7, 4
+	la    a0, hello_space
+	ecall
 
-	la   $a0, name  # note 4 is still in $v0
-	syscall
+	la    a0, name  # note 4 is still in a7
+	ecall
 
 	# don't print a newline here because
-	# one will be part of name
+	# one will be part of name unless they typed >48 characters
 
-	li   $v0, 4
-	la   $a0, how_old
-	syscall
+	li    a7, 4
+	la    a0, how_old
+	ecall
 
-	li   $v0, 5   # read integer
-	syscall
-	move $t0, $v0  # save age in t0
+	li    a7, 5   # read integer
+	ecall
+	mv    t0, a0  # save age in t0
 
-	li   $v0, 4
-	la   $a0, ask_height
-	syscall
+	li    a7, 4
+	la    a0, ask_height
+	ecall
 
-	li   $v0, 5   # read integer
-	syscall
-	add  $t0, $t0, $v0 # t0 += height
+	li    a7, 5   # read integer
+	ecall
+	add   t0, t0, a0 # t0 += height
 
 
-	li   $v0, 4
-	la   $a0, ageplusheight
-	syscall
+	li    a7, 4
+	la    a0, ageplusheight
+	ecall
 
-	li   $v0, 1  # print int
-	move $a0, $t0  # a0 = age + height
-	syscall
-	
+	li    a7, 1  # print int
+	mv    a0, t0  # t0 = age + height
+	ecall
+
 	# print newline
-	li   $v0, 11   # print char
-	li   $a0, 10   # ascii value of '\n'
-	syscall
+	li    a7, 11   # print char
+	li    a0, 10   # ascii value of '\n'
+	ecall
 
 
-	li   $v0, 10     # exit syscall
-	syscall
+	li    a7, 10     # exit ecall
+	ecall
 ----
 
 There a few things to note from the example.
 
 We don't declare global variables for age or height.  We could, but there's no reason
 to since we have to have them in registers to do the addition anyway.  Instead, we
-copy/save height to `$t0` so we can use `$v0`  for 2 more syscalls,
-then add age to `$t0`.
+copy/save age to `t0` so we can use `a0` for 2 more ecalls,
+then add height to `t0`.
 
 This is generally how it works.  Use registers for local variables unless
 required to do otherwise.  We'll cover xref:ch5.adoc#_the_convention[more about]
-register use when we cover the MIPS calling convention.
+register use when we cover the RISC-V calling convention.
 
-Another thing is when we print their name, we don't put 4 in `$v0` again because it
-is still/already 4 from the lines above.  Unless the syscall says it writes to $v0
-you can assume it is unmodified.
+Another thing is when we print their name, we don't put 4 in `a7` again because it
+is still/already 4 from the lines above.
 
 Lastly, many people will declare a string `"\n"` and use print string to print a newline,
-but it's easier to use the print char syscall as we do right before exiting.
+but it's easier to use the print char ecall as we do right before exiting.
 
 
 

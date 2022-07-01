@@ -93,11 +93,11 @@ There is also a large format of the
 https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/riscvcard_large.pdf[greensheet].
 
 The second thing is the list of
-https://github.com/TheThirdOne/rars/wiki/Environment-Calls[system calls] (aka syscalls,
-environment calls, ecalls) from the RARS wiki.
+https://github.com/TheThirdOne/rars/wiki/Environment-Calls[environment calls] (aka ecalls,
+system calls, syscalls) from the RARS wiki.
 
 I recommend you download/bookmark both and keep them open while working because
-you'll be referencing them often to remind yourself which instructions and syscalls
+you'll be referencing them often to remind yourself which instructions and ecalls
 you have available and how they work.
 
 === Hello World
@@ -146,7 +146,7 @@ main:
 	la   a0, hello  # load address of string to print into a0
 	ecall
 
-	li   a7, 10     # exit syscall
+	li   a7, 10     # exit ecall
 	ecall
 ----
 
@@ -159,7 +159,7 @@ indicating the start of our main function.
 We then put the number 4 in the `a7` register to select the print string system
 call.  The print string system call takes one argument, the address of the string
 to print, in the `a0` register.  We do that on the next line. On line 8, we call
-the system call using the syscall instruction.
+the system call using the ecall instruction.
 
 Finally we call the exit system call which takes no arguments and exits the program.
 

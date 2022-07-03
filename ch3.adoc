@@ -1,9 +1,10 @@
-:greensheet: footnote:[https://inst.eecs.berkeley.edu/~cs61c/resources/MIPS_Green_Sheet.pdf]
+:greensheet: footnote:[https://inst.eecs.berkeley.edu/~cs61c/fa17/img/riscvcard.pdf]
+:rars_instrs: footnote:[https://github.com/TheThirdOne/rars/wiki/Supported-Instructions]
 :de_morgans: footnote:[https://en.wikipedia.org/wiki/De_Morgan%27s_laws]
 
 == Chapter 3: Branches and Logic
 
-We can't go much farther in our MIPS programming journey without covering branching.
+We can't go much farther in our RISC-V programming journey without covering branching.
 Almost every non-trivial program requires some logic, even if it's only a few `if` or
 `if-else` statements.  In other words, almost every program requires branching, a way
 to do a instead of b, or to do a only if certain conditions are met.
@@ -14,7 +15,7 @@ to jump to a label on another line based on the result of various comparisons.  
 relevant instructions are listed in the following table:
 
 
-.MIPS branching related instructions (and pseudoinstructions)
+.RISC-V branching related instructions (and some pseudoinstructions)
 [cols="3,1,2,2"]
 |===
 | Name | Opcode | Format | Operation
@@ -41,26 +42,26 @@ relevant instructions are listed in the following table:
 
 |===
 
-You can see the same information and more (like which ones are pseudoinstructions)
-on the MIPS greensheet.{greensheet}
+You can see the same information and more on the RISC-V
+greensheet and the RARS Supported Instructions list.{greensheet}{rars_instrs}
 
 There are additional pseudoinstructions in the form of beq/bne/blt/bgt/ble/bge + 'z' which
 are syntactic sugar to compare a register against 0, ie the 0 register.
 
 So the following:
 ----
-	beq     $t0, $0, label
-	bne     $t1, $0, label
-	blt     $t2, $0, label
+	beq      t0, x0, label
+	bne      t1, x0, label
+	blt      t2, x0, label
 ----
 would be equivalent to:
 ----
-	beqz    $t0, label
-	bnez    $t1, label
-	bltz    $t2, label
+	beqz     t0, label
+	bnez     t1, label
+	bltz     t2, label
 ----
 
-Note `$0` is the same as `zero` and is the hard coded 0 register.  I'll cover
+Note `x0` is the same as `zero` and is the hard coded 0 register.  I'll cover
 registers in xref:ch5.adoc#_the_convention[more detail] in the chapter on functions and the calling conventions.
 
 One final thing is that labels have the same naming requirements as C variables and
@@ -70,7 +71,7 @@ underscores, or digits.
 === Practice
 
 The rest of this chapter will be going over many examples, looking at snippets
-of code in C and translating them to MIPS.
+of code in C and translating them to RISC-V.
 
 ==== Basics
 
@@ -85,15 +86,15 @@ the if statement is arbitrary.
 	a *= 2;
 ----
 
-Now in MIPS, let's assume that a is in `$t0`.  The tranlation would look
+Now in RISC-V, let's assume that a is in `t0`.  The tranlation would look
 like this:
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
-	ble   $t0, $0, less_eq_0    # if (a <= 0) goto less_eq_0
-	addi  $t0, $t0, 1           # a++
+	ble    t0, x0, less_eq_0   # if (a <= 0) goto less_eq_0
+	addi   t0, t0, 1           # a++
 less_eq_0:
-	sll   $t0, $t0, 1           # a *= 2  (shifting left by n is multiplying by 2^n)
+	slli   t0, t0, 1           # a *= 2  (shifting left by n is multiplying by 2^n)
 ----
 
 There are a few things to note in this example.  The first is that in assembly
@@ -101,8 +102,8 @@ we test for the opposite of what was in the if statement.  This will always be
 the case when jumping forward because (if we want to keep the same order of code)
 we can only jump _over_ a block of code, whereas in C we fall into the block if
 the condition is true.  In the process of mentally compiling a bit of C to
-assembly, it can be helpful to some to change to jump based
-logic first.  For example the previous C would become:
+assembly, it can be helpful to change to jump based logic first.  For example
+the previous C would become:
 
 [source,c,linenums]
 ----
@@ -129,29 +130,22 @@ Generally speaking, this also tends to result in more performant code, since
 using fewer instructions and fewer branches (the most common outcomes) saves
 execution time.
 
-In this case, the standard `mult` instruction (from the green sheet) would have
-required 3 instructions, and even the `mul` instruction (that does seem to
-be supported everywhere but is not on the green sheet) would take 2:
+In this case, using the standard `mul` instruction would actually take 2
+instructions:
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
-	li    $t1, 2
-	mult  $t0, $t1
-	mflo  $t0           # a *= 2
-
-	# or
-
-	li    $t1, 2
-	mul   $t0, $t0, $t1   # a *= 2
+	li     t1, 2
+	mul    t0, t0, t1   # a *= 2
 ----
 
-Given that, when multiplying or dividing by a power of 2 it's common practice
-to use `sll` or `sra`.  This is true in all assembly languages because
+This is why, when multiplying or dividing by a constant power of 2 it's common
+practice to use `slli` or `srai`.  This is true in all assembly languages because
 multiplication and division are relatively costly operations so using shifts
 when you can saves performance even if you didn't actually save instructions.
 
 Ok, let's look at an `if-else` example.  Again, the actual code is arbitrary and
-we're assuming a and b are in `$t0` and `$t1` respectively
+we're assuming a and b are in `t0` and `t1` respectively
 
 [source,c,linenums]
 ----
@@ -164,29 +158,29 @@ we're assuming a and b are in `$t0` and `$t1` respectively
 
 You could do it something like these two ways
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
-	bgt    $t0, $0, greater_0   # if (a > 0) goto greater_0
-	addi   $t1, $t1, -50        # b -= 50
-	j      less_eq_0
+	bgt     t0, x0, greater_0   # if (a > 0) goto greater_0
+	addi    t1, t1, -50        # b -= 50
+	j       less_eq_0
 greater_0:
-	li     $t1, 100             # b = 100
+	li      t1, 100             # b = 100
 less_eq_0:
 
 	# or
 
-	ble    $t0, $0, less_eq0    # if (a <= 0) goto less_eq_0
-	li     $t1, 100             # b = 100
-	j      greater_0
+	ble     t0, x0, less_eq0    # if (a <= 0) goto less_eq_0
+	li      t1, 100             # b = 100
+	j       greater_0
 less_eq_0:
-	addi   $t1, $t1, -50        # b -= 50
+	addi    t1, t1, -50        # b -= 50
 greater_0:
 ----
 
 You can see how the first swaps the order of the actual code which keeps the
 actual conditions the same as in C, while the second does what we discussed
 before and inverts the condition in order keep the the blocks in the same
-order.  In both cases, an extra unconditional branch and label is necessary
+order.  In both cases, an extra unconditional branch and label are necessary
 so we don't fall through the else case.  This is inefficient and wasteful,
 not to mention complicates the code unecessarily.  Remember how our job
 is to match the behavior, not the exact structure?  Imagine how we could
@@ -202,11 +196,11 @@ rewrite it in C to simplify the logic:
 
 which becomes
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
-	addi   $t1, $t1, -50        # b -= 50;
-	ble    $t0, $0, less_eq_0   # if (a <= 0) goto less_eq_0
-	li     $t1, 100             # b = 100
+	addi    t1, t1, -50        # b -= 50;
+	ble     t0, x0, less_eq_0   # if (a <= 0) goto less_eq_0
+	li      t1, 100             # b = 100
 less_eq_0:
 ----
 
@@ -370,15 +364,15 @@ no_add20:
 
 which turns into:
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
-	li     $t9, 10
-	ble    $t0, $t9, no_add20      # if (a <= 10) goto no_add20
-	bge    $t0, $t1, no_add20      # if (a >= b)  goto no_add20
+	li      t6, 10
+	ble     t0, t6, no_add20      # if (a <= 10) goto no_add20
+	bge     t0, t1, no_add20      # if (a >= b)  goto no_add20
 
-	addi   $t2, $t2, 20            # c += 20
+	addi    t2, t2, 20            # c += 20
 no_add20:
-	andi   $t1, $t1, 0xFF          # b &= 0xFF
+	andi    t1, t1, 0xFF          # b &= 0xFF
 ----
 
 See how that works?  **Or**'s do not need to remember state.  Just the fact that
@@ -387,7 +381,6 @@ were false, otherwise you'd have jumped.  If you tried to emulate the same
 thing with an *and*, as you saw in the larger snippet above, you'd need a
 bunch of extra labels and jumps for each term.
 
-// TODO add example of mixed compond expression if (A || B && C)
 What about mixed compound statements?
 
 [source,c,linenums]
@@ -448,31 +441,29 @@ done_if:
 
 That is harder to read and has both an extra print and an extra jump.
 
-So let's convert the better version to MIPS (a,b,c = `$t0`, `$t1`, `$t2`):
+So let's convert the better version to RISC-V (a,b,c = `t0`, `t1`, `t2`):
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
 .data
-true_str: .asciiz "true\n"
+true_str: .asciz "true\n"
 
 .text
-	li    $t8, 10   # get the necessary literals in some unused regs
-	li    $t9, 100
+	li     t5, 10   # get the necessary literals in some unused regs
+	li     t6, 100
 
-	bgt   $t0, $t8, do_true   # if (a > 10) goto do_true
-	ble   $t2, $t9, done_if   # if (c <= 100) goto done_if
-	blt   $t1, $t2, done_if   # if (b < c) goto done_if
+	bgt    t0, t5, do_true   # if (a > 10) goto do_true
+	ble    t2, t6, done_if   # if (c <= 100) goto done_if
+	blt    t1, t2, done_if   # if (b < c) goto done_if
 
 do_true:
-	li    $v0, 4           # print string
-	la    $a0, true_str    # address of str in a0
-	syscall
+	li     a7, 4           # print string
+	la     a0, true_str    # address of str in a0
+	ecall
 
 done_if:
-	ori   $t1, $t1, 0xAA   # b |= 0xAA
+	ori    t1, t1, 0xAA   # b |= 0xAA
 ----
-
-		
 
 ==== If-Else Chain
 
@@ -500,50 +491,50 @@ set somewhere before.
 }
 ----
 
-With chains like these, you following everything we've learned before, it
-comes out looking like this (assuming score is `$t0` and letter_grade is `$t1`):
+With chains like these, if you follow everything we've learned, it comes out
+looking like this (assuming score is `t0` and letter_grade is `t1`):
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
 .data
-grade_str: .asciiz "You got a "
+grade_str: .asciz "You got a "
 
 .text
-	li     $t1, 70   # letter_grade default to 'F' ascii value
+	li     t1, 70   # letter_grade default to 'F' ascii value
 	
-	li     $t2, 90
-	blt    $t0, $t2, not_a   # if (score < 90) goto not_a
-	li     $t1, 65           # leter_grade = 'A'
+	li     t2, 90
+	blt    t0, t2, not_a    # if (score < 90) goto not_a
+	li     t1, 65           # leter_grade = 'A'
 	j      grade_done
 
 not_a:
-	li     $t2, 80
-	blt    $t0, $t2, not_b   # if (score < 80) goto not_b
-	li     $t1, 66           # leter_grade = 'B'
+	li     t2, 80
+	blt    t0, t2, not_b    # if (score < 80) goto not_b
+	li     t1, 66           # leter_grade = 'B'
 	j      grade_done
 
 not_b:
-	li     $t2, 70
-	blt    $t0, $t2, not_c   # if (score < 70) goto not_c
-	li     $t1, 67           # leter_grade = 'C'
+	li     t2, 70
+	blt    t0, t2, not_c    # if (score < 70) goto not_c
+	li     t1, 67           # leter_grade = 'C'
 	j      grade_done
 
 not_c:
-	li     $t2, 60
-	blt    $t0, $t2, grade_done   # if (score < 60) goto grade_done
-	li     $t1, 68           # leter_grade = 'D'
+	li     t2, 60
+	blt    t0, t2, grade_done   # if (score < 60) goto grade_done
+	li     t1, 68               # leter_grade = 'D'
 
 grade_done:
-	li     $v0, 4      # print str
-	la     $a0, grade_str
-	syscall
+	li     a7, 4      # print str
+	la     a0, grade_str
+	ecall
 
-	li     $v0, 11     # print character
-	move   $a0, $t1    # char to print
-	syscall
+	li     a7, 11      # print character
+	mv     a0, t1      # char to print
+	ecall
 
-	move   $a0, 10    # print '\n'
-	syscall
+	mv     a0, 10    # print '\n'
+	ecall
 ----
 	
 You can see how we set a default value and then test for the opposite
@@ -551,7 +542,7 @@ of each condition to jump to the next test, until we get one that fails
 (aka was true in the original C condition) and set the appropriate grade.
 
 You can arrange chains like this in either direction, it doesn't have to match
-the order of the C code.  As long as it works the same, do whatever makes the 
+the order of the C code.  As long as it works the same, do whatever makes the
 code simpler and more sensible to you.
 
 === Conclusion
@@ -561,10 +552,11 @@ is something that takes a lot of practice, but eventually it'll become
 second nature.  We'll get more practice in the chapter on looping which naturally
 also involves branching.
 
-One final note, there's really no reason to use the `slt` family of opcodes _unless_
-your professor requires it, ie he says you can't use pseudoinstructions so you're
-left with `beq`, `bne`, `j` and the `slt` ops.  I'll show how you can code without
-using pseudoinstructions in a later chapter.
+One final note, there's rarely any reason to use the `slt` family of opcodes
+_unless_ your professor requires it for some strange reason.  Even if your
+professor says you can't use pseudoinstructions, that would still leave you with
+`beq`, `bne`, `blt`, `bge`, which covers every possibility even if you sometimes
+have to switch the order of the operands.
 
 // TODO reference to extra's chapter covering stupid professor requirements
 

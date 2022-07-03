@@ -4,7 +4,7 @@
 [quote, Unknown, Often misattributed to Albert Einstein]
 "Insanity is doing the same thing over and over again and expecting different results."
 
-Before we get into the MIPS, I want to cover something that may be obvious to some but
+Before we get into the RISC-V, I want to cover something that may be obvious to some but
 may have never occurred to others.  Any loop structure can be converted to any other
 (possibly with the addition of an `if` statement).  So a `for` can be written as a `while`
 and vice versa.  Even a `do-while` can be written as a `for` or `while` loop.  Let's look
@@ -94,7 +94,7 @@ loop:
 ----
 
 Ok, now that we've got the theory and structure out of the way, let's try doing a simple
-one in MIPS.
+one in RISC-V.
 
 [source,c,linenums]
 ----
@@ -108,13 +108,13 @@ That's about as basic as it gets, adding up the numbers 0 to 99.
 
 [source,mips,linenums]
 ----
-	li    $t0, 0   # sum = 0
-	li    $t1, 1   # i = 1  we can start at 1 because obviously adding 0 is pointless
-	li    $t2, 100
+	li     t0, 0   # sum = 0
+	li     t1, 1   # i = 1  we can start at 1 because obviously adding 0 is pointless
+	li     t2, 100
 loop:
-	addi  $t0, $t0, $t1    # sum += i
-	addi  $t1, $t1, 1      # i++
-	blt   $t1, $t2, loop   # while (i < 100)
+	addi   t0, t0, t1     # sum += i
+	addi   t1, t1, 1      # i++
+	blt    t1, t2, loop   # while (i < 100)
 ----
 
 Ok I don't think there's much point in doing any more without getting to what loops
@@ -144,23 +144,23 @@ Let's pretend there's an array `int numbers[10];` filled with 10 random numbers.
 
 There are several ways to do this.  The first is the most literal translation.
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
-	li    $t0, 0     # total = 0
-	li    $t1, 0     # i = 0
-	la    $t2, numbers   # t2 = numbers
-	li    $t3, 10
+	li    t0, 0     # total = 0
+	li    t1, 0     # i = 0
+	la    t2, numbers   # t2 = numbers
+	li    t3, 10
 sum_loop:
-	sll   $t4, $t1, 2    # t4 = i*sizeof(int) == i*4
-	add   $t4, $t4, $t2  # t4 = &numbers[i]
-	lw    $t4, 0($t4)    # t4 = numbers[i]
-	add   $t0, $t0, $t4  # total += numbers[i]
+	slli  t4, t1, 2   # t4 = i*sizeof(int) == i*4
+	add   t4, t4, t2  # t4 = &numbers[i]
+	lw    t4, 0(t4)   # t4 = numbers[i]
+	add   t0, t0, t4  # total += numbers[i]
 
-	addi  $t1, $t1, 1    # i++
-	blt   $t1, $t3, sum_loop   # while (i < 10)
+	addi  t1, t1, 1   # i++
+	blt   t1, t3, sum_loop   # while (i < 10)
 ----
 
-We initialize the relevant variables beforehand (`numbers` and `$t3` could be set
+We initialize the relevant variables beforehand (`numbers` and `t3` could be set
 every iteration but that's less efficient).  Now what's with the `i*4`?  We already
 discussed using shifts to multiply and divide by powers of 2 in a previous chapter,
 but here we're doing something that higher level languages do automatically for you
@@ -169,7 +169,7 @@ it is multiplying `i` by the size of the type of the array and adding that numbe
 bytes to the base address and then loading the element located there.
 
 If you're unfamiliar with the C syntax in the comments, `&` means "address of", so
-`$t4` is being set to the address of the _i_'th element.  Actually that C syntax is
+`t4` is being set to the address of the _i_'th element.  Actually that C syntax is
 redundant because the the `&` counteracts the brackets.  In C adding a number to a
 pointer does pointer math (ie it multiplies by the size of the items as discussed
 above).  This means that the following comparison is true:
@@ -186,7 +186,7 @@ array.  If you were scanning the code quickly and saw the expression on the righ
 you might not realize that's an address at all, it could be some mathematical
 expression (though the array name would hopefully clue you in if it was picked well).
 
-Anyway, back to the MIPS code.  After we get the address of the element we want, we
+Anyway, back to the RISC-V code.  After we get the address of the element we want, we
 have to actually read it from memory (ie load it).  Since it's an array of words
 (aka 4 byte ints) we can use load word, `lw`.
 
@@ -216,27 +216,28 @@ step to keep it pointing at `numbers[i]`.  Again, all mathematical operations on
 in C deal in increments of the byte syze of the type, so `p++` is really adding `1*sizeof(int)`.
 
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
-	li    $t0, 0     # total = 0
-	li    $t1, 0     # i = 0
-	la    $t2, numbers   # p = numbers
-	li    $t3, 10
+	li     t0, 0     # total = 0
+	li     t1, 0     # i = 0
+	la     t2, numbers   # p = numbers
+	li     t3, 10
 sum_loop:
-	lw    $t4, 0($t2)    # t4 = *p
-	add   $t0, $t0, $t4  # total += *p
+	lw     t4, 0(t2)    # t4 = *p
+	add    t0, t0, t4   # total += *p
 
-	addi  $t1, $t1, 1    # i++
-	addi  $t2, $t2, 4    # p++  ie p += sizeof(int)
-	blt   $t1, $t3, sum_loop   # while (i < 10)
+	addi   t1, t1, 1    # i++
+	addi   t2, t2, 4    # p++  ie p += sizeof(int)
+	blt    t1, t3, sum_loop   # while (i < 10)
 ----
 	
 Now, that may not look much better, we only saved 1 instuction, and if we were
 looping through a string (aka an array of characters, `sizeof(char) == 1`) we wouldn't
-have saved any.  However, imagine if we weren't using `sll` to do the multiply but
-`mult`.  That would take 3 instructions, not 1.  Even `mul` would take 2.  Remember
-we _would_ have to use one of those if we were iterating through an array of
-structures with a size that wasn't a power of 2.
+have saved any.  However, imagine if we weren't using `slli` to do the multiply but
+`mul`.  That would take 2 instructions, even if one could be above the loop.
+And remember we _would_ have to use `mul` instead of `slli` if we were iterating
+through an array of structures with a size that wasn't a power of 2, so using this
+method saves even more in that rare case.
 
 However, there is one more variant that you can use that can save a few more instructions.
 Instead of using `i` and `i<10` to control the loop, use `p` and the address just past the
@@ -254,26 +255,25 @@ end of the array.  In C it would be this:
 ----
 
 You could also use `!=` instead of `<`.  This is similar to using the `.end()` method
-on many C{plus}{plus} data structures when using iterators.  Now the MIPS version:
+on many C{plus}{plus} data structures when using iterators.  Now the RISC-V version:
 
 [source,mips,linenums]
 ----
-	li    $t0, 0     # total = 0
-	la    $t2, numbers   # p = numbers
-	addi  $t3, $t2, 40   # end = &numbers[10] = numbers + 10*sizeof(int)
+	li     t0, 0        # total = 0
+	la     t2, numbers  # p = numbers
+	addi   t3, t2, 40   # end = &numbers[10] = numbers + 10*sizeof(int)
 sum_loop:
-	lw    $t4, 0($t2)    # t4 = *p
-	add   $t0, $t0, $t4  # total += *p
+	lw     t4, 0(t2)    # t4 = *p
+	add    t0, t0, t4   # total += *p
 
-	addi  $t2, $t2, 4    # p++  ie p += sizeof(int)
-	blt   $t2, $t3, sum_loop   # while (p < end)
+	addi   t2, t2, 4    # p++  ie p += sizeof(int)
+	blt    t2, t3, sum_loop   # while (p < end)
 ----
 
-So we dropped from 10 to 7 instructions and even more if we had had to do `mul`
-or `mult` originally.  And this was for a 1D array.  Imagine if you had 2
-or 3 indices you had to use to calculate the correct offset.  That's what 
-we go over in the next section.
-
+So we dropped from 10 to 7 instructions, 6 to 4 in the loop itself which is
+the most important for performance.  And this was for a 1D array.  Imagine
+if you had 2 or 3 indices you had to use to calculate the correct offset.
+That's what we go over in the next section.
 
 ==== 2D Arrays
 
@@ -291,7 +291,7 @@ to a 1D array with rows*cols elements in the same order:
 ----
 
 See the code example
-https://raw.githubusercontent.com/rswinkle/mips_book/master/code/2d_arrays.c[2d_arrays.c] for more details.
+https://raw.githubusercontent.com/rswinkle/riscv_book/master/code/2d_arrays.c[2d_arrays.c] for more details.
 
 What this means is that when we declare a 2D array, it's basically a 1D array with
 the size equal to the rows * columns.  Also, when we loop through a 2D array, we can

@@ -52,7 +52,7 @@ print_int_array:
 	li    t0, 0
 	bge   t0, a1, exit_pia
 
-	mv    t1, a0  # move since we need a0 for syscalls
+	mv    t1, a0  # move since we need a0 for ecalls
 
 pia_loop:
 	li    a7, 1
@@ -81,7 +81,7 @@ print_char_array:
 	li    t0, 0
 	bge   t0, a1, exit_pca
 
-	mv    t1, a0  # move since we need a0 for syscalls
+	mv    t1, a0  # move since we need a0 for ecalls
 
 pca_loop:
 	li    a7, 11
@@ -108,7 +108,7 @@ print_float_array:
 	li    t0, 0
 	bge   t0, a1, exit_pfa
 
-	mv    t1, a0  # move since we need a0 for syscalls
+	mv    t1, a0  # move since we need a0 for ecalls
 
 pfa_loop:
 	li    a7, 2
@@ -137,7 +137,7 @@ print_double_array:
 	li    t0, 0
 	bge   t0, a1, exit_pda
 
-	mv    t1, a0  # move since we need a0 for syscalls
+	mv    t1, a0  # move since we need a0 for ecalls
 
 pda_loop:
 	li    a7, 3

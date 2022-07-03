@@ -2,11 +2,12 @@
 
 == Chapter 2: Environment Calls
 
-We mentioned environment calls (aka ecalls from now on) in chapter 0 when we were
-going over our "Hello World" program, but what exactly are they?
+We mentioned environment calls (aka ecalls, though they're also called system
+calls or syscalls in other languages like MIPS) in chapter 0 when we were going
+over our "Hello World" program, but what exactly are they?
 
 Essentially, they are the built in functions of a operating system; in this case,
-the simple operating system of the RISCV simulators.  They provide access to all the
+the simple operating system of the RISC-V simulators.  They provide access to all the
 fundamental features, like input and output to/from both the console and files,
 allocating memory, and exiting.  That covers the basics but RARS supports many more,
 for things ranging from playing MIDI sounds, to getting a random number, to creating

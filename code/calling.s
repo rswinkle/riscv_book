@@ -77,7 +77,7 @@ fib2_loop:
 
 # void hello_world()
 hello_world:
-	li   a7, 4      # print string system call
+	li   a7, 4      # print string environment call
 	la   a0, hello  # load address of string to print into a0
 	ecall
 

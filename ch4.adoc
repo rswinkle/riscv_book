@@ -106,7 +106,7 @@ one in RISC-V.
 
 That's about as basic as it gets, adding up the numbers 0 to 99.
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
 	li     t0, 0   # sum = 0
 	li     t1, 1   # i = 1  we can start at 1 because obviously adding 0 is pointless
@@ -257,7 +257,7 @@ end of the array.  In C it would be this:
 You could also use `!=` instead of `<`.  This is similar to using the `.end()` method
 on many C{plus}{plus} data structures when using iterators.  Now the RISC-V version:
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
 	li     t0, 0        # total = 0
 	la     t2, numbers  # p = numbers
@@ -318,26 +318,24 @@ Let's do an example.
 	}
 ----
 
-So assuming `rows` and `cols` are in `$a0` and `$a1` (and nonzero), it would
+So assuming `rows` and `cols` are in `a0` and `a1` (and nonzero), it would
 look like this:
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
-	la    $t0, array    # p = &array[0]
-	li    $t1, 0        # i = 0
-	mult  $a0, $a1      # a0 = rows, a1 = cols
-	mflo  $t2           # t2 = rows * cols
+	la     t0, array    # p = &array[0]
+	li     t1, 0        # i = 0
+	mul    t2, a0, a1   # t2 = rows * cols
 loop:
-	div   $t1, $a1
-	mflo  $t3           # r = i / cols
-	mfhi  $t4           # c = i % cols
-	add   $t3, $t3, $t4    # t3 = r + c
+	div    t3, t1, a1   # r = i / cols
+	rem    t4, t1, a1   # c = i % cols
+	add    t3, t3, t4    # t3 = r + c
 
-	sw    $t3, 0($t0)      # array[i] = *p = r + c
+	sw     t3, 0(t0)      # array[i] = *p = r + c
 
-	addi  $t1, $t1, 1      # i++
-	addi  $t0, $t0, 4      # p++ (keep pointer in sync with i, aka p = &array[i])
-	blt   $t1, $t2, loop   # while (i < rows*cols)
+	addi   t1, t1, 1      # i++
+	addi   t0, t0, 4      # p++ (keep pointer in sync with i, aka p = &array[i])
+	blt    t1, t2, loop   # while (i < rows*cols)
 ----
 
 You might ask if it's it worth it to convert it to a single loop when you still
@@ -351,64 +349,61 @@ get them back if you needed them.
 For comparison here's the nested translation (while still taking advantage of
 the 1D arrangement of memory and pointer iterators):
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
-	la    $t0, array    # p = &array[0]
-	li    $t1, 0        # i = 0
+	la     t0, array    # p = &array[0]
+	li     t1, 0        # i = 0
 looprows:
-	li    $t2, 0        # j = 0
+	li     t2, 0        # j = 0
 loopcols:
-	add   $t3, $t1, $t2    # t3 = i + j
-	sw    $t3, 0($t0)      # array[i][j] = *p = i + j
+	add    t3, t1, t2     # t3 = i + j
+	sw     t3, 0(t0)      # array[i][j] = *p = i + j
 
-	addi  $t2, $t2, 1         # j++
-	addi  $t0, $t0, 4         # p++ (keep pointer in sync with i and j, aka p = &array[i][j])
-	blt   $t2, $a1, loopcols  # while (j < cols)
+	addi   t2, t2, 1         # j++
+	addi   t0, t0, 4         # p++ (keep pointer in sync with i and j, aka p = &array[i][j])
+	blt    t2, a1, loopcols  # while (j < cols)
 
-	addi  $t1, $t1, 1          # i++
-	blt   $t1, $a0, looprows   # while (i < rows)
+	addi   t1, t1, 1          # i++
+	blt    t1, a0, looprows   # while (i < rows)
 ----
 
-It's a bit shorter but again, how much are those extra labels and branching worth?
-For me, this one's a toss up.  On the other hand, either of the last 2 versions are
+It's the same number of instructions, but with an extra label and branch.
+I prefer this version.  On the other hand, either of the last 2 versions are
 better than the literal translation below:
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
-	la    $t0, array    # p = &array[0]
-	li    $t1, 0        # i = 0
+	la     t0, array    # p = &array[0]
+	li     t1, 0        # i = 0
 looprows:
-	li    $t2, 0        # j = 0
+	li     t2, 0        # j = 0
 loopcols:
-	add   $t3, $t1, $t2    # t3 = i + j
+	add    t3, t1, t2    # t3 = i + j
 
 	# need to calculate the byte offset of element array[i][j]
-	mult  $t1, $a1
-	mflo  $t4              # i * cols
+	mul    t4, t1, a1      # t4 = i * cols
+	add    t4, t4, t2      # t4 = i * cols + j
+	slli   t4  t4, 2       # t4 = (i * cols + j) * sizeof(int)
 
-	add   $t4, $t4, $t2    # t4 = i * cols + j
+	add    t4, t4, t0      # t4 = &array[i][j] (calculated as array + (i*cols + j)*4)
 
-	sll   $t4  $t4, 2      # t4 = (i * cols + j) * sizeof(int)
-	add   $t4, $t4, $t0    $ t4 = &array[i][j] (calculated as array + (i*cols + j)*4)
+	sw     t3, 0(t4)       # array[i][j] = i + j
 
-	sw    $t3, 0($t4)      # array[i][j] = i + j
+	addi   t2, t2, 1         # j++
+	blt    t2, a1, loopcols  # while (j < cols)
 
-	addi  $t2, $t2, 1         # j++
-	blt   $t2, $a1, loopcols  # while (j < cols)
-
-	addi  $t1, $t1, 1          # i++
-	blt   $t1, $a0, looprows   # while (i < rows)
+	addi   t1, t1, 1          # i++
+	blt    t1, a0, looprows   # while (i < rows)
 ----
 
 That chunk in the middle calculating the offset of every element?  Not only is
 it far slower than iterating the pointer through the array, but you can
 imagine how much worse it would be for a 3D array with 3 nested loops.
 
-
 === Conclusion
 
 Hopefully after those examples you have a more solid understanding of looping in
-MIPS and how to transform various loops and array accesses into the form
+RISC-V and how to transform various loops and array accesses into the form
 that makes your life the easiest.  There is more we could cover here, like
 looping through a linked list, but I think that's beyond the scope of what we've
 covered so far.  Perhaps in a later chapter.

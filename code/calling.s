@@ -163,14 +163,14 @@ fib:
 	mv      s0, a0        # save n
 
 	addi    a0, a0, -2
-	jal     fib             # fib(n-2)
+	jal     fib           # fib(n-2)
 
 	addi    t0, s0, -1    # calc n-1 first so we can use s0 to save fib(n-2)
 	mv      s0, a0        # save return of fib(n-2) in s0
 	mv      a0, t0        # copy n-1 to a0
-	jal     fib             # fib(n-1)
+	jal     fib           # fib(n-1)
 
-	add     a0, a0, s0   #  a0 = fib(n-1) + fib(n-2)
+	add     a0, a0, s0    #  a0 = fib(n-1) + fib(n-2)
 
 exit_fib:
 	lw      ra, 0(sp)

@@ -259,27 +259,27 @@ This calls the empty function discussed at the top of this chapter.
 ----
 #int non_leaf()
 non_leaf:
-	addi    $sp, $sp, -4  # space to save 1 register, $ra
-	sw      $ra, 0($sp)   # store $ra in the newly allocated stack space
+	addi     sp, sp, -4  # space to save 1 register, ra
+	sw       ra, 0(sp)   # store ra in the newly allocated stack space
 
-	jal     func1
+	jal      func1
 
-	li      $v0, 42       # return 42
+	li       a0, 42       # return 42
 
-	lw      $ra, 0($sp)   # restore original $ra
-	addi    $sp, $sp, 4   # pop the stack
-	jr      $ra
+	lw       ra, 0(sp)   # restore original $ra
+	addi     sp, sp, 4   # pop the stack
+	ret
 ----
 
 The bit of code at the top and bottom of the function are called the prologue
 and epilogue respectively for obvious reasons.  We allocate 4 bytes on the stack
 by subtracting 4 (I add a negative rather than subtract
 because I can copy-paste the line with a single character change for the
-epilogue).  Then we store the current `$ra` in that space at the new top of the
+epilogue).  Then we store the current `ra` in that space at the new top of the
 stack.  Then before we exit we have to load it back and pop the stack.
 
-If we didn't save and restore `$ra` we would jump to line 7 when we do our
-`jr $ra` and then we'd be in an infinite loop.
+If we didn't save and restore `ra` we would jump to line 7 when we do our
+`ret` and then we'd be in an infinite loop.
 
 Next we have the second case, where we need to preserve regular local values
 across a function call.
@@ -303,57 +303,57 @@ int save_vals()
 }
 ----
 
-That becomes this in riscv:
+That becomes this in RISC-V:
 
 [source,riscv,linenums]
 ----
 #void print_letters(char letter, int count)
 print_letters:
-	ble     $a1, $0, exit_pl   # if (count <= 0) goto exit_pl
-	li      $v0, 11            # print character
+	ble      a1, $0, exit_pl   # if (count <= 0) goto exit_pl
+	li       a7, 11            # print character
 pl_loop:
 	ecall
-	addi    $a1, $a1, -1       # count--
-	bgt     $a1, $0, pl_loop   # while (count > 0)
+	addi     a1, a1, -1        # count--
+	bgt      a1, x0, pl_loop   # while (count > 0)
 
-	li      $a0, 10            # '\n'
+	li       a0, 10            # '\n'
 	ecall
 	
 exit_pl:
-	jr      $ra
+	ret
 
 
 #int save_vals()
 save_vals:
-	addi    $sp, $sp, -12
-	sw      $ra, 0($sp)
-	sw      $s0, 4($sp)
-	sw      $s1, 8($sp)
+	addi     sp, sp, -12
+	sw       ra, 0(sp)
+	sw       s0, 4(sp)
+	sw       s1, 8(sp)
 
-	li      $s0, 0  # i = 0
-	li      $s1, 10
+	li       s0, 0  # i = 0
+	li       s1, 10
 sv_loop:
-	addi    $a0, $s0, 65   # i + 'A'
-	addi    $a1, $s0, 1    # i + 1
-	jal     print_letters
+	addi     a0, s0, 65   # i + 'A'
+	addi     a1, s0, 1    # i + 1
+	jal      print_letters
 
-	addi    $s0, $s0, 1        # i++
-	blt     $s0, $s1, sv_loop  # while (i < 10)
+	addi     s0, s0, 1        # i++
+	blt      s0, s1, sv_loop  # while (i < 10)
 
-	lw      $ra, 0($sp)
-	lw      $s0, 4($sp)
-	lw      $s1, 8($sp)
-	addi    $sp, $sp, 12
-	jr      $ra
+	lw       ra, 0(sp)
+	lw       s0, 4(sp)
+	lw       s1, 8(sp)
+	addi     sp, sp, 12
+	ret
 ----
 
 Notice that for print_letters, we not only convert the loop to a `do-while`, but
 we also use the parameter `count` as the iterator to count _down_ to 0.  It saves
 us an instruction initializing an `i`.
 
-Second, for `save_vals`, we save not only `$ra` because we call another function,
+Second, for `save_vals`, we save not only `ra` because we call another function,
 but also two s registers to save `i` and our stopping point.  The second is not
-actually necessary.  Because it's a constant, we could load 10 into a register
+actually necessary; because it's a constant, we could load 10 into a register
 right before the check every iteration of the loop.  Which version is better depends on
 several factors, like how long or complex the loop is, how many times it executes, and
 of course personal preference.
@@ -374,7 +374,7 @@ int fib(int n)
 
 ----
 
-You can see how, at the very least, we'll have to save `$ra` and `n`, because we
+You can see how, at the very least, we'll have to save `ra` and `n`, because we
 need the original even after the first recursive call.  It's not as
 obvious, but we'll also have to save the return value of the first call so
 we'll still have it to do the addition after the second.  You might think
@@ -384,37 +384,38 @@ this would require using two s regs, but does it?  Let's see...
 ----
 #int fib(int n)
 fib:
-	addi    $sp, $sp, -8
-	sw      $ra, 0($sp)
-	sw      $s0, 4($sp)
+	addi    sp, sp, -8
+	sw      ra, 0(sp)
+	sw      s0, 4(sp)
 
-	move    $v0, $a0        # prepare to return n
-	li      $t0, 1
-	ble     $a0, $t0, exit_fib  # if (n <= 1) goto exit_fib (ie return n)
+	# n already in a0 for immediate return
+	li      t0, 1
+	ble     a0, t0, exit_fib  # if (n <= 1) goto exit_fib (ie return n)
 
-	move    $s0, $a0        # save n
+	mv      s0, a0        # save n
 
-	addi    $a0, $a0, -2    # a0 = n - 2
-	jal     fib             # fib(n-2)
+	addi    a0, a0, -2
+	jal     fib           # fib(n-2)
 
-	addi    $a0, $s0, -1    # a0 = n - 1, prep arg first so we can use s0 to save v0
-	move    $s0, $v0        # save return of fib(n-2) in s0
-	jal     fib             # fib(n-1)
+	addi    t0, s0, -1    # calc n-1 first so we can use s0 to save fib(n-2)
+	mv      s0, a0        # save return of fib(n-2) in s0
+	mv      a0, t0        # copy n-1 to a0
+	jal     fib           # fib(n-1)
 
-	add     $v0, $v0, $s0   #  v0 = fib(n-1) + fib(n-2)
+	add     a0, a0, s0    #  a0 = fib(n-1) + fib(n-2)
 
 exit_fib:
-	lw      $ra, 0($sp)
-	lw      $s0, 4($sp)
-	addi    $sp, $sp, 8
-	jr      $ra
+	lw      ra, 0(sp)
+	lw      s0, 4(sp)
+	addi    sp, sp, 8
+	ret
 ----
 
 Notice how we don't have to save `n` any sooner than necessary, ie right before
-we have to use `$a0` to setup the first recursive call.  Also, the ordering of
-lines 16 and 17 is important.  We needed the original `n` to calculate `n-1` but
-once that's in `$a0` ready for the call, because we won't need `n` again afterward,
-we can now use `$s0` to preserve the return value of the first call.
+we have to use `a0` to setup the first recursive call.  Also, the ordering of
+lines 15-17 is important.  We needed the original `n` to calculate `n-1` but
+once that's in `a0` ready for the call, because we won't need `n` again afterward,
+we can now use `s0` to preserve the return value of the first call.
 
 Some of you, if you were paying attention, might point out that you could save
 a few instructions of performance if you moved the base case testing before the
@@ -424,15 +425,15 @@ microsecond.  It's nicer/cleaner to keep the prologue and epilogue as the
 first and last things; they're one more thing to catch your eye and help delineate
 where functions start and end.  Regardless, if you're curious, you can see that
 version, along with every other function in this chapter in the included program
-https://raw.githubusercontent.com/rswinkle/mips_book/master/code/calling.s[calling.s].
+https://raw.githubusercontent.com/rswinkle/riscv_book/master/code/calling.s[calling.s].
 
-// TODO A recursive function that doesn't require saving anything but $ra
+// TODO A recursive function that doesn't require saving anything but ra
 
 === Conclusion
 
 While grasping the basics of a calling convention is not too difficult, it takes
 practice to get used to it.  There are many things that we haven't covered
-in this chapter, like how to pass more than 4 arguments, or use `$fp`, or handle
+in this chapter, like how to pass more than 8 arguments, or use `fp`, or handle
 floating point arguments or return values.  The latter at least, will be covered in
 the next chapter.
 

@@ -9,7 +9,8 @@ pi_double: .double 3.14159265358979323846264338327950288
 main:
 	# print best representation of pi as float
 	li      a7, 2
-	flw     fa0, pi_float, t0
+	la      t0, pi_float
+	flw     fa0, (t0)
 	ecall
 
 	li      a7, 11   # print char
@@ -30,7 +31,8 @@ main:
 
 	# print best representation of pi as double
 	li      a7, 3
-	fld     fa0, pi_double, t0
+	la      t0, pi_double
+	fld     fa0, 0(t0)
 	ecall
 
 	li      a7, 11

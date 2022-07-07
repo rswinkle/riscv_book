@@ -27,7 +27,8 @@ main:
 	li       a7, 6    # read float
 	ecall
 
-	flw      ft0, sixft, t0    # get 72.0
+	la       t0, sixft
+	flw      ft0, 0(t0)    # get 72.0
 
 	li       a7, 4
 	la       a0, shorter_than72   # preset for ecall, default shorter
@@ -98,13 +99,10 @@ convert_F2C:
 	flw      ft0, 0(t0)    # get conversion factor
 
 	# C = (F - 32) * 5/9
-	li       t0, 32        
-	fmv.s.x  ft1, t0       # move int 32 to ft1
-	fcvt.s.w ft1, t0      # convert to 32.0
+	li       t0, 32
+	fcvt.s.w ft1, t0       # convert to 32.0
 
-
-	fsub.s   fa0, fa0, ft1  # fa0 = degrees - 32
-
-	fmul.s   fa0, ft0, fa0  # fa00 = 0.555555 * fa0
+	fsub.s   fa0, fa0, ft1  # fa0 = degrees_f - 32
+	fmul.s   fa0, ft0, fa0  # fa0 = 0.555555 * fa0
 
 	ret

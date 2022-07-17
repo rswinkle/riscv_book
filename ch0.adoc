@@ -176,7 +176,7 @@ this:
 [source,bash]
 ----
 $ java -jar ~/rars_latest.jar hello.s
-RARS 4.5  Copyright 2003-2019 Pete Sanderson and Kenneth Vollmar
+RARS 1.5  Copyright 2003-2019 Pete Sanderson and Kenneth Vollmar
 
 Hello World!
 

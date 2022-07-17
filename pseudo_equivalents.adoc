@@ -7,21 +7,23 @@
 
 | Load Immediate |
 
- li    $t0, 42 |
+ li     t0, 42 |
 
- ori   $t0, $0, 42
+ ori    t0, x0, 42
  # or
- addi  $t0, $0, 42
+ addi   t0, x0, 42
 
 '''
 
 | Move           |
 
- move  $t0, $t1 |
+ mv     t0, t1 |
 
- or    $t0, $0, $t1
+ or     t0, x0, t1
  # or
- add   $t0, $0, $t1
+ add    t0, x0, t1
+ # or
+ addi   t0, t1, 0
 
 '''
 

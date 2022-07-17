@@ -7,13 +7,13 @@
 
 == Chapter 7: Tips and Tricks
 
-This chapter is a grab bag of things you can do to improve your MIPS
+This chapter is a grab bag of things you can do to improve your RISC-V
 programs and make your life easier.
 
 === Formatting
 
 You may have noticed I have a general format I like to follow when writing
-MIPS (or any) assembly.  The guidelines I use are the following
+RISC-V (or any) assembly.  The guidelines I use are the following
 
 . *1 indent for all code excluding labels/macros/constants.*
 +
@@ -22,7 +22,8 @@ it's just 1 indent according to your preferences.
 
 . *Use _spaces_ to align the first operand of all instructions out far enough.*
 +
-Given my 4 space tabs, this means column 13+ (due to syscall, though I often stop at 11).
+Given my 4 space tabs, this means column 13+ (due to longer floating point
+instructions like fcvt.s.w, though I often stop at 10 or 11 when that's sufficient).
 The reason to use spaces is to prevent the circumstances that gave
 hard tabs a bad name.  When you use hard tabs for alignment, rather than indentation,
 and then someone else opens your code with their tab set to a different width,
@@ -62,7 +63,7 @@ It helps you keep track of where things are (esp. combined with the comments).
 This can fall apart when you discover you forgot something or need to
 modify the code later and it's often not worth changing all the registers
 you're already using so you can maintain that nice sequence.  When that happens
-I'll sometimes just pick the other end of sequence (ie `$t9` or `$s7`) since
+I'll sometimes just pick the other end of sequence (ie `t6`, `a7`, or `s11`) since
 if it's out of order I might as well make it obvious.
 
 . *Minimize your jumps, labels, and especially your level of nested loops.*
@@ -70,90 +71,68 @@ if it's out of order I might as well make it obvious.
 This was already covered in the chapters on branching and loops but it bears
 repeating.
 
-. *In your prologue save `$ra` first, if necessary, then all s regs used starting at `$s0`.*
+. *In your prologue save `ra` first, if necessary, then all s regs used starting at `s0`.*
 +
 Then copy paste the whole thing to the bottom, move the first line to the bottom and
 change the number to positive and change all the `sw` to `lw`.
 
 ....
 func:
-	addi    $sp, $sp, -20
-	sw      $ra, 0($sp)
-	sw      $s0, 4($sp)
-	sw      $s1, 8($sp)
-	sw      $s2, 12($sp)
-	sw      $s3, 16($sp)
+	addi     sp, sp, -20
+	sw       ra, 0(sp)
+	sw       s0, 4(sp)
+	sw       s1, 8(sp)
+	sw       s2, 12(sp)
+	sw       s3, 16(sp)
 
 	# body of func here that calls another function or functions
 	# and needs to preserve 4 values across at least one of those calls
 
-	lw      $ra, 0($sp)
-	lw      $s0, 4($sp)
-	lw      $s1, 8($sp)
-	lw      $s2, 12($sp)
-	lw      $s3, 16($sp)
-	addi    $sp, $sp, 20
+	lw       ra, 0(sp)
+	lw       s0, 4(sp)
+	lw       s1, 8(sp)
+	lw       s2, 12(sp)
+	lw       s3, 16(sp)
+	addi     sp, sp, 20
 ....
 
 
 === Constants
 
 One of the easiest things you can do to make your programs more readable
-is to use defined constants in your programs.  Both MARS and SPIM have ways
-of defining constants similar to how C defines macro constants; ie they
+is to use defined constants in your programs.  RARS has a way of defining
+constants similar to how C defines macro constants; ie they
 aren't "constant variables" that take up space in memory, it's as if a
 search+replace was done on them right before assembling the program.
 
-Let's look at our Hello World program using constants for SPIM and MARS
+Let's look at our Hello World program using constants:
 
-SPIM:
-
-[source,mips,linenums]
-----
-sys_print_str = 4
-sys_exit = 10
-
-.data
-hello:   .asciiz "Hello World!\n"
-
-.text
-main:
-	li      $v0, sys_print_str
-	la      $a0, hello  # load address of string to print into a0
-	syscall
-
-	li      $v0, sys_exit
-	syscall
-----
-
-MARS:
-
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
 .eqv sys_print_str 4
 .eqv sys_exit 10
 
 .data
-hello:   .asciiz "Hello World!\n"
+hello:   .asciz "Hello World!\n"
 
 .text
 main:
-	li      $v0, sys_print_str
-	la      $a0, hello  # load address of string to print into a0
-	syscall
+	li   a7, sys_print_str
+	la   a0, hello  # load address of string to print into a0
+	ecall
 
-	li      $v0, sys_exit
-	syscall
+	li   a7, sys_exit
+	ecall
 ----
 
 === Macros
 
-MARS supports function style macros that can shorten your code and improve
+RARS supports function style macros that can shorten your code and improve
 readability in some cases (though I feel it can also make it worse or be a wash).
 
 The syntax looks like this:
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
 .macro macroname
 	instr1  a, b, c
@@ -171,26 +150,26 @@ The syntax looks like this:
 
 Some common examples are using them to print strings:
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
 .macro print_str_label(%x)
-	li     $v0, 4
-	la     $a0, %x
-	syscall
+	li     a7, 4
+	la     a0, %x
+	ecall
 .end_macro
 
 .macro print_str(%str)
 .data
-str: .asciiz %str
+str: .asciz %str
 .text
-	li     $v0, 4
-	la     $a0, str
-	syscall
+	li     a7, 4
+	la     a0, str
+	ecall
 .end_macro
 
 .data
 
-str1:   .asciiz "Hello 1\n"
+str1:   .asciz "Hello 1\n"
 
 .text
 # in use:
@@ -202,10 +181,7 @@ str1:   .asciiz "Hello 1\n"
 ----
 
 You can see an example program in
-https://raw.githubusercontent.com/rswinkle/mips_book/master/code/macros.s[macros.s].
-
-Unfortunately, as far as I can tell, SPIM does not support function style macros
-despite what MARS's documentation implies about using a $ instead of a % for arguments.
+https://raw.githubusercontent.com/rswinkle/riscv_book/master/code/macros.s[macros.s].
 
 === Switch-Case Statements
 
@@ -234,9 +210,9 @@ Here's a pretty short/simple example in C:
 
 You could translate this to its eqivalent `if-else` chain and handle it like we
 cover in the chapter on branching.  However, imagine if this switch statment had
-a dozen cases, two dozen etc.  The MIPS code for that quickly becomes long and ugly.
+a dozen cases, two dozen etc.  The RISC-V code for that quickly becomes long and ugly.
 
-So what if we implemented it in MIPS the same way it is semantically in C?
+So what if we implemented it in RISC-V the same way it is semantically in C?
 The same way compilers often (but not necessarily) use?  Well, before we do that,
 what is a switch actually doing?  It is _jumping_ to a specific case label based
 on the value in the specified variable.  It then starts executing, falling through
@@ -249,7 +225,6 @@ of label addresses, and using the variable to calculate an index in the table
 to use to jump to.
 
 The C eqivalent of that would look like this:
-
 
 [source,c,linenums]
 ----
@@ -266,17 +241,15 @@ are filled with the `default_label` address.  Third, there has to be an initial
 check for values outside the range to jump to default otherwise you could get an
 error from an invalid access outside of the array's bounds.
 
-The same program/code in MIPS would look like this:
+The same program/code in RISC-V would look like this:
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
 include::code/switch.s[]
 ----
 
-It's easy to forget that `jr` does not actually stand for "jump return" or
-"jump ra," though it's almost always used for that purpose.  Instead, it stands
-for "jump register" and we can use it to do the eqivalent of the computed goto
-statement in C.
+You can see we can use the pseudoinstruction `jr` (jump register) to do the eqivalent
+of the computed goto statement in C.
 
 This example probably wasn't worth making switch style, because the overhead
 and extra code of making the table and preparing to jump balanced out or even
@@ -331,147 +304,50 @@ arguments
 Notice that the first argument is the what you actually typed to invoke the program,
 so you always have at least one argument.
 
-MIPS works the same way.  The number of arguments is in `$a0` and an array of strings
-is in `$a1` when main starts.  So the same program in MIPS looks like this:
+RISC-V works the same way.  The number of arguments is in `a0` and an array of strings
+is in `a1` when main starts.  So the same program in RISC-V looks like this:
 
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
-.data
-
-there_are:  .asciiz "There are "
-arguments:  .asciiz " command line arguments:\n"
-
-.text
-
-main:
-	move    $t0, $a0  # save argc
-
-	li      $v0, 4
-	la      $a0, there_are
-	syscall
-
-	move    $a0, $t0
-	li      $v0, 1   # print int
-	syscall
-
-	li      $v0, 4            # print string
-	la      $a0, arguments
-	syscall
-
-	li      $t1, 0   # i = 0
-	j       arg_loop_test
-
-arg_loop:
-	li      $v0, 4
-	lw      $a0, 0($a1)
-	syscall
-
-	li      $v0, 11    # print character
-	li      $a0, 10    # '\n'
-	syscall
-
-	addi    $t1, $t1, 1   # i++
-	addi    $a1, $a1, 4    # argv++ ie a1 = &argv[i]
-arg_loop_test:
-	blt     $t1, $t0, arg_loop  # while (i < argc)
-
-	li      $v0, 10
-	syscall
+include::code/args.s[]
 ----
 
-This program works exactly like the C program when using SPIM:
-
-[source]
-----
-$ spim -file args.s 3 random arguments
-SPIM Version 8.0 of January 8, 2010
-Copyright 1990-2010, James R. Larus.
-All Rights Reserved.
-See the file README for a full copyright notice.
-Loaded: /usr/lib/spim/exceptions.s
-There are 4 command line arguments:
-args.s
-3
-random
-arguments
-----
-
-Obviously the commands for SPIM itself are not included but the file name (args.s)
-takes the place as the "executable".
-
-Unfortunately, MARS works differently, probably because it's more GUI focused.  It
-does not pass the program/file name as the first argument, so you can actually get
+Unfortunately, RARS works slightly differently, probably because it's more GUI focused.
+It does not pass the program/file name as the first argument, so you can actually get
 0 arguments:
 
 [source]
 ----
-$ java -jar ~/Mars4_5.jar args.s pa 3 random arguments
-MARS 4.5  Copyright 2003-2014 Pete Sanderson and Kenneth Vollmar
+$ java -jar ~/rars_latest.jar args.s pa 3 random arguments
+RARS 1.5  Copyright 2003-2019 Pete Sanderson and Kenneth Vollmar
 
 There are 3 command line arguments:
 3
 random
 arguments
+
+Program terminated by calling exit
 ----
 
 You can see that you have to pass "pa" (for "program arguments") to indicate that
 the following strings are arguments.  In the GUI, there is an option in
-"Settings" called "Program arguments provided to MIPS progam" which if selected will
+"Settings" called "Program arguments provided to progam" which if selected will
 add a text box above the Text Segment for you to enter in the arguments to be
 passed.
 
-.Enable program arguments in MARS GUI
-image::images/enable_mars_args.png[]
+.Enable program arguments in RARS GUI
+image::images/enable_rars_args.png[]
 
-.Example using program arguments in MARS GUI
-image::images/mars_args.png[]
-
-=== Delayed Branches and Delayed Loads
-
-MIPS originally had a 1-instruction delay between when a branch or load was executed,
-and when it actually jumped or completed the load.  By default, SPIM has both of
-these turned off but you can turn them on with the arguments `-delayed_branches`
-and `-delayed_loads` respectively, or use the `-bare` which turns on both, as
-well as disabling pseudoinstructions (ie it simulates the "bare" machine without
-any of the niceties).  MARS is the same as SPIM in that it defaults to the more
-user friendly mode, but you can turn on delayed branches in the settings (but
-not delayed loads, that isn't supported as far as I can tell).  From the command
-line you can turn it on with the `db` argument and you can turn off pseudoinstructions
-with `np` (for the next section).
-
-The only reason you'd probably ever want to do this to yourself is if your professor
-requires it for some unknown reason.  There is some learning value to seeing how
-pseudoinstructions are turned into actual instructions, but there's absolutely nothing
-useful to be gained in turning on the delays.
-
-To handle delayed branches, all you have to do is add a
-`nop` (No Operation) instruction after every branch or jump instruction
-(including `jal` and `jr`).  The solution is identical for delayed loads, put a
-`nop` after every load instruction.
-
-You could put other instructions there, intsructions that you have above the jumps
-or loads that don't have to occur before.  If you were doing a real project on
-real hardware and were trying to minimize program size and maximize speed, you
-would definitely do this (if that hardware had delayed branches/loads).  However,
-it's a bad idea for two reasons.  First, it takes longer to figure out which
-instructions you can move and why, and it makes your program harder to read since
-you naturally don't expect an instruction to occur before the previous one.
-Second, and more importantly, it means your program will no longer work if you
-turn delayed branches/loads off again.  Using a `nop` means the change is quick,
-easy, and you can still run it in the simulator's default mode if needed.
-
-One final note, and it relates to the following section.  Even though `nop`
-is supposedly represented by all 0's, and MARS supports it even with pseudoinstrutions
-disabled, SPIM does not support it in bare mode.  This means you have to use
-some other instruction that has no side effects, like `or  $0, $0, $0`, which
-will work as a `nop` under all conditions and simulators.
+.Example using program arguments in RARS GUI
+image::images/rars_args.png[]
 
 === No Pseudoinstructions Allowed
 
-Far more common than requiring delayed loads is forbidding pseudoinstructions,
+One relatively common assignment requirement is forbidding pseudoinstructions,
 either all of them, or some subset of them.  This forces us to explicitly write
-what actually happens when you use those pseudoinstructions.
+what those pseudoinstructions are translated into (or could be translated into
+since there are often several alternatives).
 
 ifndef::is_pdf[]
 include::pseudo_equivalents.adoc[]

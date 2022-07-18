@@ -389,96 +389,21 @@ you have a bunch of globals, it doesn't hurt to count once and put the offsets
 in comments above each label so you don't forget.  Of course, none of this matters
 if you're allowed to just use `la` which is true the vast majority of the time.
 
-Let's look at a small example.  We'll convert the following code from
-args.s to bare mode:
+Let's look at a small example.  We'll convert the args.s from above (reproduced
+here for convenience) to bare mode:
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
-.data
-
-there_are:  .asciiz "There are "
-arguments:  .asciiz " command line arguments:\n"
-
-.text
-main:
-	move    $t0, $a0  # save argc
-
-	li      $v0, 4
-	la      $a0, there_are
-	syscall
-
-	# some code removed for brevity
-
-	li      $t1, 0   # i = 0
-	j       arg_loop_test
-
-arg_loop:
-	li      $v0, 4
-	lw      $a0, 0($a1)
-	syscall
-
-	li      $v0, 11
-	li      $a0, 10    # '\n'
-	syscall
-
-	addi    $t1, $t1, 1   # i++
-	addi    $a1, $a1, 4    # argv++ ie a1 = &argv[i]
-arg_loop_test:
-	blt     $t1, $t0, arg_loop  # while (i < argc)
+include::code/args.s[]
 ----
 
-So we need to change the `move`, the ``li``'s, the `la` and the `blt` and add a `nop`
-after any branches or loads.
+So we need to change the `mv`, the ``li``'s, the `j`, and the `la`.
 
-[source,mips,linenums]
+[source,riscv,linenums]
 ----
-.data
-
-there_are:  .asciiz "There are "
-arguments:  .asciiz " command line arguments:\n"
-
-.text
-
-main:
-	or      $t0, $0, $a0  # save argc
-
-	ori     $v0, $0, 4
-	lui     $a0, 0x1000    # there_are is at beginning of data so just lui, lower is 0
-	syscall
-
-	ori     $t1, $0, 0   # i = 0
-	j       arg_loop_test
-	or      $0, $0, $0
-
-arg_loop:
-	ori     $v0, $0, 4     # print string for argv[i]
-	lw      $a0, 0($a1)
-	or      $0, $0, $0     # nop
-	syscall
-
-	ori     $v0, $0, 11
-	ori     $a0, $0, 10    # '\n'
-	syscall
-
-	addi    $t1, $t1, 1    # i++
-	addi    $a1, $a1, 4    # argv++ ie a1 = &argv[i]
-arg_loop_test:
-	bne     $t1, $t0, arg_loop  # while (i != argc)
-	or      $0, $0, $0
+include::code/args_bare.s[]
 ----
 
-Following the table, you can see the `move` became `or`, the ``li``'s became
-`ori`, we added `nop` instructions in the form of `or` with `$0` as the destination,
-and lastly, the `blt` became `bne`.  That last is worth noting, because there's no
-reason to do a complicated transformation if you don't have to and `bne` accomplishes
-the same thing here.
-
-
-See the example program
-https://raw.githubusercontent.com/rswinkle/mips_book/master/code/args_bare.s[args_bare.s]
-which is just
-https://raw.githubusercontent.com/rswinkle/mips_book/master/code/args.s[args.s]
-in bare mode for a complete example.
-
-
-
+Following the table, you can see the `mv` became `or`, the `li` became
+`ori`, the `j` became `jal` with `x0` as the destination register,
+and lastly the `la` became `lui` plus an `ori` if necessary for the byte offset.

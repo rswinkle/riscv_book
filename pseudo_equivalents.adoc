@@ -27,19 +27,9 @@
 
 '''
 
-| No Operation   |
-
- nop |
-
- # anything with $0 as dest
- # reg will work, I prefer
- or    $0, $0, $0
-
-'''
-
 | Load Address   |
 
- la    $t0, label |
+ la     t0, label |
 
  # use 0x1001 for MARS
  lui   $t0, 0x1000

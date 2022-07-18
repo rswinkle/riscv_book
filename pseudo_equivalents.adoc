@@ -31,34 +31,8 @@
 
  la     t0, label |
 
- # use 0x1001 for MARS
- lui   $t0, 0x1000
- ori   $t0, $t0, byte_offset
-
-'''
-
-| Branch Less Than |
-
- blt  $t0, $t1, label |
-
- # t2 = t0 < t1
- slt   $t2, $t0, $t1
- bne   $t2, $0, label
-
- # or if you're counting up and
- # you know they'll be equal,
- # you can simplify to
- bne   $t0, $t1, label
-
-'''
-
-| Branch Greater Than |
-
- bgt  $t0, $t1, label |
-
- # flip order to get >
- slt   $t2, $t1, $t0
- bne   $t2, $0, label
+ lui    t0, 0x10010
+ ori    t0, t0, byte_offset
 
 '''
 

@@ -20,20 +20,12 @@
  # or
  add   $t0, $0, $t1
 
-| No Operation   |
-
- nop |
-
- # anything with $0 as dest
- # reg will work, I prefer
- or    $0, $0, $0
 
 | Load Address   |
 
  la    $t0, label |
 
- # use 0x1001 for MARS
- lui   $t0, 0x1000
+ lui   $t0, 0x10010
  ori   $t0, $t0, byte_offset
 
 | Branch Less Than |

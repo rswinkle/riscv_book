@@ -8,10 +8,10 @@ html: ${DOCS}
 	mv *.html build/
 
 pdfbook: ${DOCS}
-	asciidoctor-pdf -a is_pdf -d book book.adoc -o mips_book.pdf
+	asciidoctor-pdf -a is_pdf -d book book.adoc -o riscv_book.pdf
 
 htmlbook:
-	asciidoctor -d book book.adoc -o mips_book.html
+	asciidoctor -d book book.adoc -o riscv_book.html
 
 clean:
 	rm build/*.html

@@ -3558,7 +3558,7 @@ or saved values.  The rest are special use registers like <code>ra</code>.</p>
 </div>
 <div class="paragraph">
 <p>The quickest way to summarize is to look at the table
-on the greensheet which is reproduced (with some modifications) below:</p>
+on the greensheet which is reproduced below:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 4. RISC-V Registers and Uses</caption>
@@ -3570,82 +3570,82 @@ on the greensheet which is reproduced (with some modifications) below:</p>
 </colgroup>
 <thead>
 <tr>
+<th class="tableblock halign-left valign-top">Register</th>
 <th class="tableblock halign-left valign-top">Name</th>
-<th class="tableblock halign-left valign-top">Number</th>
 <th class="tableblock halign-left valign-top">Use</th>
 <th class="tableblock halign-left valign-top">Preserved Across a Call</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">zero</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Constant 0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N.A.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">ra</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Return address</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x2</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">sp</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Stack pointer</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x3</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">gp</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Global pointer</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x4</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">tp</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Thread pointer</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x5-x7</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">t0-t2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">5-7</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Temporaries</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x8</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">s0/fp</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Saved register/Frame pointer</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x9</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">s1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">9</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Saved register</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x10-x11</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a0-a1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10-11</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Function arguments/Return values</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x12-x17</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">a2-a7</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">12-17</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Function arguments</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x18-x27</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">s2-s11</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">18-27</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Saved registers</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x28-x31</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">t3-t6</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">28-31</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Temporaries</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
 </tr>
@@ -4177,56 +4177,54 @@ can also see them in the table below:</p>
 <caption class="title">Table 5. RISC-V Floating Point Registers and Uses</caption>
 <colgroup>
 <col style="width: 20%;">
+<col style="width: 20%;">
 <col style="width: 40%;">
-<col style="width: 40%;">
+<col style="width: 20%;">
 </colgroup>
 <thead>
 <tr>
+<th class="tableblock halign-left valign-top">Register</th>
 <th class="tableblock halign-left valign-top">Name</th>
-<th class="tableblock halign-left valign-top">Number</th>
 <th class="tableblock halign-left valign-top">Use</th>
+<th class="tableblock halign-left valign-top">Preserved Across a Call</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Preserved Across a Call</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ft0-ft7</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">f0-f7</p></td>
-</tr>
-<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ft0-ft7</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Temporaries</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">fs0-fs1</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">f8-f9</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">fs0-fs1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Saved registers</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">fa0-fa1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">f10-f11</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">fa0-fa1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Arguments/Return values</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">fa2-fa7</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">f12-f17</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">f12-f17</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">fa2-fa7</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Arguments</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">fs2-fs11</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">f18-f27</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">fs2-fs11</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Saved registers</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ft8-ft11</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">f28-f31</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ft8-ft11</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Temporaries</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
 </tr>
 </tbody>
 </table>

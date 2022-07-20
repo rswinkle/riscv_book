@@ -16,21 +16,21 @@ The greensheet contains all the floating point registers and their uses but you
 can also see them in the table below:
 
 .RISC-V Floating Point Registers and Uses
-[cols="1,2,2"]
+[cols="1,1,2,1"]
 |===
-| Name | Number | Use | Preserved Across a Call
+| Register | Name     | Use                     | Preserved Across a Call
 
-| ft0-ft7 | f0-f7 | Temporaries | No
+| f0-f7    | ft0-ft7  | Temporaries             | No
 
-| fs0-fs1 | f8-f9 | Saved registers | Yes
+| f8-f9    | fs0-fs1  | Saved registers         | Yes
 
-| fa0-fa1 | f10-f11 | Arguments/Return values | No
+| f10-f11  | fa0-fa1  | Arguments/Return values | No
 
-| fa2-fa7 | f12-f17 | Arguments | No
+| f12-f17  | fa2-fa7  | Arguments               | No
 
-| fs2-fs11 | f18-f27 | Saved registers | Yes
+| f18-f27  | fs2-fs11 | Saved registers         | Yes
 
-| ft8-ft11 | f28-f31 | Temporaries | Yes
+| f28-f31  | ft8-ft11 | Temporaries             | Yes
 
 |===
 

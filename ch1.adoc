@@ -83,7 +83,7 @@ name:        .space 30
 ----
 
 As you can see in the example, we extract all the string literals and
-the character array `name` and int `age` and declare them as MIPS globals.
+the character array `name` and int `age` and declare them as globals.
 One thing to note is the second `printf`.  Because it prints a variable, `name`,
 using the conversion specifier, we break the literal into pieces around that.
 Since there is no built-in `printf` function in RISC-V, you have to handle printing

@@ -3,7 +3,7 @@
 
 include::../support.adoc[]
 
-. Convert the following C code to MIPS.
+. Convert the following C code to RISC-V.
 +
 [source,c,linenums]
 ----

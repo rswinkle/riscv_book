@@ -3,7 +3,7 @@
 
 include::../support.adoc[]
 
-. Convert the following C code to MIPS.  If using SPIM, you can just hard code
+. Convert the following C code to RISC-V.  If using Venus, you can just hard code
 a "random" number between 0 and 100.
 +
 [source,c,linenums]
@@ -35,8 +35,8 @@ int main()
 }
 ----
 
-. Write a MIPS program to find and print the average of the following array.
-Just use integer division.
+. Write a RISC-V program to find and print the average of the following array.
+Use integer division.
 +
 [source,mips,linenums]
 ----

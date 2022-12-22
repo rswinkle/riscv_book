@@ -365,19 +365,23 @@ extra register to hold the "plus 1" value if you still need the original.
 Another thing I should comment on is the `la` equivalence.  The reason it is
 a pseudoinstruction in the first place is that an address is 32 bits.  That's also
 the size of a whole instruction.  Clearly there's no way to represent a whole
-address and anything else at the same time.  The lower left corner of the
-greensheet has the actual formats of the 3 different types of instructions and
-even the jump format still needs 6 bits for the opcode.  This is why `lui` exists,
+address and anything else at the same time.  The lower right corner of the
+greensheet has the actual formats of the 6 different types of instructions and
+even the U and UJ formats still needs 12 bits for the opcode and destination.
+This is why `lui` (and `auipc`) exists,
 in order to facilitate getting a full address into a register by doing it in two
-halves, 16 + 16.  The lower 16 can be placed with `addi` or `ori` after the `lui`.
+halves, 20 + 12.  The lower 12 can be placed with `addi` or `ori` after the `lui`.
+
+NOTE: RARS actually uses `auipc` not `lui` probably because that's what the RISC-V
+spec says (also see top left on page 2 of the greensheet). They both can accomplish
+the same thing but the former is needed for PC-relative addressing which whereas
+lui is 0/absolute addressing. Since RARS works with absolute addressing the easier
+to use `lui` is fine.
 
 That begs the question, what actually goes in the upper half?  Well, since
 we're dealing with addresses in the `.data` section, the upper portion should
-match the upper part of address of the `.data` section.  In SPIM the `data` section
-starts at `0x10000000` in bare mode.  In normal mode it is `0x10010000`, but you'd be
-able to use `la` in normal mode.  However, in MARS it is always `0x10010000`,
-so you won't be able to have it work correctly in bare SPIM and MARS without
-changing that back and forth.
+match the upper part of address of the `.data` section.  In RARS it is always
+`0x10010000`.
 
 But what about the lower part of the address?  This involves counting the bytes
 from the top of `.data` to the label you want.  If all you have is words, halfs,

@@ -3,7 +3,7 @@
 
 include::../support.adoc[]
 
-. Create a MIPS data section that declares variables equivalent to the following.  This will not be a runnable program without a main.
+. Create a RISC-V data section that declares variables equivalent to the following.  This will not be a runnable program without a main.
 +
 [source,c,linenums]
 ----
@@ -12,7 +12,7 @@ include::../support.adoc[]
 	int myarray[10] = { 9, 8, 7, 6, 5, 4, 3, 2, 1 };
 	short array2[10];
 
-	char mips_str[] = "MIPS assembly is awesome!";
+	char riscv_str[] = "RISC-V assembly is awesome!";
 ----
 
 . How would you declare an array of 500 points?  The point structure is tightly

@@ -14,6 +14,6 @@ The repo for the book, where you can get the code referenced and report
 any errors (submit an issue or even a pull request) is
 https://github.com/rswinkle/riscv_book[here].
 
-If you're interested in contacting me regarding MIPS tutoring or any other
-business request related to the book, you can reach me at mips@robertwinkler.com.
+If you're interested in contacting me regarding RISC-V tutoring or any other
+business request related to the book, you can reach me at books@robertwinkler.com.
 

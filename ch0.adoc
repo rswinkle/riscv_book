@@ -62,7 +62,7 @@ MacOS on the other hand, is technically a Unix based system and you can use thei
 terminal and install virtually any program from there using Macports or Homebrew
 or similar.
 
-There are a few RISC-V simulators that I know of and h
+There are a few RISC-V simulators that I know of and have used:
 
 * RARS is a RISC-V port of MARS, a Java GUI based simulator with dozens of extra
 environment calls, syntactic sugar and features like graphics, memory mapped I/O, etc.
@@ -73,7 +73,7 @@ programming
 Of those three, RARS is by far the most full featured and user friendly for learning
 since it forked from the venerable MARS MIPS simulator.  It is also the most
 commonly used by students outside of Berkeley.  Given that, this book will focus
-primarily on RARS, though it almost all of it should apply equally well to Venus.
+primarily on RARS, though almost all of it should apply equally well to Venus.
 
 You can download/access both at the following links:
 
@@ -169,7 +169,7 @@ you up and running, not really about teaching anything specific yet.
 
 === Building and Running
 
-Now that we have our hello world MIPS program, how do we run it?  Well the easiest
+Now that we have our hello world RISC-V program, how do we run it?  Well the easiest
 and quickest{rars_slow} way is of course to do it on the command line, which can be done like
 this:
 

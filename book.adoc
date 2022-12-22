@@ -1,7 +1,7 @@
 :source-highlighter: pygments
 
 = RISC-V Assembly Programmming
-Robert Winkler <mips@robertwinkler.com>
+Robert Winkler <books@robertwinkler.com>
 v0.1.0, 2022-07-30: Beta
 :toc:
 

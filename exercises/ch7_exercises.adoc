@@ -3,10 +3,9 @@
 
 include::../support.adoc[]
 
-. Convert the exercises from chapter 5 to run in `spim -bare` mode and/or
-in MARS with delayed branches and no pseudoinstructions (`java -jar ~/Mars_4.5.jar db np file.s` on the command line).
+. Convert the exercises from chapter 5 to run with no pseudoinstructions (`java -jar ~/rars_latest.jar np file.s` on the command line).
 
-. Convert the following C code to MIPS using a jump table (Note in C/C++
+. Convert the following C code to RISC-V using a jump table (Note in C/C++
 enum values start at 0 and go up by one unless the user manually assigns a value, in
 which case it continues counting up from there).
 +

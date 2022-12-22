@@ -3,7 +3,7 @@
 
 include::../support.adoc[]
 
-. Implement the following functions in MIPS and write a program to demonstrate their use.
+. Implement the following functions in RISC-V and write a program to demonstrate their use.
 You can reuse much of your code from the previous chapter's exercises.
 +
 [source,c,linenums]

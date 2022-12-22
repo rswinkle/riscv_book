@@ -99,10 +99,10 @@ when it uses them?  In fact, how do functions communicate at all?  How do they
 pass arguments or return results?  All these questions are solved by deciding
 on a "Calling Convention".  It's different for different architectures and even
 different operating systems on the same architecture.  This is because different
-architectures have different numbers of registers, and some registers like `ra`
+architectures have different numbers of registers, and some registers like `ra` have
 semi-hardcoded uses.  The the pseudoinstruction `ret` uses `ra`, and `x0` is a
 constant 0 and there's no way to change either of those facts.  That still
-leaves a lot of flexibility about designing a calling convention.  While they
+leaves a lot of flexibility when designing a calling convention.  While they
 mostly match, you can probably find several variations of RISC-V calling
 conventions online.  They usually differ in how they setup a stack frame.
 The convention covered in this chapter is consistent with, and sufficient for,

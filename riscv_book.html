@@ -513,9 +513,9 @@ pre.pygments .tok-il { color: #666666 } /* Literal.Number.Integer.Long */
 <h1>RISC-V Assembly Programmming</h1>
 <div class="details">
 <span id="author" class="author">Robert Winkler</span><br>
-<span id="email" class="email"><a href="mailto:mips@robertwinkler.com">mips@robertwinkler.com</a></span><br>
-<span id="revnumber">version 0.1.0,</span>
-<span id="revdate">2022-07-30</span>
+<span id="email" class="email"><a href="mailto:books@robertwinkler.com">books@robertwinkler.com</a></span><br>
+<span id="revnumber">version 0.5.0,</span>
+<span id="revdate">2022-12-22</span>
 <br><span id="revremark">Beta</span>
 </div>
 <div id="toc" class="toc">
@@ -625,8 +625,8 @@ any errors (submit an issue or even a pull request) is
 <a href="https://github.com/rswinkle/riscv_book">here</a>.</p>
 </div>
 <div class="paragraph">
-<p>If you&#8217;re interested in contacting me regarding MIPS tutoring or any other
-business request related to the book, you can reach me at <a href="mailto:mips@robertwinkler.com">mips@robertwinkler.com</a>.</p>
+<p>If you&#8217;re interested in contacting me regarding RISC-V tutoring or any other
+business request related to the book, you can reach me at <a href="mailto:books@robertwinkler.com">books@robertwinkler.com</a>.</p>
 </div>
 </div>
 </div>
@@ -758,7 +758,7 @@ terminal and install virtually any program from there using Macports or Homebrew
 or similar.</p>
 </div>
 <div class="paragraph">
-<p>There are a few RISC-V simulators that I know of and h</p>
+<p>There are a few RISC-V simulators that I know of and have used:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -779,7 +779,7 @@ programming</p>
 <p>Of those three, RARS is by far the most full featured and user friendly for learning
 since it forked from the venerable MARS MIPS simulator.  It is also the most
 commonly used by students outside of Berkeley.  Given that, this book will focus
-primarily on RARS, though it almost all of it should apply equally well to Venus.</p>
+primarily on RARS, though almost all of it should apply equally well to Venus.</p>
 </div>
 <div class="paragraph">
 <p>You can download/access both at the following links:</p>
@@ -918,7 +918,7 @@ you up and running, not really about teaching anything specific yet.</p>
 <div class="sect2">
 <h3 id="_building_and_running">Building and Running</h3>
 <div class="paragraph">
-<p>Now that we have our hello world MIPS program, how do we run it?  Well the easiest
+<p>Now that we have our hello world RISC-V program, how do we run it?  Well the easiest
 and quickest<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> way is of course to do it on the command line, which can be done like
 this:</p>
 </div>
@@ -1129,7 +1129,7 @@ name:        .space 30
 </div>
 <div class="paragraph">
 <p>As you can see in the example, we extract all the string literals and
-the character array <code>name</code> and int <code>age</code> and declare them as MIPS globals.
+the character array <code>name</code> and int <code>age</code> and declare them as globals.
 One thing to note is the second <code>printf</code>.  Because it prints a variable, <code>name</code>,
 using the conversion specifier, we break the literal into pieces around that.
 Since there is no built-in <code>printf</code> function in RISC-V, you have to handle printing
@@ -1224,7 +1224,7 @@ You don&#8217;t have to understand the rest of the code, just that it prints out
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Create a MIPS data section that declares variables equivalent to the following.  This will not be a runnable program without a main.</p>
+<p>Create a RISC-V data section that declares variables equivalent to the following.  This will not be a runnable program without a main.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="pygments highlight"><code data-lang="c"><table class="linenotable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
@@ -1237,7 +1237,7 @@ You don&#8217;t have to understand the rest of the code, just that it prints out
 <span class="tok-w">	</span><span class="tok-kt">int</span><span class="tok-w"> </span><span class="tok-n">myarray</span><span class="tok-p">[</span><span class="tok-mi">10</span><span class="tok-p">]</span><span class="tok-w"> </span><span class="tok-o">=</span><span class="tok-w"> </span><span class="tok-p">{</span><span class="tok-w"> </span><span class="tok-mi">9</span><span class="tok-p">,</span><span class="tok-w"> </span><span class="tok-mi">8</span><span class="tok-p">,</span><span class="tok-w"> </span><span class="tok-mi">7</span><span class="tok-p">,</span><span class="tok-w"> </span><span class="tok-mi">6</span><span class="tok-p">,</span><span class="tok-w"> </span><span class="tok-mi">5</span><span class="tok-p">,</span><span class="tok-w"> </span><span class="tok-mi">4</span><span class="tok-p">,</span><span class="tok-w"> </span><span class="tok-mi">3</span><span class="tok-p">,</span><span class="tok-w"> </span><span class="tok-mi">2</span><span class="tok-p">,</span><span class="tok-w"> </span><span class="tok-mi">1</span><span class="tok-w"> </span><span class="tok-p">};</span><span class="tok-w"></span>
 <span class="tok-w">	</span><span class="tok-kt">short</span><span class="tok-w"> </span><span class="tok-n">array2</span><span class="tok-p">[</span><span class="tok-mi">10</span><span class="tok-p">];</span><span class="tok-w"></span>
 
-<span class="tok-w">	</span><span class="tok-kt">char</span><span class="tok-w"> </span><span class="tok-n">mips_str</span><span class="tok-p">[]</span><span class="tok-w"> </span><span class="tok-o">=</span><span class="tok-w"> </span><span class="tok-s">&quot;MIPS assembly is awesome!&quot;</span><span class="tok-p">;</span><span class="tok-w"></span>
+<span class="tok-w">	</span><span class="tok-kt">char</span><span class="tok-w"> </span><span class="tok-n">riscv_str</span><span class="tok-p">[]</span><span class="tok-w"> </span><span class="tok-o">=</span><span class="tok-w"> </span><span class="tok-s">&quot;RISC-V assembly is awesome!&quot;</span><span class="tok-p">;</span><span class="tok-w"></span>
 </pre></td></tr></table></code></pre>
 </div>
 </div>
@@ -1674,7 +1674,7 @@ but it&#8217;s easier to use the print char ecall as we do right before exiting.
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Convert the following C code to MIPS</p>
+<p>Convert the following C code to RISC-V</p>
 <div class="listingblock">
 <div class="content">
 <pre class="pygments highlight"><code data-lang="c"><table class="linenotable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
@@ -2633,7 +2633,7 @@ have to switch the order of the operands.</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Convert the following C code to MIPS.</p>
+<p>Convert the following C code to RISC-V.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="pygments highlight"><code data-lang="c"><table class="linenotable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
@@ -3322,7 +3322,7 @@ covered so far.  Perhaps in a later chapter.</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Convert the following C code to MIPS.  If using SPIM, you can just hard code
+<p>Convert the following C code to RISC-V.  If using Venus, you can just hard code
 a "random" number between 0 and 100.</p>
 <div class="listingblock">
 <div class="content">
@@ -3380,8 +3380,8 @@ a "random" number between 0 and 100.</p>
 </div>
 </li>
 <li>
-<p>Write a MIPS program to find and print the average of the following array.
-Just use integer division.</p>
+<p>Write a RISC-V program to find and print the average of the following array.
+Use integer division.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="pygments highlight"><code data-lang="mips"><table class="linenotable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
@@ -3531,10 +3531,10 @@ when it uses them?  In fact, how do functions communicate at all?  How do they
 pass arguments or return results?  All these questions are solved by deciding
 on a "Calling Convention".  It&#8217;s different for different architectures and even
 different operating systems on the same architecture.  This is because different
-architectures have different numbers of registers, and some registers like <code>ra</code>
+architectures have different numbers of registers, and some registers like <code>ra</code> have
 semi-hardcoded uses.  The the pseudoinstruction <code>ret</code> uses <code>ra</code>, and <code>x0</code> is a
 constant 0 and there&#8217;s no way to change either of those facts.  That still
-leaves a lot of flexibility about designing a calling convention.  While they
+leaves a lot of flexibility when designing a calling convention.  While they
 mostly match, you can probably find several variations of RISC-V calling
 conventions online.  They usually differ in how they setup a stack frame.
 The convention covered in this chapter is consistent with, and sufficient for,
@@ -4099,7 +4099,7 @@ the next chapter.</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Implement the following functions in MIPS and write a program to demonstrate their use.
+<p>Implement the following functions in RISC-V and write a program to demonstrate their use.
 You can reuse much of your code from the previous chapter&#8217;s exercises.</p>
 <div class="listingblock">
 <div class="content">
@@ -5521,20 +5521,34 @@ extra register to hold the "plus 1" value if you still need the original.</p>
 <p>Another thing I should comment on is the <code>la</code> equivalence.  The reason it is
 a pseudoinstruction in the first place is that an address is 32 bits.  That&#8217;s also
 the size of a whole instruction.  Clearly there&#8217;s no way to represent a whole
-address and anything else at the same time.  The lower left corner of the
-greensheet has the actual formats of the 3 different types of instructions and
-even the jump format still needs 6 bits for the opcode.  This is why <code>lui</code> exists,
+address and anything else at the same time.  The lower right corner of the
+greensheet has the actual formats of the 6 different types of instructions and
+even the U and UJ formats still needs 12 bits for the opcode and destination.
+This is why <code>lui</code> (and <code>auipc</code>) exists,
 in order to facilitate getting a full address into a register by doing it in two
-halves, 16 + 16.  The lower 16 can be placed with <code>addi</code> or <code>ori</code> after the <code>lui</code>.</p>
+halves, 20 + 12.  The lower 12 can be placed with <code>addi</code> or <code>ori</code> after the <code>lui</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+RARS actually uses <code>auipc</code> not <code>lui</code> probably because that&#8217;s what the RISC-V
+spec says (also see top left on page 2 of the greensheet). They both can accomplish
+the same thing but the former is needed for PC-relative addressing which whereas
+lui is 0/absolute addressing. Since RARS works with absolute addressing the easier
+to use <code>lui</code> is fine.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>That begs the question, what actually goes in the upper half?  Well, since
 we&#8217;re dealing with addresses in the <code>.data</code> section, the upper portion should
-match the upper part of address of the <code>.data</code> section.  In SPIM the <code>data</code> section
-starts at <code>0x10000000</code> in bare mode.  In normal mode it is <code>0x10010000</code>, but you&#8217;d be
-able to use <code>la</code> in normal mode.  However, in MARS it is always <code>0x10010000</code>,
-so you won&#8217;t be able to have it work correctly in bare SPIM and MARS without
-changing that back and forth.</p>
+match the upper part of address of the <code>.data</code> section.  In RARS it is always
+<code>0x10010000</code>.</p>
 </div>
 <div class="paragraph">
 <p>But what about the lower part of the address?  This involves counting the bytes
@@ -5763,11 +5777,10 @@ and lastly the <code>la</code> became <code>lui</code> plus an <code>ori</code> 
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Convert the exercises from chapter 5 to run in <code>spim -bare</code> mode and/or
-in MARS with delayed branches and no pseudoinstructions (<code>java -jar ~/Mars_4.5.jar db np file.s</code> on the command line).</p>
+<p>Convert the exercises from chapter 5 to run with no pseudoinstructions (<code>java -jar ~/rars_latest.jar np file.s</code> on the command line).</p>
 </li>
 <li>
-<p>Convert the following C code to MIPS using a jump table (Note in C/C++
+<p>Convert the following C code to RISC-V using a jump table (Note in C/C++
 enum values start at 0 and go up by one unless the user manually assigns a value, in
 which case it continues counting up from there).</p>
 <div class="listingblock">
@@ -5866,19 +5879,13 @@ which case it continues counting up from there).</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://inst.eecs.berkeley.edu/~cs61c/resources/MIPS_Green_Sheet.pdf">Greensheet</a></p>
+<p><a href="https://inst.eecs.berkeley.edu/~cs61c/fa17/img/riscvcard.pdf">Greensheet</a></p>
 </li>
 <li>
-<p><a href="https://courses.missouristate.edu/KenVollmar/mars/Help/SyscallHelp.html">MARS syscall list</a></p>
+<p><a href="https://github.com/TheThirdOne/rars/wiki/Environment-Calls">RARS ecall list</a></p>
 </li>
 <li>
-<p><a href="https://learnxinyminutes.com/docs/mips/">learnxinyminutes page</a></p>
-</li>
-<li>
-<p><a href="https://courses.necaise.org/MIPSReference/MIPSReference">Randolph-Macon College MIPS Reference</a></p>
-</li>
-<li>
-<p><a href="https://chortle.ccsu.edu/AssemblyTutorial/index.html">CCSU MIPS Reference</a></p>
+<p><a href="https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/Understanding_RISC_V_Calling_Convention.pdf">RISC-V calling convention</a></p>
 </li>
 </ul>
 </div>
@@ -6123,8 +6130,8 @@ which case it continues counting up from there).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.1.0<br>
-Last updated 2022-07-18 15:31:34 -0700
+Version 0.5.0<br>
+Last updated 2022-12-22 11:20:05 -0700
 </div>
 </div>
 </body>

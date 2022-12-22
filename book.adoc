@@ -2,7 +2,7 @@
 
 = RISC-V Assembly Programmming
 Robert Winkler <books@robertwinkler.com>
-v0.1.0, 2022-07-30: Beta
+v0.5.0, 2022-12-22: Beta
 :toc:
 
 include::info.adoc[]

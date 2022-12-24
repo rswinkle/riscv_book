@@ -1,0 +1,109 @@
+:source-highlighter: pygments
+
+
+:venus_ecalls: footnote:[Funny enough the Wiki link on cs61c's Venus is empty and their own https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/[documentation], entirely focused on the web version, links to ThaumicMekanism's https://github.com/ThaumicMekanism/venus/wiki/Environmental-Calls[wiki]]
+:venus_directives: footnote:[https://github.com/ThaumicMekanism/venus/wiki/Assembler-Directives]
+:cs61c_venus_docs: footnote:[https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/]
+
+== Appendix A: Venus
+
+Venus is the simulator that is used by UC Berkeley's CS 61C course.
+It's nowhere near as nice as RARS and is poorly documented and maintained.
+
+UC Berkeley is the designer of RISC-V and so was one of the first colleges
+to start teaching RISC-V, before RARS existed. Now that they've built up
+a curriculum around Venus and invested in their own fork they don't want
+to switch.
+
+In any case, this appendix will go over the most important differences
+between Venus and RARS.
+
+=== Versions and History
+
+Unlike RARS which seems to have one primary and fairly well maintained stable version, Venus is less clear.
+As far as I can tell it was started by https://github.com/kvakil/venus[kvakil] 5 years ago,
+was forked by https://github.com/ThaumicMekanism/venus[ThaumicMekanism], and finally was forked
+by Berkeley for their https://github.com/61c-teach/venus[cs61c course].  While the latter has
+the most recent commit none of them are what I would call well maintained, with the former 2
+seeming to stall in 2018 and 2020 respectively.  Venus (all versions) has a web based interface
+but I don't know why anyone would prefer that to the standalone JAR version.
+
+As of the end of 2022 you can get Venus jar files from ThaumicMekanism's
+github
+https://thaumicmekanism.github.io/venus/jvm/venus-jvm-latest.jar[here]
+or from Berkeley's course website
+https://inst.eecs.berkeley.edu/~cs61c/fa22/tools/venus-latest.jar[here].
+
+I don't know what the minor differences are between them but you should
+use whatever is provided by the course if you're taking it.
+
+=== Data section
+
+The documentation is sorely lacking and out of date but the must relevant
+difference from RARS is that it uses `.asciiz` instead of `.asciz`.
+The only documentation I can find is again from ThaumicMekanism's wiki
+and it doesn't mention `.space` even though the version of venus I have
+allows it.{venus_directives}  CS61C's documentation doesn't mention data
+directives at all.{cs61c_venus_docs}
+
+=== Environment Calls
+
+Venus only supports a handful of ecalls and they work differently than they do in
+RARS.{venus_ecalls}  In RARS, you use `a7` to select the ecall leaving the lower a
+registers for arguments which matches how you would pass arguments to a function.
+Venus uses `a0` to select the ecall which means your argument(s) start in `a1`.
+This is probably why they provide wrapper functions for the ecalls to students
+for their projects, though it took until recently to get them right.
+
+So, what does this look like in practice?  Let's take the simple command line argument
+program from chapter 7 and convert it for Venus.  So the following program:
+
+[source,riscv,linenums]
+----
+include::code/args.s[]
+----
+
+becomes
+
+[source,riscv,linenums]
+----
+include::code/args_venus.s[]
+----
+
+Note that we had to save argv beacuse `a1` is now used in our ecalls.  In addition
+the behavior is different than RARS:
+
+[source]
+----
+$ java -jar ~/venus-jvm-latest.jar args_venus.s
+There are 0 command line arguments:
+$ java -jar ~/venus-jvm-latest.jar args_venus.s hello
+There are 2 command line arguments:
+args_venus.s
+hello
+----
+
+RARS may have decided not to include the program name/"executable" in its arguments
+but at least it is consistent in its behavior. In addition, the section
+on passing arguments in CS 61C's documentation is inaccurate.  Just
+like with C and RARS, argc comes first in `a0` then argv in `a1`, not
+the other way around as described.{cs61c_venus_docs}
+
+=== Constants
+
+Another minor difference from RARS is how you declare constants.  In Venus you use
+the same syntax as C, so the constants example from chapter 7:
+
+[source,riscv,linenums]
+----
+include::code/constants_rars.s[]
+----
+
+becomes
+
+[source,riscv,linenums]
+----
+include::code/constants_venus.s[]
+----
+
+

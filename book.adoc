@@ -2,7 +2,7 @@
 
 = RISC-V Assembly Programmming
 Robert Winkler <books@robertwinkler.com>
-v0.5.0, 2022-12-22: Beta
+v0.6.1, 2022-12-24: Beta
 :toc:
 
 include::info.adoc[]
@@ -40,6 +40,8 @@ include::exercises/ch6_exercises.adoc[]
 include::ch7.adoc[]
 
 include::exercises/ch7_exercises.adoc[]
+
+include::appendix_a.adoc[]
 
 include::refs.adoc[]
 

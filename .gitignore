@@ -18,6 +18,7 @@
 
 # misc
 experiments/
+tools/
 exercises/code/
 *.c
 *~

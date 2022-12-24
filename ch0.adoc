@@ -73,12 +73,16 @@ programming
 Of those three, RARS is by far the most full featured and user friendly for learning
 since it forked from the venerable MARS MIPS simulator.  It is also the most
 commonly used by students outside of Berkeley.  Given that, this book will focus
-primarily on RARS, though almost all of it should apply equally well to Venus.
+primarily on RARS, though most of it applies equally well to Venus.  <<_appendix_a_venus>>
+covers the differences between RARS and Venus.
 
 You can download/access both at the following links:
 
 * https://github.com/TheThirdOne/rars[RARS]
-* https://venus.cs61c.org/[Venus]
+* https://github.com/ThaumicMekanism/venus[ThaumicMekanism's Venus]+
+Get the jar https://thaumicmekanism.github.io/venus/jvm/venus-jvm-latest.jar[here]
+* https://github.com/61c-teach/venus[CS 61C's Venus]+
+Get the jar https://inst.eecs.berkeley.edu/~cs61c/fa22/tools/venus-latest.jar[here].
 
 === Handy Resources
 

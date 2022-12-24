@@ -514,8 +514,8 @@ pre.pygments .tok-il { color: #666666 } /* Literal.Number.Integer.Long */
 <div class="details">
 <span id="author" class="author">Robert Winkler</span><br>
 <span id="email" class="email"><a href="mailto:books@robertwinkler.com">books@robertwinkler.com</a></span><br>
-<span id="revnumber">version 0.5.0,</span>
-<span id="revdate">2022-12-22</span>
+<span id="revnumber">version 0.6.1,</span>
+<span id="revdate">2022-12-24</span>
 <br><span id="revremark">Beta</span>
 </div>
 <div id="toc" class="toc">
@@ -589,6 +589,14 @@ pre.pygments .tok-il { color: #666666 } /* Literal.Number.Integer.Long */
 <li><a href="#_command_line_arguments">Command Line Arguments</a></li>
 <li><a href="#_no_pseudoinstructions_allowed">No Pseudoinstructions Allowed</a></li>
 <li><a href="#_exercises_8">Exercises</a></li>
+</ul>
+</li>
+<li><a href="#_appendix_a_venus">Appendix A: Venus</a>
+<ul class="sectlevel2">
+<li><a href="#_versions_and_history">Versions and History</a></li>
+<li><a href="#_data_section">Data section</a></li>
+<li><a href="#_environment_calls">Environment Calls</a></li>
+<li><a href="#_constants_2">Constants</a></li>
 </ul>
 </li>
 <li><a href="#_references_and_useful_links">References and Useful Links</a></li>
@@ -779,7 +787,8 @@ programming</p>
 <p>Of those three, RARS is by far the most full featured and user friendly for learning
 since it forked from the venerable MARS MIPS simulator.  It is also the most
 commonly used by students outside of Berkeley.  Given that, this book will focus
-primarily on RARS, though almost all of it should apply equally well to Venus.</p>
+primarily on RARS, though most of it applies equally well to Venus.  <a href="#_appendix_a_venus">Appendix A: Venus</a>
+covers the differences between RARS and Venus.</p>
 </div>
 <div class="paragraph">
 <p>You can download/access both at the following links:</p>
@@ -790,7 +799,12 @@ primarily on RARS, though almost all of it should apply equally well to Venus.</
 <p><a href="https://github.com/TheThirdOne/rars">RARS</a></p>
 </li>
 <li>
-<p><a href="https://venus.cs61c.org/">Venus</a></p>
+<p><a href="https://github.com/ThaumicMekanism/venus">ThaumicMekanism&#8217;s Venus</a>+
+Get the jar <a href="https://thaumicmekanism.github.io/venus/jvm/venus-jvm-latest.jar">here</a></p>
+</li>
+<li>
+<p><a href="https://github.com/61c-teach/venus">CS 61C&#8217;s Venus</a>+
+Get the jar <a href="https://inst.eecs.berkeley.edu/~cs61c/fa22/tools/venus-latest.jar">here</a>.</p>
 </li>
 </ul>
 </div>
@@ -5874,6 +5888,352 @@ which case it continues counting up from there).</p>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_appendix_a_venus">Appendix A: Venus</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Venus is the simulator that is used by UC Berkeley&#8217;s CS 61C course.
+It&#8217;s nowhere near as nice as RARS and is poorly documented and maintained.</p>
+</div>
+<div class="paragraph">
+<p>UC Berkeley is the designer of RISC-V and so was one of the first colleges
+to start teaching RISC-V, before RARS existed. Now that they&#8217;ve built up
+a curriculum around Venus and invested in their own fork they don&#8217;t want
+to switch.</p>
+</div>
+<div class="paragraph">
+<p>In any case, this appendix will go over the most important differences
+between Venus and RARS.</p>
+</div>
+<div class="sect2">
+<h3 id="_versions_and_history">Versions and History</h3>
+<div class="paragraph">
+<p>Unlike RARS which seems to have one primary and fairly well maintained stable version, Venus is less clear.
+As far as I can tell it was started by <a href="https://github.com/kvakil/venus">kvakil</a> 5 years ago,
+was forked by <a href="https://github.com/ThaumicMekanism/venus">ThaumicMekanism</a>, and finally was forked
+by Berkeley for their <a href="https://github.com/61c-teach/venus">cs61c course</a>.  While the latter has
+the most recent commit none of them are what I would call well maintained, with the former 2
+seeming to stall in 2018 and 2020 respectively.  Venus (all versions) has a web based interface
+but I don&#8217;t know why anyone would prefer that to the standalone JAR version.</p>
+</div>
+<div class="paragraph">
+<p>As of the end of 2022 you can get Venus jar files from ThaumicMekanism&#8217;s
+github
+<a href="https://thaumicmekanism.github.io/venus/jvm/venus-jvm-latest.jar">here</a>
+or from Berkeley&#8217;s course website
+<a href="https://inst.eecs.berkeley.edu/~cs61c/fa22/tools/venus-latest.jar">here</a>.</p>
+</div>
+<div class="paragraph">
+<p>I don&#8217;t know what the minor differences are between them but you should
+use whatever is provided by the course if you&#8217;re taking it.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_data_section">Data section</h3>
+<div class="paragraph">
+<p>The documentation is sorely lacking and out of date but the must relevant
+difference from RARS is that it uses <code>.asciiz</code> instead of <code>.asciz</code>.
+The only documentation I can find is again from ThaumicMekanism&#8217;s wiki
+and it doesn&#8217;t mention <code>.space</code> even though the version of venus I have
+allows it.<sup class="footnote">[<a id="_footnoteref_13" class="footnote" href="#_footnotedef_13" title="View footnote.">13</a>]</sup>  CS61C&#8217;s documentation doesn&#8217;t mention data
+directives at all.<sup class="footnote">[<a id="_footnoteref_14" class="footnote" href="#_footnotedef_14" title="View footnote.">14</a>]</sup></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_environment_calls">Environment Calls</h3>
+<div class="paragraph">
+<p>Venus only supports a handful of ecalls and they work differently than they do in
+RARS.<sup class="footnote">[<a id="_footnoteref_15" class="footnote" href="#_footnotedef_15" title="View footnote.">15</a>]</sup>  In RARS, you use <code>a7</code> to select the ecall leaving the lower a
+registers for arguments which matches how you would pass arguments to a function.
+Venus uses <code>a0</code> to select the ecall which means your argument(s) start in <code>a1</code>.
+This is probably why they provide wrapper functions for the ecalls to students
+for their projects, though it took until recently to get them right.</p>
+</div>
+<div class="paragraph">
+<p>So, what does this look like in practice?  Let&#8217;s take the simple command line argument
+program from chapter 7 and convert it for Venus.  So the following program:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="riscv"><table class="linenotable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span></pre></div></td><td class="code"><pre><span></span>.data
+
+there_are:  .asciz &quot;There are &quot;
+arguments:  .asciz &quot; command line arguments:\n&quot;
+
+
+.text
+
+main:
+	mv        t0, a0  # save argc
+
+	li        a7, 4
+	la        a0, there_are
+	ecall
+
+	mv        a0, t0
+	li        a7, 1   # print int
+	ecall
+
+	li        a7, 4
+	la        a0, arguments
+	ecall
+
+	li        t1, 0   # i = 0
+	j         arg_loop_test
+
+arg_loop:
+	li        a7, 4
+	lw        a0, 0(a1)
+	ecall
+
+	li        a7, 11
+	li        a0, 10    # &#39;\n&#39;
+	ecall
+
+	addi      t1, t1, 1   # i++
+	addi      a1, a1, 4    # argv++ ie a1 = &amp;argv[i]
+arg_loop_test:
+	blt       t1, t0, arg_loop  # while (i &lt; argc)
+
+	li        a7, 10
+	ecall
+</pre></td></tr></table></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>becomes</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="riscv"><table class="linenotable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span></pre></div></td><td class="code"><pre><span></span>.data
+
+there_are:  .asciiz &quot;There are &quot;
+arguments:  .asciiz &quot; command line arguments:\n&quot;
+
+
+.text
+
+main:
+	mv      t0, a0  # save argc
+	mv      t2, a1  # save argv
+
+	li      a0, 4           # print str
+	la      a1, there_are
+	ecall
+
+	mv      a1, t0
+	li      a0, 1   # print int
+	ecall
+
+	li      a0, 4
+	la      a1, arguments
+	ecall
+
+	li      t1, 0   # i = 0
+	j       arg_loop_test
+
+arg_loop:
+	li      a0, 4
+	lw      a1, 0(t2)
+	ecall
+
+	li      a0, 11
+	li      a1, 10    # &#39;\n&#39;
+	ecall
+
+	addi    t1, t1, 1   # i++
+	addi    t2, t2, 4    # argv++ ie t2 = &amp;argv[i]
+arg_loop_test:
+	blt     t1, t0, arg_loop  # while (i &lt; argc)
+
+
+	li      a0, 10
+	ecall
+</pre></td></tr></table></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that we had to save argv beacuse <code>a1</code> is now used in our ecalls.  In addition
+the behavior is different than RARS:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code><span></span>$ java -jar ~/venus-jvm-latest.jar args_venus.s
+There are 0 command line arguments:
+$ java -jar ~/venus-jvm-latest.jar args_venus.s hello
+There are 2 command line arguments:
+args_venus.s
+hello</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>RARS may have decided not to include the program name/"executable" in its arguments
+but at least it is consistent in its behavior. In addition, the section
+on passing arguments in CS 61C&#8217;s documentation is inaccurate.  Just
+like with C and RARS, argc comes first in <code>a0</code> then argv in <code>a1</code>, not
+the other way around as described.<sup class="footnote">[<a id="_footnoteref_16" class="footnote" href="#_footnotedef_16" title="View footnote.">16</a>]</sup></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_constants_2">Constants</h3>
+<div class="paragraph">
+<p>Another minor difference from RARS is how you declare constants.  In Venus you use
+the same syntax as C, so the constants example from chapter 7:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="riscv"><table class="linenotable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span></pre></div></td><td class="code"><pre><span></span>.eqv sys_print_str 4
+.eqv sys_exit 10
+
+.data
+hello:   .asciz &quot;Hello World!\n&quot;
+
+.text
+main:
+	li   a7, sys_print_str
+	la   a0, hello  # load address of string to print into a0
+	ecall
+
+	li   a7, sys_exit
+	ecall
+</pre></td></tr></table></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>becomes</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="riscv"><table class="linenotable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span></pre></div></td><td class="code"><pre><span></span>#define sys_print_str 4
+#define sys_exit 10
+
+.data
+hello:   .asciiz &quot;Hello World!\n&quot;
+
+.text
+main:
+	li   a0, sys_print_str
+	la   a1, hello  # load address of string to print into a1
+	ecall
+
+	li   a0, sys_exit
+	ecall
+</pre></td></tr></table></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_references_and_useful_links">References and Useful Links</h2>
 <div class="sectionbody">
 <div class="ulist">
@@ -6127,11 +6487,23 @@ which case it continues counting up from there).</p>
 <div class="footnote" id="_footnotedef_12">
 <a href="#_footnoteref_12">12</a>. <a href="https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html" class="bare">https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html</a>
 </div>
+<div class="footnote" id="_footnotedef_13">
+<a href="#_footnoteref_13">13</a>. <a href="https://github.com/ThaumicMekanism/venus/wiki/Assembler-Directives" class="bare">https://github.com/ThaumicMekanism/venus/wiki/Assembler-Directives</a>
+</div>
+<div class="footnote" id="_footnotedef_14">
+<a href="#_footnoteref_14">14</a>. <a href="https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/" class="bare">https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/</a>
+</div>
+<div class="footnote" id="_footnotedef_15">
+<a href="#_footnoteref_15">15</a>. Funny enough the Wiki link on cs61c&#8217;s Venus is empty and their own <a href="https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/">documentation</a>, entirely focused on the web version, links to ThaumicMekanism&#8217;s <a href="https://github.com/ThaumicMekanism/venus/wiki/Environmental-Calls">wiki</a>
+</div>
+<div class="footnote" id="_footnotedef_16">
+<a href="#_footnoteref_16">16</a>. <a href="https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/" class="bare">https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/</a>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.5.0<br>
-Last updated 2022-12-22 11:20:05 -0700
+Version 0.6.1<br>
+Last updated 2022-12-24 01:40:09 -0700
 </div>
 </div>
 </body>

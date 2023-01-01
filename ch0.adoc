@@ -50,7 +50,7 @@ I highly recommend you use Linux. It's easier in every way to do dev work
 on Linux vs Windows or Mac.  Many assignments require it, which often necessitates
 using a virtual machine (which is painful, especially on laptops) and/or ssh-ing
 into a school Linux server, which is also less than ideal.  In general, you'll have
-to learn how to use the unix terminal eventually and will probably use it to some
+to learn how to use the Unix terminal eventually and will probably use it to some
 extent in your career so it also makes sense to get used to it asap.
 
 That being said, Windows does now have WSL so you can get the full Ubuntu or Debian
@@ -79,9 +79,9 @@ covers the differences between RARS and Venus.
 You can download/access both at the following links:
 
 * https://github.com/TheThirdOne/rars[RARS]
-* https://github.com/ThaumicMekanism/venus[ThaumicMekanism's Venus]+
+* https://github.com/ThaumicMekanism/venus[ThaumicMekanism's Venus]
 Get the jar https://thaumicmekanism.github.io/venus/jvm/venus-jvm-latest.jar[here]
-* https://github.com/61c-teach/venus[CS 61C's Venus]+
+* https://github.com/61c-teach/venus[CS 61C's Venus]
 Get the jar https://inst.eecs.berkeley.edu/~cs61c/fa22/tools/venus-latest.jar[here].
 
 === Handy Resources
@@ -91,7 +91,9 @@ The first is the
 https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/riscvcard.pdf[RISC-V Greensheet].
 It's possible you already have a physical copy of this as it's actually the tearout from the Patterson
 and Hennessey textbook https://amzn.to/3zN71KP[_Computer Architecture and Design_]
-that is commonly used in college courses.
+that is commonly used in college courses.  Berkeley provides a similar
+https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/reference-card.pdf[reference sheet]
+with the same information.
 
 There is also a large format of the
 https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/riscvcard_large.pdf[greensheet].
@@ -112,13 +114,7 @@ over all the pieces in overview.  You can copy paste these into your editor of c
 
 [source,c,linenums]
 ----
-#include <stdio.h>
-
-int main()
-{
-	printf("Hello World!\n");
-	return 0;
-}
+include::code/hello.c[]
 ----
 
 It is pretty self explanatory.  You have to include stdio.h so you can use the
@@ -141,17 +137,7 @@ Now, the same program in RISC-V:
 
 [source,riscv,linenums]
 ----
-.data
-hello:   .asciz "Hello World!\n"
-
-.text
-main:
-	li   a7, 4      # load immediate, a7 = 4 (4 is print string system call)
-	la   a0, hello  # load address of string to print into a0
-	ecall
-
-	li   a7, 10     # exit ecall
-	ecall
+include::code/hello.s[]
 ----
 
 The `.data` section is where you declare global variables, which includes string

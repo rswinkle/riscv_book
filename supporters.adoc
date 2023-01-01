@@ -4,7 +4,7 @@
 === Corporate
 [%autowidth,cols="1a,1a,1a",frame=none,grid=none]
 |===
-|http://www.robertwinkler.com/projects/mips_book/[MIPS Assembly Programming]
+|http://www.robertwinkler.com/projects/riscv_book/[RISC-V Assembly Programming]
 |http://www.robertwinkler.com/[Robert Winkler]
 |supporter3
 |===

@@ -8,12 +8,13 @@
 == Appendix A: Venus
 
 Venus is the simulator that is used by UC Berkeley's CS 61C course.
-It's nowhere near as nice as RARS and is poorly documented and maintained.
+It's nowhere near as nice nor as full featured as RARS and currently seems poorly
+documented and maintained.
 
 UC Berkeley is the designer of RISC-V and so was one of the first colleges
-to start teaching RISC-V, before RARS existed. Now that they've built up
-a curriculum around Venus and invested in their own fork they don't want
-to switch.
+to start teaching RISC-V, years before RARS existed. Given that they've built up
+a curriculum around Venus and invested at leeast a little in their own fork
+it makes sense that they'd be hesitant to switch.
 
 In any case, this appendix will go over the most important differences
 between Venus and RARS.
@@ -41,7 +42,7 @@ use whatever is provided by the course if you're taking it.
 
 The documentation is sorely lacking and out of date but the must relevant
 difference from RARS is that it uses `.asciiz` instead of `.asciz`.
-The only documentation I can find is again from ThaumicMekanism's wiki
+The only documentation I can find is from ThaumicMekanism's wiki
 and it doesn't mention `.space` even though the version of venus I have
 allows it.{venus_directives}  CS61C's documentation doesn't mention data
 directives at all.{cs61c_venus_docs}
@@ -49,7 +50,21 @@ directives at all.{cs61c_venus_docs}
 === Environment Calls
 
 Venus only supports a handful of ecalls and they work differently than they do in
-RARS.{venus_ecalls}  In RARS, you use `a7` to select the ecall leaving the lower a
+RARS.  Again, the only documentation I can find is ThaumicMekanism's.{venus_ecalls}
+
+There is one that I know of that is not listed in that table.  Ecall 5 is basically
+the C function atoi which converts a string to an integer.  It takes the address
+of the string in `a1` and returns the number in `a0`.  If there is any leading or trailing
+whitespace or the string isn't a valid number it returns 0.
+
+One thing you might have noticed is that Venus doesn't support any of the input ecalls.
+This is extremely limiting since you can't write any interactive programs and to test
+a function you have to actually change the program (usually a variable in the data section)
+and re-run it.  The only way to even get variable program behavior is to use the file input
+capability to read data and do something different based on that input.
+
+But aside from the lack of some basic ecalls, there's also a behavioral difference in
+how they work.  In RARS, you use `a7` to select the ecall leaving the lower a
 registers for arguments which matches how you would pass arguments to a function.
 Venus uses `a0` to select the ecall which means your argument(s) start in `a1`.
 This is probably why they provide wrapper functions for the ecalls to students
@@ -85,7 +100,7 @@ hello
 
 RARS may have decided not to include the program name/"executable" in its arguments
 but at least it is consistent in its behavior. In addition, the section
-on passing arguments in CS 61C's documentation is inaccurate.  Just
+on passing arguments in CS 61C's documentation is inaccurate as of December 2022.  Just
 like with C and RARS, argc comes first in `a0` then argv in `a1`, not
 the other way around as described.{cs61c_venus_docs}
 
@@ -105,5 +120,11 @@ becomes
 ----
 include::code/constants_venus.s[]
 ----
+
+=== Conclusion
+
+While most of this book applies equally well to both programs and to RISC-V in general,
+this appendix should clear up any difficulties you might have run into trying to convert
+the examples to run in Venus.  Hopefully Berkeley will decide to switch to RARS eventually.
 
 

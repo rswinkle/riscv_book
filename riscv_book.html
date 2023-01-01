@@ -514,8 +514,8 @@ pre.pygments .tok-il { color: #666666 } /* Literal.Number.Integer.Long */
 <div class="details">
 <span id="author" class="author">Robert Winkler</span><br>
 <span id="email" class="email"><a href="mailto:books@robertwinkler.com">books@robertwinkler.com</a></span><br>
-<span id="revnumber">version 0.6.1,</span>
-<span id="revdate">2022-12-24</span>
+<span id="revnumber">version 0.7.0,</span>
+<span id="revdate">2022-12-31</span>
 <br><span id="revremark">Beta</span>
 </div>
 <div id="toc" class="toc">
@@ -597,6 +597,7 @@ pre.pygments .tok-il { color: #666666 } /* Literal.Number.Integer.Long */
 <li><a href="#_data_section">Data section</a></li>
 <li><a href="#_environment_calls">Environment Calls</a></li>
 <li><a href="#_constants_2">Constants</a></li>
+<li><a href="#_conclusion_6">Conclusion</a></li>
 </ul>
 </li>
 <li><a href="#_references_and_useful_links">References and Useful Links</a></li>
@@ -5892,13 +5893,14 @@ which case it continues counting up from there).</p>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Venus is the simulator that is used by UC Berkeley&#8217;s CS 61C course.
-It&#8217;s nowhere near as nice as RARS and is poorly documented and maintained.</p>
+It&#8217;s nowhere near as nice nor as full featured as RARS and currently seems poorly
+documented and maintained.</p>
 </div>
 <div class="paragraph">
 <p>UC Berkeley is the designer of RISC-V and so was one of the first colleges
-to start teaching RISC-V, before RARS existed. Now that they&#8217;ve built up
-a curriculum around Venus and invested in their own fork they don&#8217;t want
-to switch.</p>
+to start teaching RISC-V, years before RARS existed. Given that they&#8217;ve built up
+a curriculum around Venus and invested at leeast a little in their own fork
+it makes sense that they&#8217;d be hesitant to switch.</p>
 </div>
 <div class="paragraph">
 <p>In any case, this appendix will go over the most important differences
@@ -5932,7 +5934,7 @@ use whatever is provided by the course if you&#8217;re taking it.</p>
 <div class="paragraph">
 <p>The documentation is sorely lacking and out of date but the must relevant
 difference from RARS is that it uses <code>.asciiz</code> instead of <code>.asciz</code>.
-The only documentation I can find is again from ThaumicMekanism&#8217;s wiki
+The only documentation I can find is from ThaumicMekanism&#8217;s wiki
 and it doesn&#8217;t mention <code>.space</code> even though the version of venus I have
 allows it.<sup class="footnote">[<a id="_footnoteref_13" class="footnote" href="#_footnotedef_13" title="View footnote.">13</a>]</sup>  CS61C&#8217;s documentation doesn&#8217;t mention data
 directives at all.<sup class="footnote">[<a id="_footnoteref_14" class="footnote" href="#_footnotedef_14" title="View footnote.">14</a>]</sup></p>
@@ -5942,7 +5944,24 @@ directives at all.<sup class="footnote">[<a id="_footnoteref_14" class="footnote
 <h3 id="_environment_calls">Environment Calls</h3>
 <div class="paragraph">
 <p>Venus only supports a handful of ecalls and they work differently than they do in
-RARS.<sup class="footnote">[<a id="_footnoteref_15" class="footnote" href="#_footnotedef_15" title="View footnote.">15</a>]</sup>  In RARS, you use <code>a7</code> to select the ecall leaving the lower a
+RARS.  Again, the only documentation I can find is ThaumicMekanism&#8217;s.<sup class="footnote">[<a id="_footnoteref_15" class="footnote" href="#_footnotedef_15" title="View footnote.">15</a>]</sup></p>
+</div>
+<div class="paragraph">
+<p>There is one that I know of that is not listed in that table.  Ecall 5 is basically
+the C function atoi which converts a string to an integer.  It takes the address
+of the string in <code>a1</code> and returns the number in <code>a0</code>.  If there is any leading or trailing
+whitespace or the string isn&#8217;t a valid number it returns 0.</p>
+</div>
+<div class="paragraph">
+<p>One thing you might have noticed is that Venus doesn&#8217;t support any of the input ecalls.
+This is extremely limiting since you can&#8217;t write any interactive programs and to test
+a function you have to actually change the program (usually a variable in the data section)
+and re-run it.  The only way to even get variable program behavior is to use the file input
+capability to read data and do something different based on that input.</p>
+</div>
+<div class="paragraph">
+<p>But aside from the lack of some basic ecalls, there&#8217;s also a behavioral difference in
+how they work.  In RARS, you use <code>a7</code> to select the ecall leaving the lower a
 registers for arguments which matches how you would pass arguments to a function.
 Venus uses <code>a0</code> to select the ecall which means your argument(s) start in <code>a1</code>.
 This is probably why they provide wrapper functions for the ecalls to students
@@ -6152,7 +6171,7 @@ hello</code></pre>
 <div class="paragraph">
 <p>RARS may have decided not to include the program name/"executable" in its arguments
 but at least it is consistent in its behavior. In addition, the section
-on passing arguments in CS 61C&#8217;s documentation is inaccurate.  Just
+on passing arguments in CS 61C&#8217;s documentation is inaccurate as of December 2022.  Just
 like with C and RARS, argc comes first in <code>a0</code> then argv in <code>a1</code>, not
 the other way around as described.<sup class="footnote">[<a id="_footnoteref_16" class="footnote" href="#_footnotedef_16" title="View footnote.">16</a>]</sup></p>
 </div>
@@ -6229,6 +6248,14 @@ main:
 	ecall
 </pre></td></tr></table></code></pre>
 </div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_conclusion_6">Conclusion</h3>
+<div class="paragraph">
+<p>While most of this book applies equally well to both programs and to RISC-V in general,
+this appendix should clear up any difficulties you might have run into trying to convert
+the examples to run in Venus.  Hopefully Berkeley will decide to switch to RARS eventually.</p>
 </div>
 </div>
 </div>
@@ -6502,8 +6529,8 @@ main:
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.6.1<br>
-Last updated 2022-12-24 01:40:09 -0700
+Version 0.7.0<br>
+Last updated 2022-12-31 15:57:40 -0700
 </div>
 </div>
 </body>

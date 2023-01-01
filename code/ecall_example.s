@@ -46,7 +46,6 @@ main:
 	ecall
 	add   t0, t0, a0 # t0 += height
 
-
 	li    a7, 4
 	la    a0, ageplusheight
 	ecall
@@ -59,7 +58,6 @@ main:
 	li    a7, 11   # print char
 	li    a0, 10   # ascii value of '\n'
 	ecall
-
 
 	li    a7, 10     # exit ecall
 	ecall

@@ -87,7 +87,7 @@ the character array `name` and int `age` and declare them as globals.
 One thing to note is the second `printf`.  Because it prints a variable, `name`,
 using the conversion specifier, we break the literal into pieces around that.
 Since there is no built-in `printf` function in RISC-V, you have to handle printing
-variables yourself with the appropriate system calls.
+variables yourself with the appropriate environment calls.
 
 
 === Arrays
@@ -115,11 +115,11 @@ you another way to declare a string or a character array, though I can't really
 think of a reason you'd want to.  You could declare a `.byte` array and list all
 the characters individually.
 
-However, if you want an array with all elements initialized to the same value there
-is a more convenient option that I learned very recently.  After the type you
-put the value you want, a colon, and then the number of elements.  So `a: .word 123 : 10`
-would declare a 10 integer array with all elements set to 123. TODO check if venus
-supports this syntax.
+However, if you want an array with all elements initialized to the same value
+there is a more convenient option.  After the type you put the value you want,
+a colon, and then the number of elements.  So `a: .word 123 : 10` would
+declare a 10 integer array with all elements set to 123.  Note, Venus does
+not support this syntax.
 
 Given what we just covered, this:
 

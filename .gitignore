@@ -20,7 +20,6 @@
 experiments/
 tools/
 exercises/code/
-*.c
 *~
 *.kate-swp
 CMakeFiles/*

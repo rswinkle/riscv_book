@@ -6,10 +6,10 @@ We mentioned environment calls (aka ecalls, though they're also called system
 calls or syscalls in other languages like MIPS) in chapter 0 when we were going
 over our "Hello World" program, but what exactly are they?
 
-Essentially, they are the built in functions of a operating system; in this case,
-the simple operating system of the RISC-V simulators.  They provide access to all the
+Essentially, they are the built in functions of an operating system; in this case,
+the simple operating system of the RARS simulator.  They provide access to all the
 fundamental features, like input and output to/from both the console and files,
-allocating memory, and exiting.  That covers the basics but RARS supports many more,
+allocating memory, and exiting.  Those are the basics but RARS supports many more,
 for things ranging from playing MIDI sounds, to getting a random number, to creating
 GUI dialogs.{rars_ecalls}
 
@@ -91,28 +91,7 @@ program that uses a few more ecalls next.
 
 [source,c,linenums]
 ----
-#include <stdio.h>
-
-int main()
-{
-	int age;
-	int height;
-	char name[50];
-	printf("What's your name? ");
-	fgets(name, 50, stdin);
-
-	printf("Hello %s", name);
-
-	printf("How old are you? ");
-	scanf("%d", &age);
-
-	printf("Enter your height in inches: ");
-	scanf("%d", &height);
-
-	printf("Your age + height = %d\n", age + height);
-
-	return 0;
-}
+include::code/ecall_example.c[]
 ----
 
 I'm using `fgets()` instead of `scanf("%s", name)` because fgets works the same as the
@@ -120,77 +99,13 @@ read string ecall (8).
 
 [source,riscv,linenums]
 ----
-.data
-
-name:     .space 50
-
-nameprompt:  .asciz "What's your name? "
-hello_space: .asciz "Hello "
-how_old:     .asciz "How old are you? "
-ask_height:  .asciz "Enter your height in inches: "
-ageplusheight: .asciz "Your age + height = "
-
-
-.text
-main:
-	li    a7, 4      # print string
-	la    a0, nameprompt  # load address of string to print into a7
-	ecall
-
-	li    a7, 8      # read string
-	la    a0, name
-	li    a1, 50
-	ecall
-
-	li    a7, 4
-	la    a0, hello_space
-	ecall
-
-	la    a0, name  # note 4 is still in a7
-	ecall
-
-	# don't print a newline here because
-	# one will be part of name unless they typed >48 characters
-
-	li    a7, 4
-	la    a0, how_old
-	ecall
-
-	li    a7, 5   # read integer
-	ecall
-	mv    t0, a0  # save age in t0
-
-	li    a7, 4
-	la    a0, ask_height
-	ecall
-
-	li    a7, 5   # read integer
-	ecall
-	add   t0, t0, a0 # t0 += height
-
-
-	li    a7, 4
-	la    a0, ageplusheight
-	ecall
-
-	li    a7, 1  # print int
-	mv    a0, t0  # t0 = age + height
-	ecall
-
-	# print newline
-	li    a7, 11   # print char
-	li    a0, 10   # ascii value of '\n'
-	ecall
-
-
-	li    a7, 10     # exit ecall
-	ecall
+include::code/ecall_example.s[]
 ----
 
 There a few things to note from the example.
 
 We don't declare global variables for age or height.  We could, but there's no reason
-to since we have to have them in registers to do the addition anyway.  Instead, we
+to since we need them in registers to perform the addition anyway.  Instead, we
 copy/save age to `t0` so we can use `a0` for 2 more ecalls,
 then add height to `t0`.
 

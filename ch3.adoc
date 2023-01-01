@@ -4,7 +4,7 @@
 
 == Chapter 3: Branches and Logic
 
-We can't go much farther in our RISC-V programming journey without covering branching.
+We can't go much further in our RISC-V programming journey without covering branching.
 Almost every non-trivial program requires some logic, even if it's only a few `if` or
 `if-else` statements.  In other words, almost every program requires branching, a way
 to do a instead of b, or to do a only if certain conditions are met.
@@ -20,25 +20,25 @@ relevant instructions are listed in the following table:
 |===
 | Name | Opcode | Format | Operation
 
-| Branch On Equal | beq | beq rs, rt, label | if (rs == rt) goto label
+| Branch On Equal | beq | beq rs1, rs2, label | if (rs1 == rs2) goto label
 
-| Branch On Not Equal | bne | bne rs, rt, label | if (rs != rt) goto label
+| Branch On Not Equal | bne | bne rs1, rs2, label | if (rs1 != rs2) goto label
 
-| Branch Less Than | blt | blt rs, rt, label | if (rs < rt) goto label
+| Branch Less Than | blt | blt rs1, rs2, label | if (rs1 < rs2) goto label
 
-| Branch Greater Than | bgt | bgt rs, rt, label | if (rs > rt) goto label
+| Branch Greater Than | bgt | bgt rs1, rs2, label | if (rs2 > rs2) goto label
 
-| Branch Less Than Or Equal | ble | ble rs, rt, label | if (rs <= rt) goto label
+| Branch Less Than Or Equal | ble | ble rs1, rs2, label | if (rs1 <= rs2) goto label
 
-| Branch Greater Than Or Equal | bge | bge rs, rt, label | if (rs >= rt) goto label
+| Branch Greater Than Or Equal | bge | bge rs1, rs2, label | if (rs1 >= rs2) goto label
 
-| Set Less Than | slt | slt rd, rs, rt | rd = (rs < rt) ? 1 : 0
+| Set Less Than | slt | slt rd, rs1, rs2 | rd = (rs1 < rs2) ? 1 : 0
 
-| Set Less Than Immediate | slti | slt rd, rs, imm | rd = (rs < imm) ? 1 : 0
+| Set Less Than Immediate | slti | slti rd, rs1, imm | rd = (rs1 < imm) ? 1 : 0
 
-| Set Less Than Immediate Unsigned | sltiu | slt rd, rs, imm | rd = (rs < imm) ? 1 : 0
+| Set Less Than Immediate Unsigned | sltiu | sltiu rd, rs1, imm | rd = (rs1 < imm) ? 1 : 0
 
-| Set Less Than Unsigned | sltu | sltu rd, rs, imm | rd = (rs < imm) ? 1 : 0
+| Set Less Than Unsigned | sltu | sltu rd, rs1, rs2 | rd = (rs1 < rs2) ? 1 : 0
 
 |===
 
@@ -274,8 +274,8 @@ do_something:
 
 dont_do_something:
 
-	// You can see how the first success is all you need:
-	// Compare that with and below
+	// You can see how the first success is all you need
+	// Compare that with and below:
 
 	if (a && b && c) {
 		something;
@@ -469,26 +469,11 @@ done_if:
 
 Ok, let's look at a larger example.  Say you're trying to determine
 a student's letter grade based on their score.  We're going to need a chain
-of ``if-else-if``'s to handle all cases.  Assume `score` is declared and
-set somewhere before.
+of ``if-else-if``'s to handle all cases.
 
 [source,c,linenums]
 ----
-	char letter_grade;
-	if (score >= 90) {
-		letter_grade = 'A';
-	} else if (score >= 80) {
-		letter_grade = 'B';
-	} else if (score >= 70) {
-		letter_grade = 'C';
-	} else if (score >= 60) {
-		letter_grade = 'D';
-	} else {
-		letter_grade = 'F';
-	}
-
-	printf("You got a %c\n", letter_grade);
-}
+include::code/branching_example.c[]
 ----
 
 With chains like these, if you follow everything we've learned, it comes out
@@ -496,47 +481,9 @@ looking like this (assuming score is `t0` and letter_grade is `t1`):
 
 [source,riscv,linenums]
 ----
-.data
-grade_str: .asciz "You got a "
-
-.text
-	li     t1, 70   # letter_grade default to 'F' ascii value
-	
-	li     t2, 90
-	blt    t0, t2, not_a    # if (score < 90) goto not_a
-	li     t1, 65           # leter_grade = 'A'
-	j      grade_done
-
-not_a:
-	li     t2, 80
-	blt    t0, t2, not_b    # if (score < 80) goto not_b
-	li     t1, 66           # leter_grade = 'B'
-	j      grade_done
-
-not_b:
-	li     t2, 70
-	blt    t0, t2, not_c    # if (score < 70) goto not_c
-	li     t1, 67           # leter_grade = 'C'
-	j      grade_done
-
-not_c:
-	li     t2, 60
-	blt    t0, t2, grade_done   # if (score < 60) goto grade_done
-	li     t1, 68               # leter_grade = 'D'
-
-grade_done:
-	li     a7, 4      # print str
-	la     a0, grade_str
-	ecall
-
-	li     a7, 11      # print character
-	mv     a0, t1      # char to print
-	ecall
-
-	mv     a0, 10    # print '\n'
-	ecall
+include::code/branching_example.s[]
 ----
-	
+
 You can see how we set a default value and then test for the opposite
 of each condition to jump to the next test, until we get one that fails
 (aka was true in the original C condition) and set the appropriate grade.

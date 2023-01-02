@@ -16,7 +16,7 @@ next_instr:
 	jal     hello_name_number
 
 	# return value already in a0
-	li      a7, 1     # so we don't overwrite it and lose it
+	li      a7, 1     # print int
 	ecall
 
 	li      a7, 11    # print char

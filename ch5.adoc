@@ -4,9 +4,9 @@
 
 == Chapter 5: Functions and the RISC-V Calling Convention
 
-While I'm sure everyone here probably knows what functions are, and we'll cover
-them in assembly shortly, you might be wondering what a "Calling Convention" is.
-In short, it is an agreement between the caller and callee about how to treat/use
+While I'm sure everyone here probably knows what functions are, you might
+be wondering what a "Calling Convention" is.  In short, it is an
+agreement between the caller and callee about how to treat/use
 certain registers.  We'll get to the why and how later.
 
 === Functions
@@ -78,11 +78,17 @@ next_instr:
 That would get tiring and ugly fast though, having to come up with unique labels
 for the next instruction every time.  You also might be confused about why the
 greensheet says `jal` saves PC+4 in an arbitrary register R[rd] instead of `ra`
-specifically (R[1]).  The instruction does actually take a register argument but
+specifically (which would be R[1]).  The instruction does actually take a register argument but
 since it's most commonly used to call a function if you don't specify a register
 it will use `ra` as if you did `jal  ra, func`.  This works in conjunction with
-the pseudoinstruction `ret` which does PC=R[1] using the instruction jalr
-(`jalr  x0, ra, 0`) to easily return from functions.
+the pseudoinstruction `ret` which does PC=R[1] using the instruction `jalr`
+(specifically `jalr  x0, ra, 0`) to easily return from functions.
+You might also see another way of returning using `jr` which stands for
+"Jump Register" and jumps to the address in the register, so to return
+from a function you'd do `jr   ra`.  It is also a pseudoinstruction
+that uses `jalr`.  Unless your professor insists on something else, prefer
+`ret`; not only is it the shortest, returning from functions is its sole
+purpose.
 
 === The Convention
 
@@ -266,7 +272,7 @@ non_leaf:
 
 	li       a0, 42       # return 42
 
-	lw       ra, 0(sp)   # restore original $ra
+	lw       ra, 0(sp)   # restore original ra
 	addi     sp, sp, 4   # pop the stack
 	ret
 ----
@@ -309,7 +315,7 @@ That becomes this in RISC-V:
 ----
 #void print_letters(char letter, int count)
 print_letters:
-	ble      a1, $0, exit_pl   # if (count <= 0) goto exit_pl
+	ble      a1, x0, exit_pl   # if (count <= 0) goto exit_pl
 	li       a7, 11            # print character
 pl_loop:
 	ecall
@@ -413,7 +419,7 @@ exit_fib:
 
 Notice how we don't have to save `n` any sooner than necessary, ie right before
 we have to use `a0` to setup the first recursive call.  Also, the ordering of
-lines 15-17 is important.  We needed the original `n` to calculate `n-1` but
+lines 16-18 is important.  We needed the original `n` to calculate `n-1` but
 once that's in `a0` ready for the call, because we won't need `n` again afterward,
 we can now use `s0` to preserve the return value of the first call.
 

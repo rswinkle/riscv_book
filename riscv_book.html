@@ -3460,9 +3460,9 @@ array:        .word 93,8,78,-6,51,49,3,2,128,0
 <h2 id="_chapter_5_functions_and_the_risc_v_calling_convention">Chapter 5: Functions and the RISC-V Calling Convention</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>While I&#8217;m sure everyone here probably knows what functions are, and we&#8217;ll cover
-them in assembly shortly, you might be wondering what a "Calling Convention" is.
-In short, it is an agreement between the caller and callee about how to treat/use
+<p>While I&#8217;m sure everyone here probably knows what functions are, you might
+be wondering what a "Calling Convention" is.  In short, it is an
+agreement between the caller and callee about how to treat/use
 certain registers.  We&#8217;ll get to the why and how later.</p>
 </div>
 <div class="sect2">
@@ -3564,11 +3564,17 @@ next_instr:</pre>
 <p>That would get tiring and ugly fast though, having to come up with unique labels
 for the next instruction every time.  You also might be confused about why the
 greensheet says <code>jal</code> saves PC+4 in an arbitrary register R[rd] instead of <code>ra</code>
-specifically (R[1]).  The instruction does actually take a register argument but
+specifically (which would be R[1]).  The instruction does actually take a register argument but
 since it&#8217;s most commonly used to call a function if you don&#8217;t specify a register
 it will use <code>ra</code> as if you did <code>jal  ra, func</code>.  This works in conjunction with
-the pseudoinstruction <code>ret</code> which does PC=R[1] using the instruction jalr
-(<code>jalr  x0, ra, 0</code>) to easily return from functions.</p>
+the pseudoinstruction <code>ret</code> which does PC=R[1] using the instruction <code>jalr</code>
+(specifically <code>jalr  x0, ra, 0</code>) to easily return from functions.
+You might also see another way of returning using <code>jr</code> which stands for
+"Jump Register" and jumps to the address in the register, so to return
+from a function you&#8217;d do <code>jr   ra</code>.  It is also a pseudoinstruction
+that uses <code>jalr</code>.  Unless your professor insists on something else, prefer
+<code>ret</code>; not only is it the shortest, returning from functions is its sole
+purpose.</p>
 </div>
 </div>
 <div class="sect2">
@@ -3876,7 +3882,7 @@ non_leaf:
 
 	li       a0, 42       # return 42
 
-	lw       ra, 0(sp)   # restore original $ra
+	lw       ra, 0(sp)   # restore original ra
 	addi     sp, sp, 4   # pop the stack
 	ret
 </pre></td></tr></table></code></pre>
@@ -3976,7 +3982,7 @@ across a function call.</p>
 <span class="normal">37</span>
 <span class="normal">38</span></pre></div></td><td class="code"><pre><span></span>#void print_letters(char letter, int count)
 print_letters:
-	ble      a1, $0, exit_pl   # if (count &lt;= 0) goto exit_pl
+	ble      a1, x0, exit_pl   # if (count &lt;= 0) goto exit_pl
 	li       a7, 11            # print character
 pl_loop:
 	ecall
@@ -4120,7 +4126,7 @@ exit_fib:
 <div class="paragraph">
 <p>Notice how we don&#8217;t have to save <code>n</code> any sooner than necessary, ie right before
 we have to use <code>a0</code> to setup the first recursive call.  Also, the ordering of
-lines 15-17 is important.  We needed the original <code>n</code> to calculate <code>n-1</code> but
+lines 16-18 is important.  We needed the original <code>n</code> to calculate <code>n-1</code> but
 once that&#8217;s in <code>a0</code> ready for the call, because we won&#8217;t need <code>n</code> again afterward,
 we can now use <code>s0</code> to preserve the return value of the first call.</p>
 </div>

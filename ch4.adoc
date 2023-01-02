@@ -89,7 +89,7 @@ only one jump + label, rather than 2 since you can forgo the the initial `if` ch
 loop:
 	do_something;
 	i++
-	if (i < a)
+	if (i < 10)
 		goto loop;
 ----
 
@@ -127,8 +127,8 @@ Looping and arrays go together like peanut butter and jam.  An array is a sequen
 variables of the same type, almost always related in some way.  Naturally, you
 want to operate on them all together in various ways; sorting, searching,
 accumulating, etc.  Given that the only way to do that is with loops, in this
-section we'll cover different ways of looping through arrays, and dealing with
-multi-dimentional arrays.
+section we'll cover different ways of looping through arrays, including
+multidimensional arrays.
 
 ==== 1D Arrays
 
@@ -160,7 +160,7 @@ sum_loop:
 	blt   t1, t3, sum_loop   # while (i < 10)
 ----
 
-We initialize the relevant variables beforehand (`numbers` and `t3` could be set
+We initialize the relevant variables beforehand (`numbers` and `10` could be loaded
 every iteration but that's less efficient).  Now what's with the `i*4`?  We already
 discussed using shifts to multiply and divide by powers of 2 in a previous chapter,
 but here we're doing something that higher level languages do automatically for you
@@ -285,16 +285,18 @@ to a 1D array with rows*cols elements in the same order:
 
 [source,c,linenums]
 ----
+	#define ROWS 2
+	#define COLS 4
 	// The memory of these two arrays are identical
-	int array2d[2][4] = { { 1, 2, 3, 4 }, { 5, 6, 7, 8 } };
-	int array1d[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+	int array[ROWS][COLS] = { { 1, 2, 3, 4 }, { 5, 6, 7, 8 } };
+	int array1d[ROWS*COLS] = { 1, 2, 3, 4, 5, 6, 7, 8 };
 ----
 
 See the code example
 https://raw.githubusercontent.com/rswinkle/riscv_book/master/code/2d_arrays.c[2d_arrays.c] for more details.
 
 What this means is that when we declare a 2D array, it's basically a 1D array with
-the size equal to the rows * columns.  Also, when we loop through a 2D array, we can
+the size equal to rows * columns.  Also, when we loop through a 2D array, we can
 often treat it like a 1D array with a single loop.  So everything that we learned
 before applies.
 
@@ -368,8 +370,9 @@ loopcols:
 ----
 
 It's the same number of instructions, but with an extra label and branch.
-I prefer this version.  On the other hand, either of the last 2 versions are
-better than the literal translation below:
+I think I prefer this version despite the extra branch.  On the other
+hand, either of the last 2 versions are better than the literal
+translation below:
 
 [source,riscv,linenums]
 ----

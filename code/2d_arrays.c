@@ -10,7 +10,7 @@ int main()
 #define COLS 4
 
 	int array[ROWS][COLS] = { { 1, 2, 3, 4 }, { 5, 6, 7, 8 } };
-	int array1d[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+	int array1d[ROWS*COLS] = { 1, 2, 3, 4, 5, 6, 7, 8 };
 
 	for (int i=0; i<ROWS; i++) {
 		for (int j=0; j<COLS; j++) {
@@ -29,8 +29,8 @@ int main()
 
 	puts("\n\nLook at that.  Or this:");
 	
-	if (!memcmp(array, array1d, 8*sizeof(int))) {
-		puts("memcmp(array, array1d, 8*sizeof(int)) == 0\narray and array1d are identical\n");
+	if (!memcmp(array, array1d, ROWS*COLS*sizeof(int))) {
+		printf("memcmp(array, array1d, %d*sizeof(int)) == 0\narray and array1d are identical\n", ROWS*COLS);
 	}
 	
 	

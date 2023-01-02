@@ -3,6 +3,7 @@
 
 in2cm: .float 2.54
 
+# 5/9 = 0.5 with 5 repeating
 fahrenheit2celsius: .float 0.5555555
 
 sixft: .float 72.0

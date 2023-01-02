@@ -41,41 +41,41 @@ but here are the most important/useful ones:
 |===
 | Name | Opcode | Format | Operation
 
-| Load | flw,fld | flw ft, n(rs)  | F[ft] = M[R[rs]+n]
+| Load | flw,fld | flw rd, n(rs1)  | F[rd] = M[R[rs1]+n]
 
-| Store | fsw,fsd | fsw ft, n(rs)  | M[R[rs]+n] = F[ft]
+| Store | fsw,fsd | fsw rd, n(rs1)  | M[R[rs1]+n] = F[rd]
 
-| Move from Integer | fmv.[sd].x | fmv.s.x ft, rs | F[ft] = R[rs]
+| Move from Integer | fmv.[sd].x | fmv.s.x rd, rs1 | F[rd] = R[rs1]
 
-| Move to Integer | fmv.x.[sd] | fmv.x.s rs, ft | R[rs] = F[ft]
+| Move to Integer | fmv.x.[sd] | fmv.x.s rd, rs1 | R[rd] = F[rs1]
 
-| Move | fmv.[sd] | fmv.s fd, fs | F[fd] = F[fs]
+| Move | fmv.[sd] | fmv.s rd, rs1 | F[rd] = F[rs1]
 
-| Convert to SP from DP | fcvt.s.d | fcvt.s.d fd, fs | F[fd] = (float)F[fs]
+| Convert to SP from DP | fcvt.s.d | fcvt.s.d rd, rs1 | F[rd] = (float)F[rs1]
 
-| Convert to DP from SP | fcvt.d.s | fcvt.d.s fd, fs | F[fd] = (double)F[fs]
+| Convert to DP from SP | fcvt.d.s | fcvt.d.s rd, rs1 | F[rd] = (double)F[rs1]
 
-| Convert from 32b Integer | fcvt.[sd].w | fcvt.s.w fd, rs | F[fd] = (float)R[rs]
+| Convert from 32b Integer | fcvt.[sd].w | fcvt.s.w rd, rs1 | F[rd] = (float)R[rs1]
 
-| Convert to 32b Integer | fcvt.w.[sd] | fcvt.w.s rd, fs | R[rd] = (int)F[fs]
+| Convert to 32b Integer | fcvt.w.[sd] | fcvt.w.s rd, rs1 | R[rd] = (int)F[rs1]
 
-| Compare Equal | feq.[sd] | feq.s rd, fs1, fs2 | R[rd] = (F[fs1] == F[fs2]) ? 1 : 0
+| Compare Equal | feq.[sd] | feq.s rd, rs1, rs2 | R[rd] = (F[rs1] == F[rs2]) ? 1 : 0
 
-| Compare Less Than | flt.[sd] | flt.s rd, fs1, fs2 | R[rd] = (F[fs1] < F[fs2]) ? 1 : 0
+| Compare Less Than | flt.[sd] | flt.s rd, rs1, rs2 | R[rd] = (F[rs1] < F[rs2]) ? 1 : 0
 
-| Compare Less Than Equal | fle.[sd] | fle.s rd, fs1, fs2 | R[rd] = (F[fs1] <= F[fs2]) ? 1 : 0
+| Compare Less Than Equal | fle.[sd] | fle.s rd, rs1, rs2 | R[rd] = (F[rs1] <= F[rs2]) ? 1 : 0
 
-| Absolute Value | fabs.[sd] | fabs.s fd, fs | F[fd] = (F[fs] < 0) ? -F[fs] : F[fs]
+| Absolute Value | fabs.[sd] | fabs.s rd, rs1 | F[rd] = (F[rs1] < 0) ? -F[rs1] : F[rs1]
 
-| Add | fadd.[sd] | fadd.s fd, fs, ft | F[fd] = F[fs] + F[ft]
+| Add | fadd.[sd] | fadd.s rd, rs1, rs2 | F[rd] = F[rs1] + F[rs2]
 
-| Subtract | fsub.[sd] | fsub.s fd, fs, ft | F[fd] = F[fs] - F[ft]
+| Subtract | fsub.[sd] | fsub.s rd, rs1, rs2 | F[rd] = F[rs1] - F[rs2]
 
-| Multiply | fmul.[sd] | fmul.s fd, fs, ft | F[fd] = F[fs] * F[ft]
+| Multiply | fmul.[sd] | fmul.s rd, rs1, rs2 | F[rd] = F[rs1] * F[rs2]
 
-| Divide | fdiv.[sd] | fdiv.s fd, fs, ft | F[fd] = F[fs] / F[ft]
+| Divide | fdiv.[sd] | fdiv.s rd, rs1, rs2 | F[rd] = F[rs1] / F[rs2]
 
-| Negation | fneg.[sd] | fneg.s fd, fs | F[fd] = -F[fs]
+| Negation | fneg.[sd] | fneg.s rd, rs1 | F[rd] = -F[rs1]
 
 |===
 
@@ -133,10 +133,10 @@ and divide, and even that would limit you to rational numbers.  It looks like th
 As you can see, other than 0 which is a special case, it requires at least 2
 instructions.
 
-NOTE: There is a 3rd way that is easier, but it's only supported in RARS, not Venus.
-RARS lets you use `flw` and `fld` like this `flw   ft0, label, t0` where t0 is used as
-a temporary, ie it's doing the load address into t0 for you before doing the actual flw
-
+NOTE: There is a 3rd way in RARS that saves you a step.  RARS lets you
+use `flw` and `fld` like this `flw   ft0, label, t0` where t0 is used as
+a temporary, ie it's doing the load address into t0 for you before doing
+the actual flw.
 
 === Branching
 
@@ -208,8 +208,10 @@ an integer, we convert directly.
 === Conclusion
 
 As I said before, it is rare for courses to even bother covering floating point
-instructions or assign any homework or projects that use them, but hopefully this
-brief overview, combined with the knowledge of previous chapters is sufficient.
+instructions or assign any homework or projects that use them.  Venus
+doesn't even support floating point instructions.  Hopefully this
+brief overview, combined with the knowledge of previous chapters is
+sufficient if you do need or want to work with floating point values.
 
 There are also 2 example programs
 https://raw.githubusercontent.com/rswinkle/riscv_book/master/code/conversions.s[conversions.s]

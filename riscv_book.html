@@ -514,8 +514,8 @@ pre.pygments .tok-il { color: #666666 } /* Literal.Number.Integer.Long */
 <div class="details">
 <span id="author" class="author">Robert Winkler</span><br>
 <span id="email" class="email"><a href="mailto:books@robertwinkler.com">books@robertwinkler.com</a></span><br>
-<span id="revnumber">version 0.7.0,</span>
-<span id="revdate">2022-12-31</span>
+<span id="revnumber">version 0.7.1,</span>
+<span id="revdate">2023-1-2</span>
 <br><span id="revremark">Beta</span>
 </div>
 <div id="toc" class="toc">
@@ -4315,110 +4315,110 @@ but here are the most important/useful ones:</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Load</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">flw,fld</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>flw ft, n(rs)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">F[ft] = M[R[rs]+n]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>flw rd, n(rs1)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">F[rd] = M[R[rs1]+n]</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Store</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fsw,fsd</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fsw ft, n(rs)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">M[R[rs]+n] = F[ft]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fsw rd, n(rs1)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">M[R[rs1]+n] = F[rd]</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Move from Integer</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fmv.[sd].x</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fmv.s.x ft, rs</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">F[ft] = R[rs]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fmv.s.x rd, rs1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">F[rd] = R[rs1]</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Move to Integer</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fmv.x.[sd]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fmv.x.s rs, ft</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">R[rs] = F[ft]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fmv.x.s rd, rs1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">R[rd] = F[rs1]</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Move</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fmv.[sd]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fmv.s fd, fs</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">F[fd] = F[fs]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fmv.s rd, rs1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">F[rd] = F[rs1]</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Convert to SP from DP</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fcvt.s.d</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fcvt.s.d fd, fs</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">F[fd] = (float)F[fs]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fcvt.s.d rd, rs1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">F[rd] = (float)F[rs1]</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Convert to DP from SP</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fcvt.d.s</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fcvt.d.s fd, fs</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">F[fd] = (double)F[fs]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fcvt.d.s rd, rs1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">F[rd] = (double)F[rs1]</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Convert from 32b Integer</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fcvt.[sd].w</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fcvt.s.w fd, rs</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">F[fd] = (float)R[rs]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fcvt.s.w rd, rs1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">F[rd] = (float)R[rs1]</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Convert to 32b Integer</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fcvt.w.[sd]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fcvt.w.s rd, fs</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">R[rd] = (int)F[fs]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fcvt.w.s rd, rs1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">R[rd] = (int)F[rs1]</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Compare Equal</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">feq.[sd]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>feq.s rd, fs1, fs2</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">R[rd] = (F[fs1] == F[fs2]) ? 1 : 0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>feq.s rd, rs1, rs2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">R[rd] = (F[rs1] == F[rs2]) ? 1 : 0</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Compare Less Than</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">flt.[sd]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>flt.s rd, fs1, fs2</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">R[rd] = (F[fs1] &lt; F[fs2]) ? 1 : 0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>flt.s rd, rs1, rs2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">R[rd] = (F[rs1] &lt; F[rs2]) ? 1 : 0</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Compare Less Than Equal</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fle.[sd]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fle.s rd, fs1, fs2</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">R[rd] = (F[fs1] &#8656; F[fs2]) ? 1 : 0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fle.s rd, rs1, rs2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">R[rd] = (F[rs1] &#8656; F[rs2]) ? 1 : 0</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Absolute Value</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fabs.[sd]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fabs.s fd, fs</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">F[fd] = (F[fs] &lt; 0) ? -F[fs] : F[fs]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fabs.s rd, rs1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">F[rd] = (F[rs1] &lt; 0) ? -F[rs1] : F[rs1]</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Add</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fadd.[sd]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fadd.s fd, fs, ft</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">F[fd] = F[fs] + F[ft]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fadd.s rd, rs1, rs2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">F[rd] = F[rs1] + F[rs2]</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Subtract</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fsub.[sd]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fsub.s fd, fs, ft</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">F[fd] = F[fs] - F[ft]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fsub.s rd, rs1, rs2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">F[rd] = F[rs1] - F[rs2]</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Multiply</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fmul.[sd]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fmul.s fd, fs, ft</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">F[fd] = F[fs] * F[ft]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fmul.s rd, rs1, rs2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">F[rd] = F[rs1] * F[rs2]</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Divide</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fdiv.[sd]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fdiv.s fd, fs, ft</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">F[fd] = F[fs] / F[ft]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fdiv.s rd, rs1, rs2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">F[rd] = F[rs1] / F[rs2]</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Negation</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fneg.[sd]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fneg.s fd, fs</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">F[fd] = -F[fs]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fneg.s rd, rs1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">F[rd] = -F[rs1]</p></td>
 </tr>
 </tbody>
 </table>
@@ -4510,9 +4510,10 @@ instructions.</p>
 <div class="title">Note</div>
 </td>
 <td class="content">
-There is a 3rd way that is easier, but it&#8217;s only supported in RARS, not Venus.
-RARS lets you use <code>flw</code> and <code>fld</code> like this <code>flw   ft0, label, t0</code> where t0 is used as
-a temporary, ie it&#8217;s doing the load address into t0 for you before doing the actual flw
+There is a 3rd way in RARS that saves you a step.  RARS lets you
+use <code>flw</code> and <code>fld</code> like this <code>flw   ft0, label, t0</code> where t0 is used as
+a temporary, ie it&#8217;s doing the load address into t0 for you before doing
+the actual flw.
 </td>
 </tr>
 </table>
@@ -4626,8 +4627,10 @@ an integer, we convert directly.</p>
 <h3 id="_conclusion_5">Conclusion</h3>
 <div class="paragraph">
 <p>As I said before, it is rare for courses to even bother covering floating point
-instructions or assign any homework or projects that use them, but hopefully this
-brief overview, combined with the knowledge of previous chapters is sufficient.</p>
+instructions or assign any homework or projects that use them.  Venus
+doesn&#8217;t even support floating point instructions.  Hopefully this
+brief overview, combined with the knowledge of previous chapters is
+sufficient if you do need or want to work with floating point values.</p>
 </div>
 <div class="paragraph">
 <p>There are also 2 example programs
@@ -6580,8 +6583,8 @@ the examples to run in Venus.  Hopefully Berkeley will decide to switch to RARS 
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.7.0<br>
-Last updated 2022-12-31 15:57:40 -0700
+Version 0.7.1<br>
+Last updated 2023-01-02 11:48:53 -0700
 </div>
 </div>
 </body>

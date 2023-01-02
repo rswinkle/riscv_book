@@ -288,7 +288,7 @@ random
 arguments
 ----
 
-Notice that the first argument is the what you actually typed to invoke the program,
+Notice that the first argument is what you actually typed to invoke the program,
 so you always have at least one argument.
 
 RISC-V works the same way.  The number of arguments is in `a0` and an array of strings
@@ -345,9 +345,7 @@ include::pseudo_equivalents_pdf.adoc[]
 endif::[]
 
 You can see how you use the non-pseudoinstructions to match the same behavior, and
-there's often (usually) more than one way.  Of all of them, `ble` is
-the worst, because what was 1 instruction becomes 3, and you'll sometimes need an
-extra register to hold the "plus 1" value if you still need the original.
+there's often (usually) more than one way.
 
 Another thing I should comment on is the `la` equivalence.  The reason it is
 a pseudoinstruction in the first place is that an address is 32 bits.  That's also
@@ -362,13 +360,13 @@ halves, 20 + 12.  The lower 12 can be placed with `addi` or `ori` after the `lui
 NOTE: RARS actually uses `auipc` not `lui` probably because that's what the RISC-V
 spec says (also see top left on page 2 of the greensheet). They both can accomplish
 the same thing but the former is needed for PC-relative addressing which whereas
-lui is 0/absolute addressing. Since RARS works with absolute addressing the easier
-to use `lui` is fine.
+lui is 0/absolute addressing. Since RARS works with absolute addressing
+the easier-to-use `lui` is fine.
 
 That begs the question, what actually goes in the upper half?  Well, since
 we're dealing with addresses in the `.data` section, the upper portion should
-match the upper part of address of the `.data` section.  In RARS it is always
-`0x10010000`.
+match the upper part of address of the `.data` section.  In RARS the
+`.data` section starts at `0x10010000`.
 
 But what about the lower part of the address?  This involves counting the bytes
 from the top of `.data` to the label you want.  If all you have is words, halfs,

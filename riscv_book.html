@@ -514,7 +514,7 @@ pre.pygments .tok-il { color: #666666 } /* Literal.Number.Integer.Long */
 <div class="details">
 <span id="author" class="author">Robert Winkler</span><br>
 <span id="email" class="email"><a href="mailto:books@robertwinkler.com">books@robertwinkler.com</a></span><br>
-<span id="revnumber">version 0.7.1,</span>
+<span id="revnumber">version 0.7.2,</span>
 <span id="revdate">2023-1-2</span>
 <br><span id="revremark">Beta</span>
 </div>
@@ -5326,7 +5326,7 @@ arguments</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Notice that the first argument is the what you actually typed to invoke the program,
+<p>Notice that the first argument is what you actually typed to invoke the program,
 so you always have at least one argument.</p>
 </div>
 <div class="paragraph">
@@ -5374,16 +5374,12 @@ is in <code>a1</code> when main starts.  So the same program in RISC-V looks lik
 <span class="normal">37</span>
 <span class="normal">38</span>
 <span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span></pre></div></td><td class="code"><pre><span></span>.data
+<span class="normal">40</span></pre></div></td><td class="code"><pre><span></span>.data
 
 there_are:  .asciz &quot;There are &quot;
 arguments:  .asciz &quot; command line arguments:\n&quot;
 
-
 .text
-
 main:
 	mv        t0, a0  # save argc
 
@@ -5535,15 +5531,14 @@ ori    t0, t0, byte_offset</pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Branch Less Than or Equal</p></td>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="literalblock">
 <div class="content">
-<pre>ble  $t0, $t1, label</pre>
+<pre>ble   t0, t1, label</pre>
 </div>
 </div></div></td>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="literalblock">
 <div class="content">
 <pre># test for &lt; and = separately
-slt    $t2, $t0, $t1
-bne    $t2, $0, label
-beq    $t0, $t1, label</pre>
+blt     t0,  t1, label
+beq     t0,  t1, label</pre>
 </div>
 </div>
 <div class="literalblock">
@@ -5551,26 +5546,53 @@ beq    $t0, $t1, label</pre>
 <pre># or add 1 to change &lt;= to &lt;
 # use a spare reg if you need
 # to preserve the original value
-addi   $t3, $t1, 1
-slt    $t2, $t0, $t3
-bne    $t2, $0, label</pre>
+addi    t3, t1, 1
+blt     t0, t3, label</pre>
 </div>
 </div>
 <hr></div></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Branch Greater Than or Equal</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Branch Greater Than</p></td>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="literalblock">
 <div class="content">
-<pre>bge  $t0, $t1, label</pre>
+<pre>bgt   t0, t1, label</pre>
 </div>
 </div></div></td>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="literalblock">
 <div class="content">
-<pre># test for opposite
-# and branch on failure
-slt  $t2, $t0, $t1
-beq  $t2, $0, label</pre>
+<pre># flip the operands and use blt
+blt   t1, t0, label</pre>
+</div>
+</div>
+<hr></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Return</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="literalblock">
+<div class="content">
+<pre>ret</pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="literalblock">
+<div class="content">
+<pre># as mentioned in chapter 5
+jalr   x0, ra, 0</pre>
+</div>
+</div>
+<hr></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jump Register</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="literalblock">
+<div class="content">
+<pre>jr   t0</pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="literalblock">
+<div class="content">
+<pre># as mentioned in chapter 5
+jalr   x0, t0, 0</pre>
 </div>
 </div>
 <hr></div></td>
@@ -5579,9 +5601,7 @@ beq  $t2, $0, label</pre>
 </table>
 <div class="paragraph">
 <p>You can see how you use the non-pseudoinstructions to match the same behavior, and
-there&#8217;s often (usually) more than one way.  Of all of them, <code>ble</code> is
-the worst, because what was 1 instruction becomes 3, and you&#8217;ll sometimes need an
-extra register to hold the "plus 1" value if you still need the original.</p>
+there&#8217;s often (usually) more than one way.</p>
 </div>
 <div class="paragraph">
 <p>Another thing I should comment on is the <code>la</code> equivalence.  The reason it is
@@ -5604,8 +5624,8 @@ halves, 20 + 12.  The lower 12 can be placed with <code>addi</code> or <code>ori
 RARS actually uses <code>auipc</code> not <code>lui</code> probably because that&#8217;s what the RISC-V
 spec says (also see top left on page 2 of the greensheet). They both can accomplish
 the same thing but the former is needed for PC-relative addressing which whereas
-lui is 0/absolute addressing. Since RARS works with absolute addressing the easier
-to use <code>lui</code> is fine.
+lui is 0/absolute addressing. Since RARS works with absolute addressing
+the easier-to-use <code>lui</code> is fine.
 </td>
 </tr>
 </table>
@@ -5613,8 +5633,8 @@ to use <code>lui</code> is fine.
 <div class="paragraph">
 <p>That begs the question, what actually goes in the upper half?  Well, since
 we&#8217;re dealing with addresses in the <code>.data</code> section, the upper portion should
-match the upper part of address of the <code>.data</code> section.  In RARS it is always
-<code>0x10010000</code>.</p>
+match the upper part of address of the <code>.data</code> section.  In RARS the
+<code>.data</code> section starts at <code>0x10010000</code>.</p>
 </div>
 <div class="paragraph">
 <p>But what about the lower part of the address?  This involves counting the bytes
@@ -5672,16 +5692,12 @@ here for convenience) to bare mode:</p>
 <span class="normal">37</span>
 <span class="normal">38</span>
 <span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span></pre></div></td><td class="code"><pre><span></span>.data
+<span class="normal">40</span></pre></div></td><td class="code"><pre><span></span>.data
 
 there_are:  .asciz &quot;There are &quot;
 arguments:  .asciz &quot; command line arguments:\n&quot;
 
-
 .text
-
 main:
 	mv        t0, a0  # save argc
 
@@ -5984,10 +6000,14 @@ use whatever is provided by the course if you&#8217;re taking it.</p>
 <h3 id="_data_section">Data section</h3>
 <div class="paragraph">
 <p>The documentation is sorely lacking and out of date but the must relevant
-difference from RARS is that it uses <code>.asciiz</code> instead of <code>.asciz</code>.
-The only documentation I can find is from ThaumicMekanism&#8217;s wiki
-and it doesn&#8217;t mention <code>.space</code> even though the version of venus I have
-allows it.<sup class="footnote">[<a id="_footnoteref_13" class="footnote" href="#_footnotedef_13" title="View footnote.">13</a>]</sup>  CS61C&#8217;s documentation doesn&#8217;t mention data
+differences from RARS is that it uses <code>.asciiz</code> instead of <code>.asciz</code> and
+while <code>.float</code> and <code>.double</code> are reserved Venus doesn&#8217;t actually support
+floating point instructions so you can&#8217;t actually do anything with them.</p>
+</div>
+<div class="paragraph">
+<p>The only documentation I can find is from ThaumicMekanism&#8217;s wiki
+and it doesn&#8217;t mention <code>.space</code> even though the Venus seems to
+allow it.<sup class="footnote">[<a id="_footnoteref_13" class="footnote" href="#_footnotedef_13" title="View footnote.">13</a>]</sup>  CS61C&#8217;s documentation doesn&#8217;t mention data
 directives at all.<sup class="footnote">[<a id="_footnoteref_14" class="footnote" href="#_footnotedef_14" title="View footnote.">14</a>]</sup></p>
 </div>
 </div>
@@ -6063,16 +6083,12 @@ program from chapter 7 and convert it for Venus.  So the following program:</p>
 <span class="normal">37</span>
 <span class="normal">38</span>
 <span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span></pre></div></td><td class="code"><pre><span></span>.data
+<span class="normal">40</span></pre></div></td><td class="code"><pre><span></span>.data
 
 there_are:  .asciz &quot;There are &quot;
 arguments:  .asciz &quot; command line arguments:\n&quot;
 
-
 .text
-
 main:
 	mv        t0, a0  # save argc
 
@@ -6304,7 +6320,8 @@ main:
 <div class="sect2">
 <h3 id="_conclusion_6">Conclusion</h3>
 <div class="paragraph">
-<p>While most of this book applies equally well to both programs and to RISC-V in general,
+<p>While most of this book applies equally well to both programs (other
+than chapter 6 of course) and to RISC-V in general,
 this appendix should clear up any difficulties you might have run into trying to convert
 the examples to run in Venus.  Hopefully Berkeley will decide to switch to RARS eventually.</p>
 </div>
@@ -6583,8 +6600,8 @@ the examples to run in Venus.  Hopefully Berkeley will decide to switch to RARS 
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.7.1<br>
-Last updated 2023-01-02 11:48:53 -0700
+Version 0.7.2<br>
+Last updated 2023-01-02 15:49:50 -0700
 </div>
 </div>
 </body>

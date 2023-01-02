@@ -41,10 +41,13 @@ use whatever is provided by the course if you're taking it.
 === Data section
 
 The documentation is sorely lacking and out of date but the must relevant
-difference from RARS is that it uses `.asciiz` instead of `.asciz`.
+differences from RARS is that it uses `.asciiz` instead of `.asciz` and
+while `.float` and `.double` are reserved Venus doesn't actually support
+floating point instructions so you can't actually do anything with them.
+
 The only documentation I can find is from ThaumicMekanism's wiki
-and it doesn't mention `.space` even though the version of venus I have
-allows it.{venus_directives}  CS61C's documentation doesn't mention data
+and it doesn't mention `.space` even though the Venus seems to
+allow it.{venus_directives}  CS61C's documentation doesn't mention data
 directives at all.{cs61c_venus_docs}
 
 === Environment Calls
@@ -123,7 +126,8 @@ include::code/constants_venus.s[]
 
 === Conclusion
 
-While most of this book applies equally well to both programs and to RISC-V in general,
+While most of this book applies equally well to both programs (other
+than chapter 6 of course) and to RISC-V in general,
 this appendix should clear up any difficulties you might have run into trying to convert
 the examples to run in Venus.  Hopefully Berkeley will decide to switch to RARS eventually.
 

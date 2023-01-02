@@ -2,5 +2,6 @@
 == References and Useful Links
 
 * https://inst.eecs.berkeley.edu/~cs61c/fa17/img/riscvcard.pdf[Greensheet]
+* https://github.com/jameslzhu/riscv-card/raw/master/riscv-card.pdf[Alternative info sheet]
 * https://github.com/TheThirdOne/rars/wiki/Environment-Calls[RARS ecall list]
 * https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/Understanding_RISC_V_Calling_Convention.pdf[RISC-V calling convention]

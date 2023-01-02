@@ -1,4 +1,3 @@
-:old_website: footnote:[Besides, https://www.cs.uaf.edu/2000/fall/cs301/notes/notes/node66.html[it's], the same one we referenced last chapter about fp == s8]
 
 == Chapter 6: Floating Point Types
 

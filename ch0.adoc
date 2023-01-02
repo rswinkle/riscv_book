@@ -88,7 +88,7 @@ Get the jar https://inst.eecs.berkeley.edu/~cs61c/fa22/tools/venus-latest.jar[he
 
 There are a few references that you should bookmark (or download) before you get started.
 The first is the
-https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/riscvcard.pdf[RISC-V Greensheet].
+https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/riscv_greensheet.pdf[RISC-V Greensheet].
 It's possible you already have a physical copy of this as it's actually the tearout from the Patterson
 and Hennessey textbook https://amzn.to/3zN71KP[_Computer Architecture and Design_]
 that is commonly used in college courses.  Berkeley provides a similar
@@ -96,7 +96,7 @@ https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/referenc
 with the same information.
 
 There is also a large format of the
-https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/riscvcard_large.pdf[greensheet].
+https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/riscv_greensheet_large.pdf[greensheet].
 
 The second thing is the list of
 https://github.com/TheThirdOne/rars/wiki/Environment-Calls[environment calls] (aka ecalls,

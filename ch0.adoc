@@ -90,7 +90,7 @@ There are a few references that you should bookmark (or download) before you get
 The first is the
 https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/riscv_greensheet.pdf[RISC-V Greensheet].
 It's possible you already have a physical copy of this as it's actually the tearout from the Patterson
-and Hennessey textbook https://amzn.to/3zN71KP[_Computer Architecture and Design_]
+and Hennessey textbook https://amzn.to/3i6Rj9p[_Computer Architecture and Design_]
 that is commonly used in college courses.  Berkeley provides a similar
 https://raw.githubusercontent.com/rswinkle/riscv_book/master/references/reference-card.pdf[reference sheet]
 with the same information.

@@ -191,7 +191,7 @@ Here's a pretty short/simple example in C:
 	case 'C': puts("At least you passed?"); break;
 	case 'D': puts("Probably should have dropped it..."); break;
 	case 'F': puts("Did you even know you were signed up for the class?"); break;
-	default: puts("You entered and invalid grade!");
+	default: puts("You entered an invalid grade!");
 	}
 ----
 

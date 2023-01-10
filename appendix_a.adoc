@@ -13,7 +13,7 @@ documented and maintained.
 
 UC Berkeley is the designer of RISC-V and so was one of the first colleges
 to start teaching RISC-V, years before RARS existed. Given that they've built up
-a curriculum around Venus and invested at leeast a little in their own fork
+a curriculum around Venus and invested at least a little in their own fork
 it makes sense that they'd be hesitant to switch.
 
 In any case, this appendix will go over the most important differences

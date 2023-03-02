@@ -278,7 +278,7 @@ As you can see, `argc` contains the number of parameters and `argv` is an array 
 those arguments as C strings.  If you run this program you'll get something
 like this:
 
-[source,bash]
+[source,console]
 ----
 $ ./args 3 random arguments
 There are 4 command line arguments:

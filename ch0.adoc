@@ -126,7 +126,7 @@ then return 0 to exit.  Returning 0 indicates success and there were no errors.
 You can compile and run it in a linux/unix terminal as shown below.  You
 can substitute clang or another compiler for gcc if you want.
 
-[source,bash]
+[source,console]
 ----
 $ gcc -o hello hello.c
 $ ./hello
@@ -163,7 +163,7 @@ Now that we have our hello world RISC-V program, how do we run it?  Well the eas
 and quickest{rars_slow} way is of course to do it on the command line, which can be done like
 this:
 
-[source,bash]
+[source,console]
 ----
 $ java -jar ~/rars_latest.jar hello.s
 RARS 1.5  Copyright 2003-2019 Pete Sanderson and Kenneth Vollmar

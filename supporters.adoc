@@ -52,7 +52,7 @@
 ===== Bronze
 [%autowidth,cols="1a,1a,1a",frame=none,grid=none]
 |===
-|supporter21
+|https://www.ccsf.edu/academics/schools/stem/computer-science-department[CCSF cs student 0x01]
 |supporter22
 |supporter23
 

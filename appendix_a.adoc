@@ -40,13 +40,13 @@ use whatever is provided by the course if you're taking it.
 
 === Data section
 
-The documentation is sorely lacking and out of date but the must relevant
-differences from RARS is that it uses `.asciiz` instead of `.asciz` and
-while `.float` and `.double` are reserved Venus doesn't actually support
+The documentation is sorely lacking and out of date but the most relevant
+differences from RARS are that it uses `.asciiz` instead of `.asciz` and
+while `.float` and `.double` are reserved, Venus doesn't actually support
 floating point instructions so you can't actually do anything with them.
 
 The only documentation I can find is from ThaumicMekanism's wiki
-and it doesn't mention `.space` even though the Venus seems to
+and it doesn't mention `.space` even though Venus seems to
 allow it.{venus_directives}  CS61C's documentation doesn't mention data
 directives at all.{cs61c_venus_docs}
 

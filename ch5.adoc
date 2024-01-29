@@ -48,7 +48,7 @@ hello:   .asciz "Hello World!\n"
 main:
 	jal   hello_world
 
-	li    v0, 10     # exit ecall
+	li    a7, 10     # exit ecall
 	ecall
 
 

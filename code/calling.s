@@ -194,7 +194,7 @@ fib2:
 	addi    a0, a0, -2
 	jal     fib2             # fib2(n-2)
 
-	addi    t0, s0, -1    # calc n-1 first so we can use s0 to save v0
+	addi    t0, s0, -1    # calc n-1 first so we can use s0 to save a0
 	mv      s0, a0        # save return of fib(n-2) in s0
 	mv      a0, t0        # copy n-1 to a0
 	jal     fib2            # fib2(n-1)

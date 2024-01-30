@@ -58,7 +58,7 @@ main:
 
 # float calc_pi_float(int iterations)
 calc_pi_float:
-	fmv.s.x  ft0, x0     # move 0 to ft0 (0 integer == 0.0 float)
+	fmv.s.x  fa0, x0     # sum = 0 (0 integer == 0.0 float)
 
 	# get 4 to 4.0 in ft1
 	li       t0, 4
@@ -82,12 +82,14 @@ gregory_leibniz_loop:
 	fneg.s   ft4, ft4
 
 no_negate:
-	fadd.s   ft0, ft0, ft4       # sum += term  (sum approaches pi)
+	fadd.s   fa0, fa0, ft4       # sum += term  (sum approaches pi)
 	
 
 	addi     t0, t0, 1     # negate++
-	fadd.s   ft4, ft4, ft3   # denominator += 2
+	fadd.s   ft2, ft2, ft3   # denominator += 2
 	blt      t0, a0, gregory_leibniz_loop  # while (negate aka i < iterations)
+
+	# sum already in fa0 for return
 
 	ret
 
@@ -95,7 +97,7 @@ no_negate:
 
 # double calc_pi_double(int iterations)
 calc_pi_double:
-	fcvt.d.w ft0, x0    # move 0 to $f0-f1 (0 integer == 0.0 float)
+	fcvt.d.w fa0, x0    # sum = 0 (0 integer == 0.0 float)
 
 	# get 4 to 4.0 in ft1
 	li       t0, 4
@@ -119,11 +121,13 @@ gregory_leibniz_loop_d:
 	fneg.d   ft4, ft4
 
 no_negate_d:
-	fadd.d   ft0, ft0, ft4       # sum += term  (sum approaches pi)
+	fadd.d   fa0, fa0, ft4       # sum += term  (sum approaches pi)
 	
 
 	addi     t0, t0, 1     # negate++
-	fadd.d   ft4, ft4, ft3   # denominator += 2
+	fadd.d   ft2, ft2, ft3   # denominator += 2
 	blt      t0, a0, gregory_leibniz_loop_d  # while (negate aka i < iterations)
+
+	# sum already in fa0 for return
 
 	ret

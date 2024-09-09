@@ -21,7 +21,8 @@ between Venus and RARS.
 
 === Versions and History
 
-Unlike RARS which seems to have one primary and fairly well maintained stable version, Venus is less clear.
+Unlike RARS which seems to have one primary and fairly well maintained stable version, and
+a few even more updated forks, Venus is less clear.
 As far as I can tell it was started by https://github.com/kvakil/venus[kvakil] 5 years ago,
 was forked by https://github.com/ThaumicMekanism/venus[ThaumicMekanism], and finally was forked
 by Berkeley for their https://github.com/61c-teach/venus[cs61c course].  While the latter has

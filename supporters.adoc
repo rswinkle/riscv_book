@@ -53,7 +53,7 @@
 [%autowidth,cols="1a,1a,1a",frame=none,grid=none]
 |===
 |https://www.ccsf.edu/academics/schools/stem/computer-science-department[CCSF cs student 0x01]
-|supporter22
+|http://chaw.eip10.org/[Sudarshan S Chawathe]
 |supporter23
 
 |supporter24

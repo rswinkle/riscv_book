@@ -79,6 +79,7 @@ covers the differences between RARS and Venus.
 You can download/access both at the following links:
 
 * https://github.com/TheThirdOne/rars[RARS]
+* https://github.com/rarsm/rars[RARSM] RARS iMproved; fork of RARS with fixes/features
 * https://github.com/ThaumicMekanism/venus[ThaumicMekanism's Venus]
 Get the jar https://thaumicmekanism.github.io/venus/jvm/venus-jvm-latest.jar[here]
 * https://github.com/61c-teach/venus[CS 61C's Venus]

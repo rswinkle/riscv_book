@@ -18,9 +18,10 @@ Under the following terms:
 * *ShareAlike* — If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
 * *No additional restrictions* — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
-This book is available online in both
-http://www.robertwinkler.com/projects/riscv_book/riscv_book.html[HTML] and
-http://www.robertwinkler.com/projects/riscv_book/riscv_book.pdf[PDF] form.
+This book is available online in
+https://www.robertwinkler.com/projects/riscv_book/riscv_book.html[HTML],
+https://www.robertwinkler.com/projects/riscv_book/riscv_book.pdf[PDF], and
+https://www.robertwinkler.com/projects/riscv_book/riscv_book.epub[EPUB] form.
 
 include::support.adoc[]
 

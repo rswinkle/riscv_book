@@ -2,7 +2,12 @@
 
 = RISC-V Assembly Programmming
 Robert Winkler <books@robertwinkler.com>
-v1.0.1, 2024-09-09
+v1.0.2, 2024-11-30
+:front-cover-image: images/riscv_book.png
+:title-page-background-image: image:images/riscv_book.png[fit=none,pdfwidth=50%,position=top]
+//:title-logo-image: image:images/riscv_book.png[fit=none,pdfwidth=50%,position=top]
+:doctype: book
+:title-page:
 :toc:
 
 include::info.adoc[]

@@ -511,8 +511,8 @@ pre.pygments .tok-il { color: #666666 } /* Literal.Number.Integer.Long */
 <div class="details">
 <span id="author" class="author">Robert Winkler</span><br>
 <span id="email" class="email"><a href="mailto:books@robertwinkler.com">books@robertwinkler.com</a></span><br>
-<span id="revnumber">version 1.0.1,</span>
-<span id="revdate">2024-09-09</span>
+<span id="revnumber">version 1.0.2,</span>
+<span id="revdate">2024-11-30</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -652,9 +652,10 @@ which summarized means:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>This book is available online in both
-<a href="http://www.robertwinkler.com/projects/riscv_book/riscv_book.html">HTML</a> and
-<a href="http://www.robertwinkler.com/projects/riscv_book/riscv_book.pdf">PDF</a> form.</p>
+<p>This book is available online in
+<a href="https://www.robertwinkler.com/projects/riscv_book/riscv_book.html">HTML</a>,
+<a href="https://www.robertwinkler.com/projects/riscv_book/riscv_book.pdf">PDF</a>, and
+<a href="https://www.robertwinkler.com/projects/riscv_book/riscv_book.epub">EPUB</a> form.</p>
 </div>
 <div class="paragraph">
 <p>You can support the book and purchase the chapter exercise solutions
@@ -1025,10 +1026,6 @@ to do in RISC-V, whether for a class, or on your own for fun.</p>
 </li>
 </ol>
 </div>
-<div class="paragraph">
-<p>purposes of learning and actually using assembly directly, there&#8217;s no reason to make your life
-harder than necessary.]</p>
-</div>
 </div>
 </div>
 </div>
@@ -1151,7 +1148,7 @@ about actually using them so let&#8217;s move onto some examples.</p>
 <div class="paragraph">
 <p>The first thing you have to remember when converting from a higher level language
 to assembly (any assembly), is that what matters is whether it is functionally
-the same, not whether everything is done in exactly the same wayfootnote:[Obviously compilers have to follow stricter rules, but for the.
+the same, not whether everything is done in exactly the same way<sup class="footnote">[<a id="_footnoteref_4" class="footnote" href="#_footnotedef_4" title="View footnote.">4</a>]</sup>.
 In this instance, that means realizing that your literal strings and your local
 variables <code>name</code> and <code>age</code> become globals in RISC-V.</p>
 </div>
@@ -1335,7 +1332,7 @@ the simple operating system of the RARS simulator.  They provide access to all t
 fundamental features, like input and output to/from both the console and files,
 allocating memory, and exiting.  Those are the basics but RARS supports many more,
 for things ranging from playing MIDI sounds, to getting a random number, to creating
-GUI dialogs.<sup class="footnote">[<a id="_footnoteref_4" class="footnote" href="#_footnotedef_4" title="View footnote.">4</a>]</sup></p>
+GUI dialogs.<sup class="footnote">[<a id="_footnoteref_5" class="footnote" href="#_footnotedef_5" title="View footnote.">5</a>]</sup></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 2. Basic RARS supported ecalls</caption>
@@ -1877,7 +1874,7 @@ relevant instructions are listed in the following table:</p>
 </table>
 <div class="paragraph">
 <p>You can see the same information and more on the RISC-V
-greensheet and the RARS Supported Instructions list.<sup class="footnote">[<a id="_footnoteref_5" class="footnote" href="#_footnotedef_5" title="View footnote.">5</a>]</sup><sup class="footnote">[<a id="_footnoteref_6" class="footnote" href="#_footnotedef_6" title="View footnote.">6</a>]</sup></p>
+greensheet and the RARS Supported Instructions list.<sup class="footnote">[<a id="_footnoteref_6" class="footnote" href="#_footnotedef_6" title="View footnote.">6</a>]</sup><sup class="footnote">[<a id="_footnoteref_7" class="footnote" href="#_footnotedef_7" title="View footnote.">7</a>]</sup></p>
 </div>
 <div class="paragraph">
 <p>There are additional pseudoinstructions in the form of beq/bne/blt/bgt/ble/bge + 'z' which
@@ -2309,7 +2306,7 @@ the whole expression is false the second a single false term is found.</p>
 <p>You&#8217;re exactly right.  That final translation of <strong>and</strong> is exactly like <strong>or</strong>.</p>
 </div>
 <div class="paragraph">
-<p>It takes advantage of De Morgan&#8217;s laws.<sup class="footnote">[<a id="_footnoteref_7" class="footnote" href="#_footnotedef_7" title="View footnote.">7</a>]</sup>  For those
+<p>It takes advantage of De Morgan&#8217;s laws.<sup class="footnote">[<a id="_footnoteref_8" class="footnote" href="#_footnotedef_8" title="View footnote.">8</a>]</sup>  For those
 of you who haven&#8217;t taken a Digital Logic course (or have forgotten), De
 Morgan&#8217;s laws are 2 equivalencies, a way to change an <strong>or</strong> to an <strong>and</strong>, and vice versa.</p>
 </div>
@@ -3510,7 +3507,7 @@ certain registers.  We&#8217;ll get to the why and how later.</p>
 <p>In assembly, a function is simply a label with a return instruction associated with it;
 because this is far more ambiguous than a function in a higher level language, it
 is good practice to only have a single return instruction associated with a
-function.<sup class="footnote">[<a id="_footnoteref_8" class="footnote" href="#_footnotedef_8" title="View footnote.">8</a>]</sup>  A comment above the label is also helpful.  Together those help you
+function.<sup class="footnote">[<a id="_footnoteref_9" class="footnote" href="#_footnotedef_9" title="View footnote.">9</a>]</sup>  A comment above the label is also helpful.  Together those help you
 quickly see the start and end of the function.</p>
 </div>
 <div class="listingblock">
@@ -3620,9 +3617,9 @@ purpose.</p>
 <h3 id="_the_convention">The Convention</h3>
 <div class="paragraph">
 <p>We&#8217;ve gone as far as we can without starting to talk about registers and their
-purposes in functions.  You can think of registers as variables<sup class="footnote">[<a id="_footnoteref_9" class="footnote" href="#_footnotedef_9" title="View footnote.">9</a>]</sup> that
+purposes in functions.  You can think of registers as variables<sup class="footnote">[<a id="_footnoteref_10" class="footnote" href="#_footnotedef_10" title="View footnote.">10</a>]</sup> that
 are part of the CPU.  In this case, since we&#8217;re dealing with a 32-bit RISC-V
-architecture, they are 32-bit (aka 4 bytes, 1 word) variables.<sup class="footnote">[<a id="_footnoteref_10" class="footnote" href="#_footnotedef_10" title="View footnote.">10</a>]</sup>  Since
+architecture, they are 32-bit (aka 4 bytes, 1 word) variables.<sup class="footnote">[<a id="_footnoteref_11" class="footnote" href="#_footnotedef_11" title="View footnote.">11</a>]</sup>  Since
 they&#8217;re part of the CPU, they exist for the life of the program and the whole
 program shares the same registers.</p>
 </div>
@@ -4738,7 +4735,7 @@ hard tabs a bad name.  When you use hard tabs for alignment, rather than indenta
 and then someone else opens your code with their tab set to a different width,
 suddenly everything looks terrible.  Thus, tabs for indentation, spaces for alignment.
 Or as is increasingly common (thanks Python), spaces for everything but I refuse
-to do that to the poor planet.<sup class="footnote">[<a id="_footnoteref_11" class="footnote" href="#_footnotedef_11" title="View footnote.">11</a>]</sup></p>
+to do that to the poor planet.<sup class="footnote">[<a id="_footnoteref_12" class="footnote" href="#_footnotedef_12" title="View footnote.">12</a>]</sup></p>
 </div>
 </li>
 <li>
@@ -5143,7 +5140,7 @@ to use to jump to.</p>
 </div>
 <div class="paragraph">
 <p>The <code>&amp;&amp;</code> and <code>goto *var</code> syntax are actually not standard C/C++ but are GNU
-extensions that are supported in gcc (naturally) and clang, possibly others.<sup class="footnote">[<a id="_footnoteref_12" class="footnote" href="#_footnotedef_12" title="View footnote.">12</a>]</sup></p>
+extensions that are supported in gcc (naturally) and clang, possibly others.<sup class="footnote">[<a id="_footnoteref_13" class="footnote" href="#_footnotedef_13" title="View footnote.">13</a>]</sup></p>
 </div>
 <div class="paragraph">
 <p>First, notice how the size of the jump table is the value of the highest valued label
@@ -6047,15 +6044,15 @@ floating point instructions so you can&#8217;t actually do anything with them.</
 <div class="paragraph">
 <p>The only documentation I can find is from ThaumicMekanism&#8217;s wiki
 and it doesn&#8217;t mention <code>.space</code> even though Venus seems to
-allow it.<sup class="footnote">[<a id="_footnoteref_13" class="footnote" href="#_footnotedef_13" title="View footnote.">13</a>]</sup>  CS61C&#8217;s documentation doesn&#8217;t mention data
-directives at all.<sup class="footnote">[<a id="_footnoteref_14" class="footnote" href="#_footnotedef_14" title="View footnote.">14</a>]</sup></p>
+allow it.<sup class="footnote">[<a id="_footnoteref_14" class="footnote" href="#_footnotedef_14" title="View footnote.">14</a>]</sup>  CS61C&#8217;s documentation doesn&#8217;t mention data
+directives at all.<sup class="footnote">[<a id="_footnoteref_15" class="footnote" href="#_footnotedef_15" title="View footnote.">15</a>]</sup></p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_environment_calls">Environment Calls</h3>
 <div class="paragraph">
 <p>Venus only supports a handful of ecalls and they work differently than they do in
-RARS.  Again, the only documentation I can find is ThaumicMekanism&#8217;s.<sup class="footnote">[<a id="_footnoteref_15" class="footnote" href="#_footnotedef_15" title="View footnote.">15</a>]</sup></p>
+RARS.  Again, the only documentation I can find is ThaumicMekanism&#8217;s.<sup class="footnote">[<a id="_footnoteref_16" class="footnote" href="#_footnotedef_16" title="View footnote.">16</a>]</sup></p>
 </div>
 <div class="paragraph">
 <p>There is one that I know of that is not listed in that table.  Ecall 5 is basically
@@ -6280,7 +6277,7 @@ hello</code></pre>
 but at least it is consistent in its behavior. In addition, the section
 on passing arguments in CS 61C&#8217;s documentation is inaccurate as of December 2022.  Just
 like with C and RARS, argc comes first in <code>a0</code> then argv in <code>a1</code>, not
-the other way around as described.<sup class="footnote">[<a id="_footnoteref_16" class="footnote" href="#_footnotedef_16" title="View footnote.">16</a>]</sup></p>
+the other way around as described.<sup class="footnote">[<a id="_footnoteref_17" class="footnote" href="#_footnotedef_17" title="View footnote.">17</a>]</sup></p>
 </div>
 </div>
 <div class="sect2">
@@ -6599,49 +6596,52 @@ the examples to run in Venus.  Hopefully Berkeley will decide to switch to RARS 
 <a href="#_footnoteref_3">3</a>. <a href="https://github.com/TheThirdOne/rars/wiki/Using-the-command-line" class="bare">https://github.com/TheThirdOne/rars/wiki/Using-the-command-line</a>
 </div>
 <div class="footnote" id="_footnotedef_4">
-<a href="#_footnoteref_4">4</a>. <a href="https://github.com/TheThirdOne/rars/wiki/Environment-Calls" class="bare">https://github.com/TheThirdOne/rars/wiki/Environment-Calls</a>
+<a href="#_footnoteref_4">4</a>. Obviously compilers have to follow stricter rules, but for the purposes of learning and actually using assembly directly, there&#8217;s no reason to make your life harder than necessary.
 </div>
 <div class="footnote" id="_footnotedef_5">
-<a href="#_footnoteref_5">5</a>. <a href="https://inst.eecs.berkeley.edu/~cs61c/fa17/img/riscvcard.pdf" class="bare">https://inst.eecs.berkeley.edu/~cs61c/fa17/img/riscvcard.pdf</a>
+<a href="#_footnoteref_5">5</a>. <a href="https://github.com/TheThirdOne/rars/wiki/Environment-Calls" class="bare">https://github.com/TheThirdOne/rars/wiki/Environment-Calls</a>
 </div>
 <div class="footnote" id="_footnotedef_6">
-<a href="#_footnoteref_6">6</a>. <a href="https://github.com/TheThirdOne/rars/wiki/Supported-Instructions" class="bare">https://github.com/TheThirdOne/rars/wiki/Supported-Instructions</a>
+<a href="#_footnoteref_6">6</a>. <a href="https://inst.eecs.berkeley.edu/~cs61c/fa17/img/riscvcard.pdf" class="bare">https://inst.eecs.berkeley.edu/~cs61c/fa17/img/riscvcard.pdf</a>
 </div>
 <div class="footnote" id="_footnotedef_7">
-<a href="#_footnoteref_7">7</a>. <a href="https://en.wikipedia.org/wiki/De_Morgan%27s_laws" class="bare">https://en.wikipedia.org/wiki/De_Morgan%27s_laws</a>
+<a href="#_footnoteref_7">7</a>. <a href="https://github.com/TheThirdOne/rars/wiki/Supported-Instructions" class="bare">https://github.com/TheThirdOne/rars/wiki/Supported-Instructions</a>
 </div>
 <div class="footnote" id="_footnotedef_8">
-<a href="#_footnoteref_8">8</a>. I do not agree with an ironclad "one return" policy in higher level languages.  Sometimes returning early results in cleaner code, sometimes not.  Similarly, `goto` is not evil and there are rare cases where using it creates the best code.
+<a href="#_footnoteref_8">8</a>. <a href="https://en.wikipedia.org/wiki/De_Morgan%27s_laws" class="bare">https://en.wikipedia.org/wiki/De_Morgan%27s_laws</a>
 </div>
 <div class="footnote" id="_footnotedef_9">
-<a href="#_footnoteref_9">9</a>. Obviously the zero register is not really a variable.  I never understood how people could say "const variable" with a straight face, it&#8217;s literally an oxymoron.
+<a href="#_footnoteref_9">9</a>. I do not agree with an ironclad "one return" policy in higher level languages.  Sometimes returning early results in cleaner code, sometimes not.  Similarly, `goto` is not evil and there are rare cases where using it creates the best code.
 </div>
 <div class="footnote" id="_footnotedef_10">
-<a href="#_footnoteref_10">10</a>. RARS does support 64 bit I think TODO
+<a href="#_footnoteref_10">10</a>. Obviously the zero register is not really a variable.  I never understood how people could say "const variable" with a straight face, it&#8217;s literally an oxymoron.
 </div>
 <div class="footnote" id="_footnotedef_11">
-<a href="#_footnoteref_11">11</a>. When I find the post I read years ago about how using tabs saves CO2 I&#8217;ll put it here, but I&#8217;m joking.  I use tabs because it makes sense and there are accessibility reasons too: <a href="https://www.reddit.com/r/javascript/comments/c8drjo/nobody_talks_about_the_real_reason_to_use_tabs/" class="bare">https://www.reddit.com/r/javascript/comments/c8drjo/nobody_talks_about_the_real_reason_to_use_tabs/</a>
+<a href="#_footnoteref_11">11</a>. RARS does support 64 bit I think TODO
 </div>
 <div class="footnote" id="_footnotedef_12">
-<a href="#_footnoteref_12">12</a>. <a href="https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html" class="bare">https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html</a>
+<a href="#_footnoteref_12">12</a>. When I find the post I read years ago about how using tabs saves CO2 I&#8217;ll put it here, but I&#8217;m joking.  I use tabs because it makes sense and there are accessibility reasons too: <a href="https://www.reddit.com/r/javascript/comments/c8drjo/nobody_talks_about_the_real_reason_to_use_tabs/" class="bare">https://www.reddit.com/r/javascript/comments/c8drjo/nobody_talks_about_the_real_reason_to_use_tabs/</a>
 </div>
 <div class="footnote" id="_footnotedef_13">
-<a href="#_footnoteref_13">13</a>. <a href="https://github.com/ThaumicMekanism/venus/wiki/Assembler-Directives" class="bare">https://github.com/ThaumicMekanism/venus/wiki/Assembler-Directives</a>
+<a href="#_footnoteref_13">13</a>. <a href="https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html" class="bare">https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html</a>
 </div>
 <div class="footnote" id="_footnotedef_14">
-<a href="#_footnoteref_14">14</a>. <a href="https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/" class="bare">https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/</a>
+<a href="#_footnoteref_14">14</a>. <a href="https://github.com/ThaumicMekanism/venus/wiki/Assembler-Directives" class="bare">https://github.com/ThaumicMekanism/venus/wiki/Assembler-Directives</a>
 </div>
 <div class="footnote" id="_footnotedef_15">
-<a href="#_footnoteref_15">15</a>. Funny enough the Wiki link on cs61c&#8217;s Venus is empty and their own <a href="https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/">documentation</a>, entirely focused on the web version, links to ThaumicMekanism&#8217;s <a href="https://github.com/ThaumicMekanism/venus/wiki/Environmental-Calls">wiki</a>
+<a href="#_footnoteref_15">15</a>. <a href="https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/" class="bare">https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/</a>
 </div>
 <div class="footnote" id="_footnotedef_16">
-<a href="#_footnoteref_16">16</a>. <a href="https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/" class="bare">https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/</a>
+<a href="#_footnoteref_16">16</a>. Funny enough the Wiki link on cs61c&#8217;s Venus is empty and their own <a href="https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/">documentation</a>, entirely focused on the web version, links to ThaumicMekanism&#8217;s <a href="https://github.com/ThaumicMekanism/venus/wiki/Environmental-Calls">wiki</a>
+</div>
+<div class="footnote" id="_footnotedef_17">
+<a href="#_footnoteref_17">17</a>. <a href="https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/" class="bare">https://inst.eecs.berkeley.edu/~cs61c/su21/resources/venus-reference/</a>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.0.1<br>
-Last updated 2024-09-08 22:25:10 -0700
+Version 1.0.2<br>
+Last updated 2024-11-30 12:23:03 -0700
 </div>
 </div>
 </body>

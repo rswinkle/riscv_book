@@ -1,5 +1,5 @@
-:what_matters: footnote:[Obviously compilers have to follow stricter rules, but for the
-purposes of learning and actually using assembly directly, there's no reason to make your life
+:what_matters: footnote:[Obviously compilers have to follow stricter rules, but for the \
+purposes of learning and actually using assembly directly, there's no reason to make your life \
 harder than necessary.]
 
 == Chapter 1: Data

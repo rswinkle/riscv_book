@@ -10,14 +10,11 @@ Get the source from https://github.com/rswinkle/riscv_book[Github].
 The pre-built book is available in the root directory in html, pdf, and
 epub formats.  They're also available on my website and Leanpub:
 
-https://www.robertwinkler.com/projects/riscv_book/riscv_book.html[HTML Page]
+* https://www.robertwinkler.com/projects/riscv_book/riscv_book.html[HTML]
+* https://www.robertwinkler.com/projects/riscv_book/riscv_book.pdf[PDF]
+* https://www.robertwinkler.com/projects/riscv_book/riscv_book.epub[EPUB]
+* https://leanpub.com/riscvassemblyprogramming[Leanpub]
 
-https://www.robertwinkler.com/projects/riscv_book/riscv_book.pdf[PDF]
-
-https://www.robertwinkler.com/projects/riscv_book/riscv_book.epub[EPUB]
-
-<iframe width='160' height='400' src='https://leanpub.com/riscvassemblyprogramming/embed' frameborder='0' allowtransparency='true'></iframe>
-  
 
 == Code
 You can get all code seen or mentioned in the book in the

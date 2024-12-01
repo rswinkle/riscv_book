@@ -21,7 +21,7 @@ Under the following terms:
 This book is available online in
 https://www.robertwinkler.com/projects/riscv_book/riscv_book.html[HTML],
 https://www.robertwinkler.com/projects/riscv_book/riscv_book.pdf[PDF], and
-https://www.robertwinkler.com/projects/riscv_book/riscv_book.epub[EPUB] form.
+https://www.robertwinkler.com/projects/riscv_book/riscv_book.epub[EPUB] formats.
 
 include::support.adoc[]
 

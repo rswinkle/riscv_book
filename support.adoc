@@ -1,3 +1,4 @@
 
 You can support the book and purchase the chapter exercise solutions
-https://store.robertwinkler.com/[here].
+from https://store.robertwinkler.com/[my store] or
+https://leanpub.com/riscvassemblyprogrammming[Leanpub].

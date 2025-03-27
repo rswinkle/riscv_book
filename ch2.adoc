@@ -44,7 +44,7 @@ a1 = buffer size | works like C's fgets
 | read character | 12 | | a0 = character read
 
 | open file | 1024 | a0 = address of filename +
-$a1 = flags | a0 = file descriptor (negative if error)
+a1 = flags | a0 = file descriptor (negative if error)
 
 | lseek | 62 | a0 = file descriptor, a1 = offset from base, +
 a2 = beginning(0), current(1), or end of the file(2) |

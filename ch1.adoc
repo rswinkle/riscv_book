@@ -20,7 +20,7 @@ in the following table:
 .RISC-V data types
 [cols="1,1,2"]
 |===
-| Directive | Size | C equivalent
+| Directive | Size (bytes) | C equivalent
 
 | .byte | 1 | char
 

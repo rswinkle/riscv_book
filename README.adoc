@@ -21,8 +21,10 @@ You can get all code seen or mentioned in the book in the
 https://github.com/rswinkle/riscv_book/tree/main/code[code] directory.
 
 == Exercise Solutions
-You can support the book by purchasing the chapter exercise solutions at
-https://store.robertwinkler.com/[my store] or at https://leanpub.com/riscvassemblyprogramming[Leanpub].
+You can support the book by purchasing the chapter exercise solutions from
+https://store.robertwinkler.com/[my store], https://leanpub.com/riscvassemblyprogramming[Leanpub],
+or https://rswinkle.itch.io/[itch.io].
+
 
 == Contact Me/Tutoring
 If you're interested in contacting me regarding assembly tutoring or any other

@@ -1838,13 +1838,13 @@ relevant instructions are listed in the following table:</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Branch Greater Than</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">bgt</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">bgt rs1, rs2, label</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">if (rs2 &gt; rs2) goto label</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">if (rs1 &gt; rs2) goto label</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Branch Less Than Or Equal</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">ble</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">ble rs1, rs2, label</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">if (rs1 &#8656; rs2) goto label</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">if (rs1 &lt;= rs2) goto label</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Branch Greater Than Or Equal</p></td>
@@ -4427,7 +4427,7 @@ but here are the most important/useful ones:</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Compare Less Than Equal</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fle.[sd]</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>fle.s rd, rs1, rs2</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">R[rd] = (F[rs1] &#8656; F[rs2]) ? 1 : 0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">R[rd] = (F[rs1] &lt;= F[rs2]) ? 1 : 0</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Absolute Value</p></td>

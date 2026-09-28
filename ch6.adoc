@@ -63,7 +63,7 @@ but here are the most important/useful ones:
 
 | Compare Less Than | flt.[sd] | flt.s rd, rs1, rs2 | R[rd] = (F[rs1] < F[rs2]) ? 1 : 0
 
-| Compare Less Than Equal | fle.[sd] | fle.s rd, rs1, rs2 | R[rd] = (F[rs1] <= F[rs2]) ? 1 : 0
+| Compare Less Than Equal | fle.[sd] | fle.s rd, rs1, rs2 | R[rd] = (F[rs1] \<= F[rs2]) ? 1 : 0
 
 | Absolute Value | fabs.[sd] | fabs.s rd, rs1 | F[rd] = (F[rs1] < 0) ? -F[rs1] : F[rs1]
 

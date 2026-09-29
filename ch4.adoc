@@ -76,7 +76,7 @@ done_loop:
 
 In general it's better to test at the bottom, both because the condition matches
 the higher level form, and because when you know the loop is going to execute at least once it requires
-only one jump + label, rather than 2 since you can forgo the the initial `if` check:
+only one jump + label, rather than 2 since you can forgo the initial `if` check:
 
 [source,c,linenums]
 ----
@@ -170,7 +170,7 @@ bytes to the base address and then loading the element located there.
 
 If you're unfamiliar with the C syntax in the comments, `&` means "address of", so
 `t4` is being set to the address of the _i_'th element.  Actually that C syntax is
-redundant because the the `&` counteracts the brackets.  In C adding a number to a
+redundant because the `&` counteracts the brackets.  In C adding a number to a
 pointer does pointer math (ie it multiplies by the size of the items as discussed
 above).  This means that the following comparison is true:
 

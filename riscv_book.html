@@ -513,8 +513,8 @@ pre.pygments .tok-il { color: #666666 } /* Literal.Number.Integer.Long */
 <div class="details">
 <span id="author" class="author">Robert Winkler</span><br>
 <span id="email" class="email"><a href="mailto:books@robertwinkler.com">books@robertwinkler.com</a></span><br>
-<span id="revnumber">version 1.0.7,</span>
-<span id="revdate">2026-09-28</span>
+<span id="revnumber">version 1.0.8,</span>
+<span id="revdate">2026-09-29</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -2077,7 +2077,7 @@ greater_0:
 <div class="paragraph">
 <p>You can see how the first swaps the order of the actual code which keeps the
 actual conditions the same as in C, while the second does what we discussed
-before and inverts the condition in order keep the the blocks in the same
+before and inverts the condition in order keep the blocks in the same
 order.  In both cases, an extra unconditional branch and label are necessary
 so we don&#8217;t fall through the else case.  This is inefficient and wasteful,
 not to mention complicates the code unecessarily.  Remember how our job
@@ -2911,7 +2911,7 @@ becomes inverted, and you put an unconditional jump at the bottom:</p>
 <div class="paragraph">
 <p>In general it&#8217;s better to test at the bottom, both because the condition matches
 the higher level form, and because when you know the loop is going to execute at least once it requires
-only one jump + label, rather than 2 since you can forgo the the initial <code>if</code> check:</p>
+only one jump + label, rather than 2 since you can forgo the initial <code>if</code> check:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3050,7 +3050,7 @@ bytes to the base address and then loading the element located there.</p>
 <div class="paragraph">
 <p>If you&#8217;re unfamiliar with the C syntax in the comments, <code>&amp;</code> means "address of", so
 <code>t4</code> is being set to the address of the <em>i</em>'th element.  Actually that C syntax is
-redundant because the the <code>&amp;</code> counteracts the brackets.  In C adding a number to a
+redundant because the <code>&amp;</code> counteracts the brackets.  In C adding a number to a
 pointer does pointer math (ie it multiplies by the size of the items as discussed
 above).  This means that the following comparison is true:</p>
 </div>
@@ -3645,7 +3645,7 @@ pass arguments or return results?  All these questions are solved by deciding
 on a "Calling Convention".  It&#8217;s different for different architectures and even
 different operating systems on the same architecture.  This is because different
 architectures have different numbers of registers, and some registers like <code>ra</code> have
-semi-hardcoded uses.  The the pseudoinstruction <code>ret</code> uses <code>ra</code>, and <code>x0</code> is a
+semi-hardcoded uses.  The pseudoinstruction <code>ret</code> uses <code>ra</code>, and <code>x0</code> is a
 constant 0 and there&#8217;s no way to change either of those facts.  That still
 leaves a lot of flexibility when designing a calling convention.  While they
 mostly match, you can probably find several variations of RISC-V calling
@@ -6660,8 +6660,8 @@ the examples to run in Venus.  Hopefully Berkeley will decide to switch to RARS 
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.0.7<br>
-Last updated 2026-09-28 04:29:07 -0700
+Version 1.0.8<br>
+Last updated 2026-09-29 04:00:34 -0700
 </div>
 </div>
 </body>

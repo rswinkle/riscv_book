@@ -179,7 +179,7 @@ greater_0:
 
 You can see how the first swaps the order of the actual code which keeps the
 actual conditions the same as in C, while the second does what we discussed
-before and inverts the condition in order keep the the blocks in the same
+before and inverts the condition in order keep the blocks in the same
 order.  In both cases, an extra unconditional branch and label are necessary
 so we don't fall through the else case.  This is inefficient and wasteful,
 not to mention complicates the code unecessarily.  Remember how our job
